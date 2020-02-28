@@ -1,7 +1,7 @@
 # Jekyll configuration
 
 name: Mateusz Myalski
-description: A real OS fits in a floppy disk,
+description: A real OS fits in a floppy disk.
 
 # url is currently only used only for the RSS feed in feed.xml
 url: https://scotte.github.io/jekyll-clean
