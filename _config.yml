@@ -27,5 +27,4 @@ github_username:  jekyll
 # Build settings
 plugins:
   - jekyll-remote-theme
-
-remote_theme: heiswayi/the-plain
+remote_theme: fongandrew/hydeout
