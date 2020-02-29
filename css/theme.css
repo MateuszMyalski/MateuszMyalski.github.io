@@ -44,8 +44,8 @@ body {
 
 .well p img {
     max-width: 100%;
-    float: left;
-    margin-right: 5%;
+    display: block;
+    margin: 0 auto;
 }
 
 .author {
