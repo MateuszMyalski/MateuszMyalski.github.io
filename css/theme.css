@@ -42,6 +42,10 @@ body {
     font-size: 1.3em;
 }
 
+.well p img {
+    max-width: 100%;
+}
+
 .author {
     color: #ee4444;
 }
