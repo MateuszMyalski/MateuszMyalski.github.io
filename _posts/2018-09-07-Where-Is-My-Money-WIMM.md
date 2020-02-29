@@ -1,10 +1,11 @@
 ---
 layout: post
 title: "Where Is My Money WIMM"
+date: 2018-09-07
 ---
 # Where Is My Money - WIMM
 
-![WIMM](_articles/assets/wimm/WIMM.png) Monitorowanie swojego budżetu czasami wymaga, podzielenie go na subkonta, będące jednak praktycznie wciąż całością jednego konta bankowego. Nie znajdując odpowiedniej aplikacji, która potrafiłaby tą rzecz postanowiłem, że jako jeden ze swoich pierwszych projektów podczas nauki języka Python stworzę aplikację umożliwiającą śledzenie domowego budżetu uwzględniając jednocześnie możliwość posiadania różnych kont bankowych i **subkont**.
+![WIMM](/images/wimm/WIMM.png) Monitorowanie swojego budżetu czasami wymaga, podzielenie go na subkonta, będące jednak praktycznie wciąż całością jednego konta bankowego. Nie znajdując odpowiedniej aplikacji, która potrafiłaby tą rzecz postanowiłem, że jako jeden ze swoich pierwszych projektów podczas nauki języka Python stworzę aplikację umożliwiającą śledzenie domowego budżetu uwzględniając jednocześnie możliwość posiadania różnych kont bankowych i **subkont**.
 
 Wykorzystałem standardową bibliotekę graficzną, którą oferuje Python w swoim zestawie - Tkinter. Same walory estetyczne nie są porażające, aczkolwiek wielkim atutem tej biblioteki jest sama prostota użycia. Aplikacja przechowuje swoje dane w lokalnej bazie SQLite, przed niepowołanym dostępem zabezpiecza ją prosty formularz logowania. 
 
@@ -14,4 +15,4 @@ Program wykrywa automatycznie bazy danych umieszczone w tym samym pliku co plik 
 
 *Osobiście bazę danych jak i sam program umieszczam na dysku Google, a na pulpicie tworzę jedynie skrót do programu, to pozwala na bardzo łatwą synchronizację baz danych pomiędzy różnymi urządzeniami.*
 
-*Aktualnie projekt nie rozwijany dalej.*
+*Aktualnie projekt nierozwijany dalej.*

@@ -1,14 +1,15 @@
 ---
 layout: post
 title: "Eksperyment przetwornicy z udziałem AVR"
+date: 2018-06-20
 ---
 # Eksperyment - przetwornica na AVR
 
 ## Wstęp
-![](_articles/assets/przetwornica/uklad.png)Robiąc małą inwentaryzację częsci, które plątały mi się po szafce, w moje ręce wpadła mała cewka. Do mojej głowy natychmiast wpadł pomysł wykorzystania jej do zrobienia prostego eksperymentu, który może przybliżyć mi problemy jakie można napotkać podczas projektowania przetwornicy. Postanowiłem wykorzystać mikrokontroler AVR, a dokładnie _ATTiny45_, aby kluczować tranzystor i utrzymywać zadane napięcie. Jako, że jest to mój pierwszy projekt dotyczący "zasilania" korzystający z techniki impulsowej, chciałem zdobyć odrobinę pojęcia o tym, w jaki sposób taki układ może się zachowywać.
+![](/images/przetwornica/uklad.png)Robiąc małą inwentaryzację częsci, które plątały mi się po szafce, w moje ręce wpadła mała cewka. Do mojej głowy natychmiast wpadł pomysł wykorzystania jej do zrobienia prostego eksperymentu, który może przybliżyć mi problemy jakie można napotkać podczas projektowania przetwornicy. Postanowiłem wykorzystać mikrokontroler AVR, a dokładnie _ATTiny45_, aby kluczować tranzystor i utrzymywać zadane napięcie. Jako, że jest to mój pierwszy projekt dotyczący "zasilania" korzystający z techniki impulsowej, chciałem zdobyć odrobinę pojęcia o tym, w jaki sposób taki układ może się zachowywać.
 
 Postanowiłem zbudować konwerter napięcia z 5V na 12V. Przystępując do projektowania, było dla mnie oczywistym, że upraszczając układ do ośmiobitowego sterownika nie można mieć wygórowanych marzeń. Układy takie, najlepiej realizuje się korzystając z dedykowanych układów scalonych, które doskonale radzą sobie z takim zadaniem.
-Układ ograniczyłem do minimum, jego schemat jest wręcz wyjęty wprost z podręczników do elektroniki. Jako tranzystor kluczyjący wybór padł na **IRF540**, dioda to element z odzysku o symbolu - **BA 159**. **Indukcyjność cewki około 100mH** - jako że element pozbawiony jest wszelkich oznaczeń, a nie posiadam urządzenia do zmierzenia tej wartości - wartość została oszacowana poprzez liczbę zwoi i wymiary elementu. Postanowiłem zabezpieczyć wejście ADC uC poprzez prosty dzielnik rezystorowy, który w przypadku nadmiernego napięcia wejściowego nie pozwoli, aby na wejściu ADC pojawiło się napięcie większe niż 5V.
+Układ ograniczyłem do minimum, jego schemat jest wręcz wyjęty wprost z podręczników do elektroniki. Jako tranzystor kluczujący wybór padł na **IRF540**, dioda to element z odzysku o symbolu - **BA 159**. **Indukcyjność cewki około 100mH** - jako że element pozbawiony jest wszelkich oznaczeń, a nie posiadam urządzenia do zmierzenia tej wartości - wartość została oszacowana poprzez liczbę zwoi i wymiary elementu. Postanowiłem zabezpieczyć wejście ADC uC poprzez prosty dzielnik rezystorowy, który w przypadku nadmiernego napięcia wejściowego nie pozwoli, aby na wejściu ADC pojawiło się napięcie większe niż 5V.
 
 ## Praktyczna strona projektu
 Elementy w tym projekcie absolutnie nie są krytyczne. Dodatkowo podkreślam, że jest to układ **WYŁĄCZNIE** edukacyjny i w takiej formie nie powinien być wykorzystywany w praktycznych rozwiązaniach. Co najważniejsze, układowi brak jakiegokolwiek zabezpieczenia _nadprądowego_ i wartości _napięcia wyjściowego_.
@@ -63,7 +64,8 @@ W załączniku przedstawiam algorytm, który ilustruje działanie programu.
 
 ## Ogólna budowa
 Dokładny schemat urządzenia, wykonany w programie KiCad znajduje się w załączniku. W budowie przetwornicy zastosowałem cewkę z rdzeniem ferrytowym, której indukcyjność to około 100 μH. Element ten nie jest przystosowany do pracy przy dużych prądach z powodu małej średnicy drutu użytego w uzwojeniu, przekłada się to na obciążalność wyjściową przetwornicy, która nie jest wysoka.
-	Wykorzystany został jeden kanał ADC mikrokontrolera, którego rozdzielczość wynosi 10 bitów (±2 bity). Wejście pomiarowe zabezpieczone dzielnikiem napięciowym, składającym się z 100kΩ  i 1kΩ, umożliwia to podanie maksymalnego napięcia na wejście kanału pomiarowego o wartości większej niż 50V. Za napięcie odniesienia używane jest wewnętrzne źródło mikrokontrolera, które według noty katalogowej wynosi 2,56V. Częstotliwość próbkowania napięcia ustawiona została na 250kHz. Częstotliwość kluczowania tranzystora MOSFET ustawione na około 20kHz z wypełnieniem od 1% do około 98%. Na procesor podawany jest sygnał z rezonatora kwarcowego o wartości 16Mhz. Użycie zewnętrznego zegara nie było konieczne, aczkolwiek w celu minimalnej poprawy stabilności próbkowania został on zastosowany w układzie.
+
+Wykorzystany został jeden kanał ADC mikrokontrolera, którego rozdzielczość wynosi 10 bitów (±2 bity). Wejście pomiarowe zabezpieczone dzielnikiem napięciowym, składającym się z 100kΩ  i 1kΩ, umożliwia to podanie maksymalnego napięcia na wejście kanału pomiarowego o wartości większej niż 50V. Za napięcie odniesienia używane jest wewnętrzne źródło mikrokontrolera, które według noty katalogowej wynosi 2,56V. Częstotliwość próbkowania napięcia ustawiona została na 250kHz. Częstotliwość kluczowania tranzystora MOSFET ustawione na około 20kHz z wypełnieniem od 1% do około 98%. Na procesor podawany jest sygnał z rezonatora kwarcowego o wartości 16Mhz. Użycie zewnętrznego zegara nie było konieczne, aczkolwiek w celu minimalnej poprawy stabilności próbkowania został on zastosowany w układzie.
 
 ## Pomiary
 - Urządzenia użyte do wykonania pomiarów:
@@ -71,7 +73,7 @@ Dokładny schemat urządzenia, wykonany w programie KiCad znajduje się w załą
 - Multimetr – UNI-T M890G
 - Oscyloskop – GW INSTEK GDS-1072A-U
 
-![](_articles/assets/przetwornica/tabela.jpg)Jak widać, obciążalność, jak i sama sprawność przetwornicy jest tragiczna. Nie można jednakże powiedzieć, że idea jest wadliwa, ponieważ uzyskaliśmy pożądane napięcie wyjściowe.
+![](/images/przetwornica/tabela.jpg)Jak widać, obciążalność, jak i sama sprawność przetwornicy jest tragiczna. Nie można jednakże powiedzieć, że idea jest wadliwa, ponieważ uzyskaliśmy pożądane napięcie wyjściowe.
 
 ## Załączniki
 - Schemat [PDF][a6d5ede6]

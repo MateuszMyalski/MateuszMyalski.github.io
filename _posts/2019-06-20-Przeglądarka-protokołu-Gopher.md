@@ -1,9 +1,10 @@
 ---
 layout: post
-title: "Przeglądarka protokołu Gopher"
+title: "Windows Gopher Client"
+date: 2019-06-20
 ---
 # Windows Gopher Client
-![](_articles/assets/gopher/Main_Window.JPG)
+![](/images/gopher/Main_Window.JPG)
 W czasach, gdy internet dopiero raczkował wymiana treściami pomiędzy osobami była nieco utrudniona. Sposoby przesyłania plików były na tyle skomplikowane, że tylko nieliczni potrafili robić to korzystając z konsolowych poleceń. Nie wspominając nawet o wymianie całych katalogów. Tak powstał protokół Gopher, stworzony przez Mark P. McCahill na Uniwersytecie w Minnesocie.
 
 Głównym zamiarem tej kreacji było umożliwienie prostej wymiany i przeglądania plików innych użytkowników. Generatory stron miał składać się tylko z nielicznych tagów tekstowych (podobnie zresztą jak HTML, jednak z dużo bardziej uboższą ich ilością), strona miała być lekka i mieć hierarchiczną budowę.
@@ -22,7 +23,7 @@ Have Fun!
 
 
 
-[Repozytorium Git](https://MateuszWaldemarMyalski@bitbucket.org/MateuszWaldemarMyalski/windows-gopher-client.git)
+[Repozytorium Git](https://github.com/MateuszMyalski/windows-gopher-client)
 
 
 
