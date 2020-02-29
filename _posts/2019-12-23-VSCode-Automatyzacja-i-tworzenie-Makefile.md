@@ -34,7 +34,7 @@ Warto zaznaczyć, że znaki białe są dosyć istotne w tego typu plików.
 
 Następnie określmy parę zmiennych, które ułatwią nam uniwersalizację poleceń wydawanych kompilatorowi.
 
-```
+```makefile
 # -*- MakeFile -*-
 CC = gcc#					 Informacja o tym, jakiego kompilatora używamy
 BUILDPATH = build#			 Ścieżka do folderu, gdzie będą generowane pliki .o
@@ -48,7 +48,7 @@ Aby odwołać się potem do zmiennych wpisujemy: `$(nazwa_zmiennej)`.
 
 Zacznijmy pisać pierwszą zależność. Struktura podprogramów wygląda następująco:
 
-```
+```makefile
 etykieta: zależności
 	instrukcje do wykonania
 ```
@@ -56,7 +56,7 @@ etykieta: zależności
 Etykieta, jak sama nazwa wskazuje - nazywa dany blok skryptu. Zależności określają nam, jakie podprogramy muszą zostać wykonane wcześniej, nim przejdziemy do wykonywania instrukcji. Przybliżmy do przykładem.
 Wykonujemy polecenie `mingw32-make Makefile AAA`, w pliku make mamy następujący kod:
 
-```
+```makefile
 # -*- MakeFile -*-
 AAA: BBB.o CCC.o
 	instrukcja1
@@ -70,7 +70,7 @@ Wywołujemy początkowo etykietę AAA, podprogram ten ma dwie zależności BBB.o
 
 Wróćmy do pisania naszego prawdziwego makefile. Potrzebujemy skompilować główny kod programu, zawarty w pliku `main.c`, program korzysta z zewnętrznie dostarczonej funkcji, opisanej w pliku `utilfunc.c`. Potrzebujemy, więc dokonać kompilacji tych dwóch plików. Robiąc to ręcznie napisalibyśmy kolejno:
 
-```
+```makefile
 gcc -g -Wall -c main.c -o build/main.o
 gcc -g -Wall -c utilfunc.c -o build/utilfunc.o
 gcc -g -Wall build/main.o build/utilfunc.o -o main
@@ -86,7 +86,7 @@ Pamiętajmy, że zostanie zamienione :
 - BUILDPATH na "build"
 - OUTFILENAME na "main"
 
-```
+```makefile
 main: main.o utilfunc.o
 	$(CC) $(DEBUGFLAGS) $(BUILDPATH)/main.o $(BUILDPATH)/utilfunc.o -o $(OUTFILENAME) 
 
@@ -102,7 +102,7 @@ Jak sam widzisz, całe składanie gotowego pliku wykonawczego, musi zostać popr
 
 Dodajmy jeszcze możliwość czyszczenia plików wygenerowanych w folderze `build`
 
-```
+```makefile
 clean:
 	del -f $(BUILDPATH)\*.o
 ```
@@ -110,7 +110,7 @@ clean:
 *Ścieżki plików w makefile podajemy korzystając z '/', a ścieżki dla poleceń w wierszu poleceń (Windows) '\\'*.
 Cały gotowy `Makefile`powinien prezentować się następująco:
 
-```
+```makefile
 # -*- MakeFile -*-
 CC = gcc#					Informacja o tym, jakiego kompilatora używamy
 BUILDPATH = build#			Ścieżka do folderu, gdzie będą generowane pliki .o
@@ -151,7 +151,7 @@ Rozpocznijmy od otwarcia naszego folderu z projektem w VSCode. Następnie, klika
 
 Wklejamy poniższą zawartość do pliku:
 
-```
+```json
 {
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
@@ -192,7 +192,7 @@ Co możemy zmienić:
 Czas na automatyzację wykonania pliku Makefile.
 W utworzonym folderze .vscode dodajemy plik `tasks.json` i wklejamy do niego zawartość:
 
-```
+```json
 {
     "version": "2.0.0",
     "tasks": [
@@ -221,7 +221,7 @@ Następnie, aby rozpocząć debugowanie `F5`.
 
 Jeżeli chcemy, aby przed każdym uruchomieniem programu wykonywana była kompilacja, w pliku `launch.json` dodajemy linijkę:
 
-```
+```json
 "preLaunchTask": "Build"
 ```
 
