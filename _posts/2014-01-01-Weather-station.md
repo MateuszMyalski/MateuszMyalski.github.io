@@ -4,8 +4,7 @@ title: "Weather station"
 date:   2014-01-01
 ---
 # Weather Station
-![Main picture](/images/weather_station/main.jpg)
-As my first project to dive into uC proramming is based on Atmega328P with Arduino bootloader. The main target of this device is to have some basic information about the climat (Humidity, Temperature, Atmospheric Pressure).
+![Main picture](/images/weather_station/main.jpg)As my first project to dive into uC proramming is based on Atmega328P with Arduino bootloader. The main target of this device is to have some basic information about the climat (Humidity, Temperature, Atmospheric Pressure).
 I have created two kinds of this project. One built-up in the wall and one as stand alone device.
 I had a need to control brightness of LEDs stripe behind the TV so I decided to include this feature by using simple MOSFET driver.
 
@@ -14,8 +13,7 @@ The display shows one parameter at the time. The delay time to switch to another
 LCD is controlled with the shift register (74HC595) to save microcontroller`s pins.
 
 ## Fit the LEDs brightness to the room lightening.
-![TV](/images/weather_station/TV.PNG)
-To have LED strip behind my TV I thought it is important to not have too bright light there. I decided to measure the lighting in the room and create proper duty cycle of PWM.
+![TV](/images/weather_station/TV.PNG)To have LED strip behind my TV I thought it is important to not have too bright light there. I decided to measure the lighting in the room and create proper duty cycle of PWM.
 In my opinion this operation creates nice shadows that highlight the TV`s slot in the wall.
 
 Sensors I have used.
