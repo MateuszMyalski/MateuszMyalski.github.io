@@ -1,14 +1,23 @@
 {% include header.html %}
 
-<div class="container container-left">
-    <div class="row">
-        <div class="col-md-3 hidden-xs">
-            {% include sidebar.html %}
+<div id="main_wrapper">
+    <div id="left">
+        <h1>Mateusz Myalski</h1>
+        <h2>The real OS fits in a floppy disk.</h2>
+        <div class="spacer">
+
         </div>
-        <div class="col-md-9">
-            {{ content }}
-        </div>
+        <ul id="nav">
+            <li id="active"><a href="{{ site.baseurl }}/about.html">About</a></li>
+            <li><a href="https://linkedin.com/in/mateuszmyalski">LinkedIn</a></li>
+            <li><a href="{{ site.baseurl }}/tutorials.html">Tutorials</a></li>
+            <li><a href="{{ site.baseurl }}/projects.html">Projects</a></li>
+            <li><a href="{{ site.baseurl }}/lifestyle.html">Life style</a></li>
+            <li><a href="https://github.com/mateuszmyalski">Github</a></li>
+        </ul>
+    </div>
+    <div class="right">
+        {{ content }}
     </div>
 </div>
-
 {% include footer.html %}
