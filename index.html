@@ -2,53 +2,28 @@
 layout: default
 ---
 
-
 <div id="posts">
   <ul>
-    <li><a href="">POST TITLE</a><span class="date">2020-01-01</span></li>
-    <li><a href="">POST TITLE</a><span class="date">2020-01-01</span></li>
-    <li><a href="">POST TITLE</a><span class="date">2020-01-01</span></li>
-    <li><a href="">POST TITLE</a><span class="date">2020-01-01</span></li>
-    <li><a href="">Lorem ipsum dolor, sit amet consectetur adipisicing elit.</a><span class="date">2020-01-01</span>
-    </li>
-    <li><a href="">POST TITLE</a><span class="date">2020-01-01</span></li>
+    {% for post in paginator.posts %}
+    <li><a href="{{ site.baseurl}}{{ post.url }}">{{ post.title }}</a><span class="date">{{ post.date | date: "%Y %b, %-d" }}</span></li>
+    {% endfor %}
   </ul>
 </div>
 
 <div id="list_nav">
-  <div class="prev"><a href="">[10]</a></div>
-  <div class="next"><a href="">[11]</a></div>
-</div>
-
-<!-- 
-{% for post in paginator.posts %}
-<div class="article">
-    <div class="well">
-        <h1><a href="{{ site.baseurl}}{{ post.url }}">{{ post.date | date: "%b %-d, %Y" }} - {{ post.title }}</a></h1>
-        {% if site.comments and post.comments %}
-            {% if site.disqus != '' %}
-            <p class="author"><a href="{{ site.baseurl }}{{ post.url }}/#disqus_thread" data-disqus-identifier="{{ post.url | slugify }}">Comments</a></p>
-            {% elsif site.isso != '' %}
-            <p class="author"><a href="{{ site.baseurl }}{{ post.url }}{{ site.isso_suffix }}#isso-thread">Comments</a></p>
-            {% endif %}
-        {% endif %}
-        <div class="content">
-            {{ post.content }}
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-<div class="pagination">
   {% if paginator.previous_page %}
-      {% if paginator.previous_page == 1 %}
-        <a class="btn btn-default" href="{{ site.baseurl}}/index.html" class="previous">Newer</a>
-      {% else %}
-        <a class="btn btn-default" href="{{ site.baseurl}}/page{{ paginator.previous_page }}" class="previous">Newer</a>
-      {% endif %}
+  <div class="prev">
+    {% if paginator.previous_page == 1 %}
+    <a href="{{ site.baseurl}}/index.html">[{{ paginator.previous_page }}]</a>
+    {% else %}
+    <a href="{{ site.baseurl}}/page{{ paginator.previous_page }}">[{{ paginator.previous_page }}]</a>
+    {% endif %}
+  </div>
   {% endif %}
-  <span class="page_number ">Page: {{ paginator.page }} of {{ paginator.total_pages }}</span>
+
   {% if paginator.next_page %}
-    <a class="btn btn-default" href="{{ site.baseurl}}/page{{ paginator.next_page }}" class="next">Older</a>
+  <div class="next">
+    <a href="{{ site.baseurl}}/page{{ paginator.next_page }}">[{{ paginator.next_page }}]</a>
+  </div>
   {% endif %}
-</div> -->
+</div>
