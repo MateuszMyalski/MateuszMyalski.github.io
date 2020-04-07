@@ -3,9 +3,9 @@ layout: default
 ---
 
 <div class="article">
-        <h3>{{ date | date: "%Y %b, %-d" }} | {{#each categories}}#{{.}}{{/each}}</h3>
+        <h3>{{ page.date | date: "%Y %b, %-d" }} | {{#each page.categories}}#{{.}}{{/each}}</h3>
         <div class="content">
-            {{ content }}
+            {{ page.content }}
         </div>
     </div>
 </div>
