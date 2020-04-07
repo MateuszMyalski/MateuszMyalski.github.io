@@ -2,6 +2,7 @@
 layout: post
 title: "Counter module - auto up, down"
 date: 2016-03-23
+categories: [projects]
 ---
 # Counter module - auto up/down counting
 ![Main picture](/images/counter/main_low.png)

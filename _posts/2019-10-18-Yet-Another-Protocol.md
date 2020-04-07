@@ -2,6 +2,7 @@
 layout: post
 title: "Yet Another Protocol"
 date: 2019-10-18
+categories: [projects]
 ---
 # Yet Another Protocol - YAP
 

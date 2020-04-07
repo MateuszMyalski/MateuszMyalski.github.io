@@ -2,6 +2,7 @@
 layout: post
 title: "Multivibrator test station"
 published: false
+categories: [projects]
 ---
 #Test station - Multivibrator
 ![Main board](_articles/assets/multivibrator/multivibrator_side_low.jpg)

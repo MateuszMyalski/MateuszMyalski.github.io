@@ -2,6 +2,7 @@
 layout: post
 title: "Eksperyment przetwornicy z udziałem AVR"
 date: 2018-06-20
+categories: [projects]
 ---
 # Eksperyment - przetwornica na AVR
 

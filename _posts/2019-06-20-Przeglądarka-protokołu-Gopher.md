@@ -2,6 +2,7 @@
 layout: post
 title: "Windows Gopher Client"
 date: 2019-06-20
+categories: [projects]
 ---
 # Windows Gopher Client
 ![](/images/gopher/Main_Window.JPG)

@@ -2,6 +2,7 @@
 layout: post
 title: "Weather station"
 date:   2014-01-01
+categories: [projects]
 ---
 # Weather Station
 ![Main picture](/images/weather_station/main.jpg)As my first project to dive into uC proramming is based on Atmega328P with Arduino bootloader. The main target of this device is to have some basic information about the climat (Humidity, Temperature, Atmospheric Pressure).
