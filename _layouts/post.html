@@ -2,10 +2,10 @@
 layout: default
 ---
 
-<div class="article">
-        <h3>{{ page.date | date: "%Y %b, %-d" }} | {{#each page.categories}}#{{.}}{{/each}}</h3>
+<div class="article">  
+        <h3>{{ page.date | date: "%Y %b, %-d" }} | {% for tag in page.tags %}#{{ tag }}{% endfor %}</h3>
         <div class="content">
-            {{ page.content }}
+            {{ content }}
         </div>
     </div>
 </div>
