@@ -2,7 +2,7 @@
 layout: post
 title: "Elektroniczna kukułka"
 date: 2019-09-17
-categories: [projects]
+tags: [projects]
 ---
 # Elektroniczna kukułka
 

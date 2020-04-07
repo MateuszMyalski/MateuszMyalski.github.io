@@ -2,7 +2,7 @@
 layout: post
 title: "Test station - Counter CD40192"
 date: 2015-03-21
-categories: [projects]
+tags: [projects]
 ---
 # Test station - Counter CD40192
 ![Main device](/images/CD40192/counter_low.png)

@@ -2,7 +2,7 @@
 layout: post
 title: "Feed the birds - symulacja z biblioteką p5 JavaScript"
 date: 2018-05-20
-categories: [projects, tutorials]
+tags: [projects, tutorials]
 ---
 # Feed the birds - symulacja z biblioteką p5 JavaScript
 

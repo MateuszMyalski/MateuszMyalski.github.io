@@ -9,7 +9,9 @@ layout: default
     {% endfor %}
   </ul>
 </div>
-
+{% for tag in tags %}
+	<a href="#{{ tag | slugify }}"> {{ tag }} </a>
+{% endfor %}
 <div id="list_nav">
   {% if paginator.previous_page %}
   <div class="prev">

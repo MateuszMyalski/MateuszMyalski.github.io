@@ -2,7 +2,7 @@
 layout: post
 title: "Where Is My Money WIMM"
 date: 2018-09-07
-categories: [projects]
+tags: [projects]
 ---
 # Where Is My Money - WIMM
 

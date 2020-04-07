@@ -38,15 +38,3 @@ markdown: kramdown
 gems: ['jekyll-paginate']
 
 exclude: ['README.md', 'LICENSE']
-
-collections:
-  category:
-    output: true
-
-defaults:
-  -
-    scope:
-      path: ""
-      type: category
-    values:
-      layout: "category"

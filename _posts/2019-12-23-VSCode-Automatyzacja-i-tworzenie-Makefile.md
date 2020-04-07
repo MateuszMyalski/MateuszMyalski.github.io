@@ -2,7 +2,7 @@
 layout: post
 title: "VSCode Automatyzacja i tworzenie Makefile"
 date: 2019-12-23
-categories: [tutorials]
+tags: [tutorials]
 ---
 # VSCode Minimalistyczna konfiguracja (MinGW & Makefile & GDB)
 

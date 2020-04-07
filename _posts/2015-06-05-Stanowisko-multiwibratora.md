@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Stanowisko pomiarowe multiwibratora astabilnego"
-categories: [projects]
+tags: [projects]
 ---
 # Stanowisko pomiarowe multiwibratora astabilnego
 ![Main board](/images/multivibrator/multivibrator_side_low.jpg)

@@ -2,7 +2,7 @@
 layout: post
 title: "Samochodowe światła ostrzegawcze"
 date: 2016-05-03
-categories: [projects]
+tags: [projects]
 ---
 # Samochodowe światła ostrzegawcze
 ![Board](/images/blinker/main_low.jpg) Układ świateł ostrzegawczych, które mają służyć, jako dodatkowa sygnalizacja postoju samochodu dostawczego. W założeniu miały być dwa pomarańczowe panele na przodzie samochodu i jedno na tylnych drzwiach. Jako, że miejsca na układ było bardzo dużo, a klient chciał mieć możliwość ewentualnej zmiany częstotliwości, czy kolejności świecenia diod, postanowiłem wykorzystać dwa układy scalone. NE555 i DC4017.
