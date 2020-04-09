@@ -127,13 +127,16 @@ html {
     margin-top: 1vh;
     padding: 10px;
     width: 140px;
- 
+	-moz-transition: background-color 300ms ease-in-out 0s;
+	-ms-transition: background-color 300ms ease-in-out 0s;
+	-o-transition: background-color 300ms ease-in-out 0s;
+	-webkit-transition: background-color 300ms ease-in-out 0s;
+	transition: background-color 300ms ease-in-out 0s;
 }
 
 #nav li#active {
 	background: white;
 	margin-right: 0;
-    
 }
 
 #nav li a:visited, 
@@ -350,7 +353,6 @@ tr:hover {
   background-color: #fff176; /* Change the hover background-color of rows here */
 }
 
-
 tr {
   border-top: 1px solid #cccccc;
   border-bottom: 1px solid #cccccc;
@@ -359,3 +361,16 @@ tr {
 th, td {
   border: none;
 }
+
+pre {
+	font-family: Courier New;
+	line-height: 1.5em;
+	font-size: 0.8em;
+    border: 1px solid #CDCDCD;
+    white-space: pre-wrap;
+    word-break: keep-all;
+    width: 100%;
+    padding: 1em 0.5em;
+    background-color: #FAFAFA !important;
+}
+
