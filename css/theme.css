@@ -381,7 +381,7 @@ pre {
 		padding: 0;
 		width: 90%;
 		margin: 0 auto;
-		overflow: hidden;
+/* 		overflow: hidden; */
 	}
 
     #left h1 {
@@ -395,13 +395,18 @@ pre {
     }
 
     #left ul {
-    	width: 100%;
+    	width: 90%;
+    	margin: 0 auto;
     }
 
     #left li {
     	margin: 0 auto;
     	text-align: center;
-    	width: 100%;
+    	width: inherit;
+    }
+
+    #left li#active {
+    	margin-right: auto;
     }
 
     #left li:hover{
@@ -417,5 +422,8 @@ pre {
 	    width: 90%;
 	    min-width: 90%;
         max-width: unset;
+	}
+	* {
+		outline: 1px solid red;
 	}
 }
