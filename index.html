@@ -31,6 +31,20 @@ The following part removes dulpicated tags and invalid tags like blank tag.
 	{% endif %}
 {% endfor %}
 
+{% for tag in tags %}
+	<h2 id="{{ tag | slugify }}">{{ tag }}</h2>
+	<ul>
+	 {% for post in site.posts %}
+		 {% if post.tags contains tag %}
+		 <li>
+		 <a href="{{ post.url }}">{{ post.title }}</a><span class="date">{{ post.date | date: "%Y %b, %-d" }}</span>
+		 </li>
+		 {% endif %}
+	 {% endfor %}
+	</ul>
+{% endfor %}
+
+
 <div id="posts">
   <ul>
     {% for post in paginator.posts %}
@@ -38,9 +52,6 @@ The following part removes dulpicated tags and invalid tags like blank tag.
     {% endfor %}
   </ul>
 </div>
-{% for tag in tags %}
-	<a href="#{{ tag | slugify }}"> {{ tag }} </a>
-{% endfor %}
 <div id="list_nav">
   {% if paginator.previous_page %}
   <div class="prev">
