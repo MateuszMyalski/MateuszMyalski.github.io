@@ -33,40 +33,11 @@ The following part removes dulpicated tags and invalid tags like blank tag.
 {% endfor %}
 
 <div id="posts">
-  <ul>
-    {% for tag in tags %}
-    <h2 id="{{ tag | slugify }}">{{ tag }}</h2>
     <ul>
       {% for post in site.posts %}
       {% if post.tags contains "projects" %}
-      <li>
-        <a href="{{ post.url }}">{{ post.title }}</a><span class="date">{{ post.date | date: "%Y %b, %-d" }}</span>
-      </li>
+      <li><a href="{{ post.url }}">{{ post.title }}</a><span class="date">{{ post.date | date: "%Y %b, %-d" }}</span></li>
       {% endif %}
       {% endfor %}
     </ul>
-    {% endfor %}
-
-    {% for post in paginator.posts %}
-    <li><a href="{{ site.baseurl}}{{ post.url }}">{{ post.title }}</a><span
-        class="date">{{ post.date | date: "%Y %b, %-d" }}</span></li>
-    {% endfor %}
-  </ul>
-</div>
-<div id="list_nav">
-  {% if paginator.previous_page %}
-  <div class="prev">
-    {% if paginator.previous_page == 1 %}
-    <a href="{{ site.baseurl}}/index.html">[{{ paginator.previous_page }}]</a>
-    {% else %}
-    <a href="{{ site.baseurl}}/page{{ paginator.previous_page }}">[{{ paginator.previous_page }}]</a>
-    {% endif %}
-  </div>
-  {% endif %}
-
-  {% if paginator.next_page %}
-  <div class="next">
-    <a href="{{ site.baseurl}}/page{{ paginator.next_page }}">[{{ paginator.next_page }}]</a>
-  </div>
-  {% endif %}
 </div>
