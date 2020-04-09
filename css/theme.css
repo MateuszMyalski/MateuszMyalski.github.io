@@ -374,3 +374,48 @@ pre {
     background-color: #FAFAFA !important;
 }
 
+@media only screen and (max-width: 1080px) {
+	#left {
+		position: initial;
+		height: fit-content;
+		padding: 0;
+		width: 90%;
+		margin: 0 auto;
+		overflow: hidden;
+	}
+
+    #left h1 {
+    	margin: 0 auto;
+   
+    }
+
+    #left h2 {
+    	margin: 1em auto;
+    	text-align: center;
+    }
+
+    #left ul {
+    	width: 100%;
+    }
+
+    #left li {
+    	margin: 0 auto;
+    	text-align: center;
+    	width: 100%;
+    }
+
+    #left li:hover{
+    	margin: 0 auto;
+    }
+    
+    #left .spacer {
+    	margin: 0;
+    }
+
+	#right {
+	    margin: 0 auto;
+	    width: 90%;
+	    min-width: 90%;
+        max-width: unset;
+	}
+}
