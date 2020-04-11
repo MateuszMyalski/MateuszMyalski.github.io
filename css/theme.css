@@ -423,7 +423,5 @@ pre {
 	    min-width: 90%;
         max-width: unset;
 	}
-	* {
-		outline: 1px solid red;
-	}
+
 }
