@@ -4,10 +4,10 @@ title: "Feed the birds - symulacja z biblioteką p5 JavaScript"
 date: 2018-05-20
 tags: [projects, tutorials]
 ---
-# Feed the birds - symulacja z biblioteką p5 JavaScript
-
 ## Wstęp
-![](/images/feedthebirds/p5.png)Pogłębiając wiedzę z języka JavaScript wpadła mi w ręce bardzo ciekawa biblioteka. Chcąc zaczerpnąc odrobinę odpoczynku od elektroniki, skusiłem się zajrzeć do zawartości biblioteki pod nazwą **p5**. Możliwości jakie p5 daje można wymieniać w nieskończoność. Przykłady, wykorzystania tej biblioteki można znaleźć na stronie, jak i w bardzo ciekawy sposób zaprezentowane na kanale youtube Coding Train. Ja postanowiłem stworzyć symulator karmienia ptaków.
+![](/images/feedthebirds/p5.png)
+
+Pogłębiając wiedzę z języka JavaScript wpadła mi w ręce bardzo ciekawa biblioteka. Chcąc zaczerpnąc odrobinę odpoczynku od elektroniki, skusiłem się zajrzeć do zawartości biblioteki pod nazwą **p5**. Możliwości jakie p5 daje można wymieniać w nieskończoność. Przykłady, wykorzystania tej biblioteki można znaleźć na stronie, jak i w bardzo ciekawy sposób zaprezentowane na kanale youtube Coding Train. Ja postanowiłem stworzyć symulator karmienia ptaków.
 
 ## Założenia
 Generować losowe obiekty, które są ptakami, a ptaki mają być łase na karmę, którą użytkownik rzuca na planszę. Ptak leci do najbliżeszgo ziarenka, zjada je i następnie (gdy nie ma już pokarmu na ekranie) odlatuje. Ptaszek im więcej zje tym większy się staje.

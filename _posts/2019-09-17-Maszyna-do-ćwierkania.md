@@ -4,12 +4,14 @@ title: "Elektroniczna kukułka"
 date: 2019-09-17
 tags: [projects]
 ---
-# Elektroniczna kukułka
+![main](/images/maszyna_do_cwierkania/main.jpg)
 
-![main](/images/maszyna_do_cwierkania/main.jpg)W wolnym czasie realizuję zadania zlecone przez znajomych. Ostatnio zostałem poproszony o stworzenie układu elektronicznej kukułki, która ma działać wraz ze stajenką Bożonarodzeniową. 
+W wolnym czasie realizuję zadania zlecone przez znajomych. Ostatnio zostałem poproszony o stworzenie układu elektronicznej kukułki, która ma działać wraz ze stajenką Bożonarodzeniową. 
 
 W mojej miejscowości posiadamy bardzo dużą wystawną stajenkę, jako że układy działające tam mają już za sobą szmat czasu nastała pora na wymianę jednej z jej części. Niestety jej stara elektronika powoli pada i należało odtworzyć pewne układy. Zerknąwszy co posiadam aktualnie w swoim warsztacie udało mi się złożyć działający układ, który realizuje zadaną funkcję. Całość oparta na module **ISD1820** wraz z przedwzmacniaczem, wzmacniaczem i układem zasilającym. 
+
 ![main](/images/maszyna_do_cwierkania/inside.jpg)
+
 Podchodząc do zadania starałem się znaleźć gotowe rozwiązanie, niestety nic oprócz dość sporych układów wykorzystujących generowanie dwóch częstotliwości nie znalazłem. Postanowiłem, więc wykorzystać nagranie śpiewu ptaka, który jest zapętlany w kółko. Wszystko zamknięte w jednej obudowie wraz ze wzmacniaczem 2x20W. Pomimo, że  dźwięk wychodzący z układu scalonego jest w wersji monofonicznej użycie dwóch głośników było konieczne w celu zapewnienia odpowiedniej głośności i efektu. 
 
 ## Szczegóły
