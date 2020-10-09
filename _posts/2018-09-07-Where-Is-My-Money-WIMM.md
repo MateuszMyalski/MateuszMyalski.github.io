@@ -2,7 +2,6 @@
 layout: post
 title: "Where Is My Money WIMM"
 date: 2018-09-07
-tags: [projects]
 ---
 ![WIMM](/images/wimm/WIMM.png)
 

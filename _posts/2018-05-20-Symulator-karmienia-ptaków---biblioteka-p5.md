@@ -2,7 +2,6 @@
 layout: post
 title: "Feed the birds - symulacja z biblioteką p5 JavaScript"
 date: 2018-05-20
-tags: [projects, tutorials]
 ---
 ## Wstęp
 ![](/images/feedthebirds/p5.png)
@@ -218,8 +217,8 @@ function draw() {
 Zabawa z tą biblioteką dostarczyła mi naprawdę wiele radości.  W przyszłosci, gdy będę potrzebował integracji moich urządzeń z prezentowaniem informacji w przeglądarce internetowej, na pewno sięgnę po p5. "Żywą" demonstarację symulatora karmienia ptaków można znaleźć w sekcji "załączniki".
 
 ## Załączniki
-- Repozytorium [BitBucket][bitbucket]
+- Repozytorium [GitHub][git]
 - Demonstracja działania programu: [Symulator karmienia ptaków DEMO][demonstracja]
 
-  [demonstracja]: http://myalski.co.uk/attachments/feedthebirds/demo "Symulator karmienia ptaków DEMO"
-  [bitbucket]: https://github.com/MateuszMyalski/feed-the-birds "Repozytorium"
+  [demonstracja]: https://mateuszmyalski.github.io/attachments/feed-the-birds "Symulator karmienia ptaków DEMO"
+  [git]: https://github.com/MateuszMyalski/feed-the-birds "Repozytorium"

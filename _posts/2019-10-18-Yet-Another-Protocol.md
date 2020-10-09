@@ -2,7 +2,6 @@
 layout: post
 title: "Yet Another Protocol"
 date: 2019-10-18
-tags: [projects]
 ---
 ![](/images/YAP/console.JPG)
 

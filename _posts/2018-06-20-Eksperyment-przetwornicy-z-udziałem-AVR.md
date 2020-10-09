@@ -1,8 +1,7 @@
 ---
 layout: post
-title: "Eksperyment przetwornicy z udziałem AVR"
+title: "Najgorsza przetwornica z AVR"
 date: 2018-06-20
-tags: [projects]
 ---
 ## Wstęp
 ![](/images/przetwornica/uklad.png)

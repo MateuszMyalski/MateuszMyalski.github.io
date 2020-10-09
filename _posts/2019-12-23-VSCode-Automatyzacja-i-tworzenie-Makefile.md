@@ -2,7 +2,6 @@
 layout: post
 title: "VSCode Automatyzacja i tworzenie Makefile"
 date: 2019-12-23
-tags: [tutorials]
 ---
 Automatyzacja kompilacji programów napisanych w języku C, lub dostęp do debuggera potrafi być nieocenione, gdy potrzebujemy przetestować krótki program na naszym komputerze. Niektóre opisy, w jaki sposób pisać proste Makefile potrafią przysporzyć bóle głowy, a integracja z VSCode zawsze była dla mnie zagadką. W tym wpisie, postaram się wyjaśnić jak w prosty sposób napisać Makefile i zautomatyzować kompilację i debuggowanie w VSCode.
 

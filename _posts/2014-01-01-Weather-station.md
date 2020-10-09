@@ -1,8 +1,7 @@
 ---
 layout: post
 title: "Weather station"
-date:   2014-01-01
-tags: [projects]
+date:  2014-01-01
 ---
 ![Main picture](/images/weather_station/main.jpg)
 

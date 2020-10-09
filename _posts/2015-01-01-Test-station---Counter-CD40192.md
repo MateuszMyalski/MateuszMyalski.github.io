@@ -2,13 +2,11 @@
 layout: post
 title: "Test station - Counter CD40192"
 date: 2015-03-21
-tags: [projects]
 ---
-# Test station - Counter CD40192
 ![Main device](/images/CD40192/counter_low.png)
 
-This device helps students in uderstanding how digital counters works, and how we can make n modulo counter.
-I was asked to make this station as an assigment in my school.
+This device helps students in uderstanding how digital counters works, and how we can make n modulo counter using standard digital ICs.
+I was asked to make this station as an assigment while finishing my technician school.
 
 ## 8x AND Gates
 ![Main device](/images/CD40192/and_low.png)
