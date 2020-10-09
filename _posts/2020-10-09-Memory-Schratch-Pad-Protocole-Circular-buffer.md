@@ -164,4 +164,4 @@ Now we can go forward to create our scratch pad protocole implementation.
 
 Below you can find ready files with circular buffer library:
 
-[GPL_library] (https://github.com/MateuszMyalski/GPL)
+[GPL_library](https://github.com/MateuszMyalski/GPL)
