@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Memory Schratch Pad Protocole - Circular buffer"
+title: "Memory Schratch Pad Protocole - Circular Buffer"
 date: 2020-10-9
 ---
 When working with many ICs that acts as slave you probably have seen their memory organization. Data that is responsible for hardware configuration is mapped to a certain memory addresses which you can access or modify correspondingly. By implementing well known standards such a SPI or I2C you can send: address, command and in case of write operation data to the slave device. The region of memory which is kept updated is called memory scratchpad — this memory registers are acting like a bridge between configuration bits and also conversion results.
