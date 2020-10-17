@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Memory Schratch Pad Protocole - Protocole Implementation"
+title: "Memory Scratch Pad Protocole - Protocole Implementation"
 date: 2020-10-10
 ---
 In the previous chapter we have created implementation of circular buffer. Let's put this aside now and think, how we will parse our incoming messages. We have decided that every byte will mean something, and we also stated that bytes will not be translated into any ASCII character. What will happen after our program runs?
