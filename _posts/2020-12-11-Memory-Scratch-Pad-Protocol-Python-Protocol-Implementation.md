@@ -5,7 +5,7 @@ date: 2020-12-11
 ---
 After we have taught our microcontroller how to receive and respond to commands that comes from serial terminal, we have room for some improvements and automation from PC side. We can use C/C++ with proper library to handle serial communication. In case of Windows users it is possible to interact with virtual COM with WinApi. We are going to choose more universal solution.Python is ideal for task to create our protocol. On my repo you can find ready to use package that you can simply install via pip.
 
-By using objective language it is possible to create simple model of our database just by using built-in features and one external package 'py-serial' We are going to divide our package into classes, that will handle bare connection and data model. Our module will automatically update internal registers and send proper commands. This will make our life simpler if we would like to write programs that interact with internal registers stored in our uC.
+By using objective language it is possible to create simple model of our database just by using built-in features and one external package 'py-serial' We are going to divide our package into classes,that will handle bare connection and data model. Our module will automatically update internal registers and send proper commands.This will make our life simpler if we would like to write programs that interact with internal registers stored in our uC.
 
 # Data transmission
 The first thing we should create is data link layer. Let's create simple class that serves atomic method for receiving and sending data. In feature we can swap the method for sending/reading bytes to for e.g. sockets read/write. 
