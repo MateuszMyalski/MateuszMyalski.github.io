@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Memory Scratch Pad Protocol - PC interaction"
-date: 2020-11-1
+date: 2020-12-11
 ---
 After we have taught our microcontroller how to receive and respond to commands that comes from serial terminal, we have room for some improvements and automation from PC side. We can use C/C++ with proper library to handle serial communication. In case of Windows users it is possible to interact with virtual COM with WinApi. We are going to choose more universal solution.Python is ideal for task to create our protocol. On my repo you can find ready to use package that you can simply install via pip.
 
