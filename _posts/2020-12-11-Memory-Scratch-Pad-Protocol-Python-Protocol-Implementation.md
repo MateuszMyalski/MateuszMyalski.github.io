@@ -3,12 +3,12 @@ layout: post
 title: "Memory Scratch Pad Protocol - PC interaction"
 date: 2020-12-11
 ---
-After we have taught our microcontroller how to receive and respond to commands that comes from serial terminal, we have room for some improvements and automation from PC side. We can use C/C++ with proper library to handle serial communication. In case of Windows users it is possible to interact with virtual COM with WinApi. We are going to choose more universal solution.Python is ideal for task to create our protocol. On my repo you can find ready to use package that you can simply install via pip.
+After we have taught our microcontroller how to receive and respond to commands that comes from serial terminal, we have room for some improvements and automation from PC side. We can use C/C++ with proper library to handle serial communication. In case of Windows users it is possible to interact with virtual COM with WinApi. We are going to choose more universal solution.Python is ideal for task to create our protocol. On my repo you can find ready to use package that you can simply install via pip.
 
-By using objective language it is possible to create simple model of our database just by using built-in features and one external package 'py-serial' We are going to divide our package into classes,that will handle bare connection and data model. Our module will automatically update internal registers and send proper commands.This will make our life simpler if we would like to write programs that interact with internal registers stored in our uC.
+By using objective language it is possible to create simple model of our database just by using built-in features and one external package 'py-serial' We are going to divide our package into classes,that will handle bare connection and data model. Our module will automatically update internal registers and send proper commands.This will make our life simpler if we would like to write programs that interact with internal registers stored in our uC.
 
 # Data transmission
-The first thing we should create is data link layer. Let's create simple class that serves atomic method for receiving and sending data. In feature we can swap the method for sending/reading bytes to for e.g. sockets read/write. 
+The first thing we should create is data link layer. Let's create simple class that serves atomic method for receiving and sending data. In feature we can swap the method for sending/reading bytes to for e.g. sockets read/write.
 ```Python
 import serial
 
@@ -31,7 +31,7 @@ class SerialLink:
 ``` 
 
 # Protocol implementation
-Now it is time to create protocol class. This class is going to know how to format the command and how to parse the received data. 
+Now it is time to create protocol class. This class is going to know how to format the command and how to parse the received data. 
 ```Python
 from .serial_link import SerialLink
 
@@ -73,7 +73,7 @@ class ScratchPadProtocol:
 ```
 
 # High-level overlay
-If you are more familiar with high-level programming you can notice that we can refer to the uC registers like to the standard array. Why not use this mechanism and override this behavior with our methods that will ask the external device when we are trying to get the value, or send data when we are performing set action.
+If you are more familiar with high-level programming you can notice that we can refer to the uC registers like to the standard array. Why not use this mechanism and override this behavior with our methods that will ask the external device when we are trying to get the value, or send data when we are performing set action.
 ```Python
 from .scratch_pad_protocol import ScratchPadProtocol
 
@@ -132,7 +132,7 @@ for i in range(256):
 print(f"Value 3:{scratchpad[3]}")
 print(f"Value 0:{scratchpad[0]}")
 ```
-We can make it more generic and create simple python package. This thing is beyond of the scope of this tutorial. You can download ready to use package and C code from repo and use it as you want.
-After three chapters we have created ready to use protocol that is generic and adding another data to read/store is very simple. For sure there is a lot of methods to improve this code.Therefor the scope of these three articles was to show easy way of getting simple communication between your PC and DIY hardware.By using simple UART - COM converter we interact with our external devices without any extra drivers that we need to develop ourselves from scratch.Now make use of it and create simple data aggregator that read the value from some sensors and stores it in internal registers - create pretty plot by using py-plot!
+We can make it more generic and create simple python package. This thing is beyond of the scope of this tutorial. You can download ready to use package and C code from repo and use it as you want.
+After three chapters we have created ready to use protocol that is generic and adding another data to read/store is very simple. For sure there is a lot of methods to improve this code.Therefor the scope of these three articles was to show easy way of getting simple communication between your PC and DIY hardware.By using simple UART - COM converter we interact with our external devices without any extra drivers that we need to develop ourselves from scratch.Now make use of it and create simple data aggregator that read the value from some sensors and stores it in internal registers - create pretty plot by using py-plot!
 
 [GPL_library](https://github.com/MateuszMyalski/GPL)
