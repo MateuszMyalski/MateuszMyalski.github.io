@@ -13,21 +13,21 @@ The first thing we should create is data link layer. Let's create si
 import serial
 
 class SerialLink:
-	def __init__(self, COM, baud_rate, timeout, stop_bits):
-		self._serial = serial.Serial(
-			f"COM{COM}",
-			baudrate=baud_rate,
-			timeout=timeout,
-			bytesize=seria.EIGHTBITS,
-			stopbits=stop_bits
-		)
-	
-	def write_byte(self, byte: byte) -> None:
-		self._serial.write(byte)
+  def __init__(self, COM, baud_rate, timeout, stop_bits):
+    self._serial = serial.Serial(
+      f"COM{COM}",
+      baudrate=baud_rate,
+      timeout=timeout,
+      bytesize=seria.EIGHTBITS,
+      stopbits=stop_bits
+    )
+  
+  def write_byte(self, byte: byte) -> None:
+    self._serial.write(byte)
 
-	def read_byte(self, length: int) -> bytearray:
-		received = self._serial.read(length)
-		return received
+  def read_byte(self, length: int) -> bytearray:
+    received = self._serial.read(length)
+    return received
 ``` 
 
 # Protocol implementation
@@ -36,39 +36,39 @@ Now it is time to create protocol class. This class is going to kno
 from .serial_link import SerialLink
 
 class ScratchPadProtocol:
-	response_length = 9
+  response_length = 9
 
-	def __init__(
-			self,
-			port: int = None,
-			COM: int = None,
-			baud_rate: int = None,
-			stop_bits: int = 1,
-			timeout: int = 1,
-		) -> None:
-			self._transport = SerialLink(COM = COM, baud_rate = baud_rate, stop_bits = stop_bits, timeout = timeout)
+  def __init__(
+      self,
+      port: int = None,
+      COM: int = None,
+      baud_rate: int = None,
+      stop_bits: int = 1,
+      timeout: int = 1,
+    ) -> None:
+      self._transport = SerialLink(COM = COM, baud_rate = baud_rate, stop_bits = stop_bits, timeout = timeout)
 
-	def read_address(self, address: int) -> bytes:
-		cell = address.to_bytes(1, byteorder="big")
-		self._transport.write_byte(cell)
-		cell_value = self._transport.read_bytes(self.response_length)
-		return cell_value
+  def read_address(self, address: int) -> bytes:
+    cell = address.to_bytes(1, byteorder="big")
+    self._transport.write_byte(cell)
+    cell_value = self._transport.read_bytes(self.response_length)
+    return cell_value
 
-	def write_address(self, address: int, data: int) -> None:
-		frame = [address, data]
-		self._transport.write_byte(bytes(frame))
+  def write_address(self, address: int, data: int) -> None:
+    frame = [address, data]
+    self._transport.write_byte(bytes(frame))
 
-	def decode(self, received_frame: bytes) -> tuple:
-		frame = received_frame.decode("UTF-8")
-		# "0xXX:0xZZ" - 9 chars
-		if len(frame) != 9:
-			raise ValueError("Invalid response!") 
+  def decode(self, received_frame: bytes) -> tuple:
+    frame = received_frame.decode("UTF-8")
+    # "0xXX:0xZZ" - 9 chars
+    if len(frame) != 9:
+      raise ValueError("Invalid response!") 
 
-		cell, cell_value = frame.split(":")
+    cell, cell_value = frame.split(":")
 
-		cell = int(cell, 16)
-		cell_value = int(cell_value, 16)
-		return (cell, cell_value)
+    cell = int(cell, 16)
+    cell_value = int(cell_value, 16)
+    return (cell, cell_value)
 
 ```
 
@@ -127,8 +127,8 @@ scratchpad = ScratchPad(32, 4, 9600)
 scratchpad.update_scratchpad()
 print(scratchpad)
 for i in range(256):
-	scratchpad[3] = i
-	time.sleep(0.01)
+  scratchpad[3] = i
+  time.sleep(0.01)
 print(f"Value 3:{scratchpad[3]}")
 print(f"Value 0:{scratchpad[0]}")
 ```
