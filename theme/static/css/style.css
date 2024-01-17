@@ -1,0 +1,202 @@
+@import url(pygments/github.css);
+
+:root {
+    --font-color: black;
+    --main-bg-color: white;
+    --accent-one-color: #E6CE1E;
+    --accent-two-color: #E6391E;
+    --accent-three-color: #3210E5;
+    --accent-four-color: #008F4F;
+}
+
+
+body {
+    font-family: Monospace;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height:1.4;
+    color: var(--font-color);
+    max-width: 60vw;
+    min-width: 40vw;
+    margin-left: 1vw;
+}
+
+header {
+    border-bottom-style: ridge;
+    margin-bottom: 1em;
+}
+
+header a {
+    color: #000;
+    text-decoration-skip-ink: auto;
+    text-decoration: none;
+}
+
+header a::before {
+    content: "["
+}
+header a::after {
+    content: "]"
+}
+
+header hgroup h1 {
+    font-size: 3em;
+    margin-bottom: 0;
+    margin-top: 1vh;
+    font-weight: lighter;
+}
+
+header hgroup h1:hover {
+    font-weight: bolder;
+}
+
+header hgroup p {
+    font-style: italic;
+    margin-top: 0;
+}
+
+header nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding-bottom: 0.5em;
+}
+
+header nav li {
+    list-style: none;
+    font-size: 1.2em;
+    font-weight: lighter;
+    margin-right: 2vw;
+}
+
+header nav li:hover {
+    font-weight: bolder;
+}
+
+section a {
+    color: var(--accent-three-color);
+    text-decoration: none;
+}
+
+section a:hover {
+    text-decoration: underline;
+    font-weight: bolder;
+}
+
+section.page a::before {
+    content: "["
+}
+section.page a::after {
+    content: "]"
+}
+
+section.posts_list ul a {
+    text-decoration: none;
+}
+
+section.posts_list ul li {
+    margin-top: 0.2em;
+}
+
+section.about_me h2, section.posts_list h2 {
+    font-weight: lighter;
+}
+
+section.meta {
+    border-top-style: ridge;
+    padding: 10px 10px;
+}
+
+section.post em {
+    background-color: var(--accent-two-color);
+    font-family: monospace;
+    font-style: normal;
+    padding: 0px 2px;
+}
+
+section.post h1 {
+    font-size: 2em;
+}
+
+section.post img {
+    max-width:100%;
+    display: block;
+    margin: 3% auto;
+}
+
+section.post p code {
+    border: 1px solid black;
+    padding: 0px 2px;
+}
+
+section.post blockquote {
+    border-left-color: var(--accent-one-color);
+    border-left-width: 4px;
+    border-left-style: solid;
+    margin-left: 0;
+    padding-left: 40px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+section.post table {
+    width: 100%;
+}
+
+
+section div.highlight {
+    padding-left: 10px;
+    overflow-y: auto;
+    border-left: 4px var(--accent-four-color) solid;
+}
+
+footer {
+    text-align: right;
+    border-top-style: ridge;
+}
+
+footer span#heart {
+    font-size: 1.2em;
+    margin-left: 0.3em;
+    color: var(--accent-two-color);
+}
+
+@media print {
+    body {
+        margin: 0;
+        padding: 0;
+        color: #000;
+        background-color: #fff;
+        min-width: initial;
+        max-width: initial;
+    }
+
+    header {
+        display: none;
+    }
+
+    * {
+        background-image: none !important;
+        break-inside: avoid;
+    }
+
+    img.print, svg.print {
+        display: block;
+        max-width: 100%;
+    }
+    
+    section a::after {
+        content: " (" attr(href) ")";
+    }
+
+    section.post section.meta {
+        display: none;
+    }
+
+    footer span#heart::after {
+        content: " Copyright Mateusz Myalski";
+        font-size: initial;
+        color: var(--font-color)
+    }
+}
+

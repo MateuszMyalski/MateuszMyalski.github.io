@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="{% block html_lang %}{{ DEFAULT_LANG }}{% endblock html_lang %}">
+
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta title="{{ SITENAME }}">
+
+    <link rel="alternate" type="application/atom+xml" title="{{ SITESUBTITLE }}" href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="{{ AUTHOR }}">
+    <link rel="shortcut icon" href="{{ SITEURL }}/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="{{ SITEURL }}/theme/favicon.png" type="image/x-icon">
+
+    {% if SITESUBTITLE %}
+    <meta name="description" content="{{ SITESUBTITLE }}" />
+    {% endif %}
+
+    <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/style.css" />
+
+    {% endblock head %}
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="{{ SITEURL }}/index.html">{{ SITENAME }}</a>
+            </h1>
+            {% if SITESUBTITLE %}
+            <p>{{ SITESUBTITLE }}</p>
+            {% endif %}
+        </hgroup>
+
+        <nav>
+            {% for p in pages %}
+            <li>
+                <a href="{{ SITEURL }}/{{ p.url }}">{{ p.title }}</a>
+            </li>
+            {% endfor %}
+            {% for title, link in MENUITEMS %}
+            <li>
+                <a href="{{ link }}">{{ title }}</a>
+            </li>
+            {% endfor %}
+        </nav>
+
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>

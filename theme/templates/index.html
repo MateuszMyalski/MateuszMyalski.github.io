@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if ABOUTME %}
+<section class="about_me">
+    <h3>$ whoami</h3>
+    {{ ABOUTME }}
+</section>
+{% endif %}
+
+<section class="posts_list">
+    {% block content_title %}
+    <h3>$ ls -ls | awk '{print $7,$8,$9,$10}</h3>
+    {% endblock %}
+
+    <ul>
+        {% for article in articles_page.object_list %}
+        <li>
+            <a href="{{ SITEURL }}/{{ article.url }}">
+                <time datetime="{{ article.date.isoformat() }}">
+                    [{{ article.date|strftime('%d/%m/%Y')}}]
+                </time>
+                - {{ article.title }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock content %}

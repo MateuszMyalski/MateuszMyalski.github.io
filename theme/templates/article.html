@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="post">
+    {{ article.content }}
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                {{ article.title }}
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="{{ article.date.isoformat() }}">{{ article.date|strftime('%d/%m/%Y') }}
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">&#128438; Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+{% endblock content %}
