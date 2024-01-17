@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="Tech-Notes">
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mateusz Myalski">
+    <link rel="shortcut icon" href="https://mateuszmyalki.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalki.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalki.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalki.github.io/index.html">Tech-Notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalki.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>Secure boot concept in IoT devices</h1>
+<h1>Introduction</h1>
+<p>Software security is rather a huge topic that has many rabbit holes. When it comes to IoT devices, that interacts with the network, the level of security difficulties rapidly increases. When not only the software can be damaged due to the potential attack, but also the device itself can be stolen and reused, the security layer must be even stronger than normally.</p>
+<p>In this article, I am willing to describe the basic concept about <strong>secure boot</strong>. We are going to get familiar with <strong>secure booting path</strong> mechanism, Over-The-Air safe device update and discuss basic attacks mitigation that secure boot should implement.</p>
+<h1>The standard bootloader</h1>
+<p>Before we jump straight to elaborating about security, we should answer to one important question. <strong>What actually bootloader is and what value does it bring to the device?</strong></p>
+<p>The first thing that should come to our mind is that the bootloader <em>boots the main application on our device</em>, after this we can define that the bootloader <em>is the first piece of software that runs after the device is turned on</em>. These two statements gives the overall picture of the situation.</p>
+<p>The bootloader also should allow updating the application that normally runs on the device. Often standard interfaces that are present on the chip are utilized: UART, I2C, SPI, USB. Bootloaders that are supplied are often quite small (1 KB - 4 KB), and their execution time is counted in milliseconds. They have two simple jobs that they need to fulfill - initialize the device for program execution and execute the native application.</p>
+<p><img alt="Standard Booting Path" src="images/secure_boot_in_iot_devices/booting_path.png"></p>
+<h1>The secure bootloader</h1>
+<p>When we stated what standard bootloader implements and what are their characteristics, we can finally say few words about <strong>secure bootloader</strong>.  To start with, we bullet point what features it includes.</p>
+<p>All features that <strong>standard bootloader</strong> do:</p>
+<ul>
+<li>initialize the system,</li>
+<li>load the main app to the executable memory region,</li>
+<li>allows to perform self-update,</li>
+<li>allows to perform main app update,</li>
+</ul>
+<p>Secure bootloader <em>extends</em> features to:</p>
+<ul>
+<li>implementing <strong>secure booting path</strong>,</li>
+<li>adds security when performing Over-The-Air (OTA) software updated:<ul>
+<li>ensure safe data authentication</li>
+<li>data integrity check</li>
+<li>safe software replacement</li>
+</ul>
+</li>
+<li>prepares the device for productization:<ul>
+<li>prevents the device from insecure configuration</li>
+<li>gives possibility for authorized access in case of the Return Merchandiser Authorization (RMA).</li>
+</ul>
+</li>
+</ul>
+<p>To summarize with one statement what secure bootloader is we can state that…</p>
+<blockquote>
+<p>Secure bootloader ensure that the software run on the device is authenticated and verified.</p>
+</blockquote>
+<h2>Secure booting path</h2>
+<p>The booting sequence of the device should not be connected only with one stage. Device that is being designed for multi vendors should give wide area to implement own business logic and security strategy.  It is impossible without dividing the device booting procedure into smaller stages that are implemented by the next customer.</p>
+<p><img alt="Secure Booting Path" src="images/secure_boot_in_iot_devices/secure_booting_path.png"></p>
+<h3>ROM Bootloader</h3>
+<p>The first booting stage starts in “ROM Bootloader”. This piece of software residue in the Read Only Memory in the chip itself and is <strong>impossible to change</strong> after the chip is manufactured. This means that no future updated is possible. Furthermore, having physically immutable software makes it incredibly hard for a potential attacker to change the code and insert different, malicious, software. This stage of the booting path is supplied by the chip vendor – usually is certified together with the chip itself. ROM Bootloader probably would not implement any necessary functionality that is requested from us, and is very, very primitive. <em>It has one simple job – securely verify the next stage image and run it.</em> On-chip bootloaders are very limited even in terms of selecting the image from which to boot the device, therefore we should implement such features in the next booting stage.  </p>
+<h3>Root-Of-Trust</h3>
+<p>Before we go further, we should emphasize that our ROM Bootloader is the <strong>“Root-Of-Trust”</strong> in our whole cryptographic system. This means, since it is an immutable piece of software, we are laying on it our entire trust that it will not behave malicious at any point.</p>
+<h3>Extended Bootloader</h3>
+<p>Because our ROM Bootloader is very primitive and would not implement any needed feature from our customer, we need to implement it by ourselves. This means, we have need for <strong>Extended Bootloader</strong> that is going to be authenticated by the previous stage and would implement all the necessary functionalities. This stage of the secure booting path is often supplied by the evolutional board vendor, on which third-party customers create their targeted devices. Extended bootloader implements all the necessary features that are needed in the system, prepares the device for running the next software image and authenticate the next stage. This is the first possibility to apply OTA mechanisms and fully control the device, so it is important to protect the extended bootloader from tampering and leaking the used instructions outside the device.</p>
+<h3>End of the booting path</h3>
+<p>The third stage of booting can supply another bootloader, or the main app. The recipient of our evolutional board has free field to implement his own strategy.</p>
+<h2>Permission dropping</h2>
+<p>Talking about booting stages leads us to the first security mechanism that the secure bootloader should add up to protect the device. After every stage of the booting path, the customers has bigger freedom to implement his own device behavior. Such possibility implies also potential vulnerabilities in e.g. accessing protected regions of the system -getting access to the stored secret keys and the mistekly dumping them on UART interface. Each stage of the bootloader should protect critical data that are used for authentication. Not only authentication content is the target of attacks, but also interfaces that gives attacker possibility to inject malicious code or use the to read internal state of the CPU and memory registers.</p>
+<p>Such simple implementation of the permission dropping mechanism can force the hardware to:</p>
+<ul>
+<li>block JTAG interface, </li>
+<li>disallow read or write access to One-Time-Programmable (OTP) registers/FLASH/RAM,</li>
+<li>disable chip interfaces (UART/SPI/I2C) etc.</li>
+</ul>
+<p>Disabling access to the regions should be possible to perform in one-way, this means that after dropped permission in previous booting stage no possibility to undo the operation in higher level of the software.</p>
+<h2>Security in the secure booting path</h2>
+<p>The most critical mechanism that we should take under consideration and understand the concept is preparing secure images. Having the possibility to accelerate cryptograophic operation by hardware is a huge help during authenticating the image. This not only speeds up the entire process, but also adds another layer of security to the overall system. </p>
+<p>Before we start explaining how the device is validating the loaded image, we have to assume, that the device contain <strong>symmetric key used for encryption</strong>, and <strong>public key to verify the signature</strong>.</p>
+<p><img alt="Image security" src="images/secure_boot_in_iot_devices/image_security.png"></p>
+<h3>Encryption and signature</h3>
+<p>The software is compiled and is ready to be executed on the device. The first case that we have to take care of is ensuring that after the binary get to the wrong hands, no one will be able to disassemble it and read the content that the binary file contains. Here we are utilizing the symmetric cryptography and by using symmetric key we are encrypting the binary file.</p>
+<p>The next problem is ensuring that the data comes from trusted source, it can be done by signing the binary file. Here we are taking a helping hand from asymmetric cryptography and generate a hash of the file which is later encrypted with the private key – this is the signature that is attached to the encrypted file. </p>
+<p>The device can use public key to decrypt the encrypted hash and check if the binary file is still the same as at the moment when it has been signed.</p>
+<p><img alt="Binary Hash" src="images/secure_boot_in_iot_devices/standard_binary_sandwich.png"></p>
+<h3>Integrity check after decryption</h3>
+<p>The first security gap occurs when decrypting the image. During binary decryption the attacker can try to replace the file, even more, after decryption we are losing the authentication because the image is no longer the same version that has been used while signing.</p>
+<p>The problem can be solved in few ways. The first solution is to attach the raw hash to the original binary right before it gets encrypted. During data encryption, we take binary data and the generated hash. Then, after the device decipher the image, the deciphered content can be checked with the stored hash. The disadvantage of such idea is adding extra step of validation that opens new potential attack vectors. Another cryptographic operation extends the booting time, what is not a good sign for the bootloader’s performance.</p>
+<p><img alt="HMAC with binary" src="images/secure_boot_in_iot_devices/hmac_binary_sandwich.png"></p>
+<p>The difficulties can be overcome by using the hybrid algorithms. We can use HMAC to generate <strong>tag</strong> in the same time when the binary is encrypted/decrypted. This algorithm can be easily implemented in hardware, so our overall speed and code size would be optimized. The device should <strong>reencrypt the binary on the device with new generated keys</strong> that have not been used before, this improves the security aspect and mitigate the potential symmetric key leakage. During reencryption the device can store the generated tag, so later during boot it can be rechecked. </p>
+<h2>ROM Bootloader authenticate next stage</h2>
+<p>At the beginning, we have hardly stated – ROM Bootloader is immutable – so how we can instruct it to load and authenticate dynamic content?</p>
+<p>This can be solved in the following ways:</p>
+<ol>
+<li>fixed address in FLASH with constant size of the next stage image,</li>
+<li>configuration registers inside the chip that configure the ROM Bootloader,</li>
+<li>fixed address in FLASH that stores meta header with next stage image information,</li>
+<li>One-TIme-Programmable (OTP) registers.</li>
+</ol>
+<p>Using fixed address in our FLASH memory and limiting the software size does not sound like a good idea for the potential customers. Soon there are going to arise problems where we need to relocate the piece of software or even extend it more, but our ROM Bootloader would not have such possibility anymore. We can try to solve the problem by using special, dedicated registers, that are going to instruct the ROM Bootloader, where to look for the next image and what size the binary is. It is a better idea, but it would be very time-consuming accessing internal registers of the chip during manufacturing…</p>
+<p>The easiest way would be to <strong>write to the flash some information about the next stage</strong> of booting and stores such frame in fixed position. Then, after the ROM Bootloader starts, it would seek information about the incoming image in the FLASH memory. Brilliant idea, unfortunately everyone can write to the FLASH memory, especially when it is external chip. Here comes time for the cryptographic, our device can utilize the OTP registers! At the first boot (during manufacturing stage), the device can <strong>generate a signed HASH of the meta frame stored in the FLASH</strong>, then store it into the OTP register. Now, after every boot, the ROM bootloader, before it takes information from the meta frame, it would reevaluate the signed HASH and check it with the stored version. Such mechanism, would secure the meta frame stored in the FLASH memory. The used algorithm to generate signed hash can be HMAC.</p>
+<p><img alt="Meta frame hash" src="images/secure_boot_in_iot_devices/meta_frame_hash.png"></p>
+<p>Meta frame stored in FLASH should contain:</p>
+<ul>
+<li>image address,</li>
+<li>image size,</li>
+<li>image execution load address,</li>
+<li><strong>version of the image</strong>.</li>
+</ul>
+<h2>Antirollback</h2>
+<p>It might sound at the beginning quite strange, but also software that comes from verified source can be potentially big security risk for our entire system.</p>
+<p>Imagine, that our factory produced software and versioned it with version number 3. Our device contains the software and are using this version to operate. Now it happens, our security engineers found potential big security gap in the software. Our developers fix the problem and produce new software versioned with version number 4. We are sending new version of the software to the devices to update them and fix vulnerabilities. Devices update everything is fine. The issue comes when potential attackers found out, that the previous version of the software has vulnerabilities that can be used to take control over the device. The only way, of protecting the device from such attack is to <strong>ban old versions of the software</strong>.</p>
+<p>The scenario describes the need of having antirollback mechanism in our bootloader. After the device verify that the image come from trusted source, the version of the image must be compared to the version counter stored inside the device. The version counter store the latest version of the image that has been <strong>successfully</strong> executed on the device in the past. In case of trying to load an older version of the image, the device calls exception. When the image version is equal or greater, the bootloader decipher the image and jumps to the target image.</p>
+<p><img alt="Antirollback" src="images/secure_boot_in_iot_devices/antirollback.png"></p>
+<p>It is important to decipher the image <strong>after</strong> the version check, because in case of failure, we are ending up with ready to lunch image in the internal memory. When this scenario happens, the attacker have many possibilities to trick the CPU to jump to the not secure version of the image.</p>
+<p>The antirollback counter can be stored in singed memory region or in OTP registers. The counter needs the possibility to only increments, it would extra bonus if the decrement option would be blocked by hardware. The decrement can be blocked by burning bits and damaging the memory regions, so the operations of unsetting the bit is irreversible. </p>
+<h2>OTA</h2>
+<p>At the beginning have been said, that secure bootloader should allow safe image update. To achieve the functionality, many concepts can be described. This article is going to present a scenario where special trust-agency is going to take care about our secure keys. <strong>The trust-agency is responsible for key generation and signing the data.</strong> This adds another layer of security when managing secret keys by the factory. The described concept would also assume that the OTA binaries are going to use special keys for this functionality not connected with the secure booting path.</p>
+<h3>Keys exchange</h3>
+<p>The process starts with exchanging the keys between trust-agnecy and manufacturer. The manufacturer request generation of:</p>
+<ul>
+<li>symmetric key – for OTA image encryption,</li>
+<li>a pair of private and public key for the feature OTA image signature.</li>
+</ul>
+<p>The symmetric key and public key is send to the manufacturer, where it is latter embedded into the device – this prepares the device for authentication and decryption of the OTA image.</p>
+<p><img alt="Keys exchange" src="images/secure_boot_in_iot_devices/keys_exchange.png"></p>
+<h3>Preparing OTA image</h3>
+<p>The manufacturer releases the new version of the image, by using received symmetric key, encrypts the released OTA image. In the next step, the encrypted image is sent to the trust-agency that sign the image with previously generated private key. Image is ready to be sent to the devices.</p>
+<p><img alt="Preparing OTA" src="images/secure_boot_in_iot_devices/preparing_ota.png"></p>
+<h3>Device update</h3>
+<p>Now we should take a look at the internal memory of our device and analyze what is going to happen during device update. Assume that the FLASH memory has three partitions: <strong>main partition</strong> – contains old software version that is booted by default during boot up, <strong>fallback partition</strong> – stores backup of the valid version of the software, <strong>scratch partition</strong> – stores incoming update.</p>
+<ol>
+<li>The device downloads the image via some interface (wireless/direct interface), then stores the full image in scratch partition.</li>
+<li>The device has the public key for the incoming OTA image, the first stage is verification that the new image comes from a trusted source. </li>
+<li>Later, the antirollback version must be checked, to ensure, that the incoming update is newer than the currently running software. </li>
+<li>The device deciphers the OTA image with the symmetric key burned during manufacturing stage.</li>
+<li>To ensure that the binary is stored securley, the new version of the image must be <strong>reencrypted</strong> on device together with <strong>key regeneration</strong>.</li>
+<li>The last step is to replace the old image in the main partition with a new reencrypted image.</li>
+</ol>
+<p><img alt="Device OTA" src="images/secure_boot_in_iot_devices/device_update.png"></p>
+<p>When all steps have been executed with success, it is time to reboot the device. CPU is trying to execute the new image from main partition. When the new version of the software failures on boot, the device uses the fallback partition to restore the old version. When it is not the case, the device copy the new version of the software to the fallback partition to always have the backup in the memory. The last important thing is to <strong>bump the antirollback version</strong>. It is critical to bump the version AFTER valid image execution, so the device does not have the possibility to be bricked when using the fallback image in case of failure.</p>
+<h3>Key rotation</h3>
+<p>Usually, the manufacturer would not like to use already used keys for the previous OTA image. The new images for next OTA can be supplied with the encrypted binary.</p>
+<h2>Summary</h2>
+<p>There are many steps and mechanics that must be taken under consideration to developed a really secure bootloader. The article is based on my speech that I have pleasure to give on the embedded meetup event in Wrocław. The link to the speech is available below in Polish language.</p>
+<p><a href="https://youtu.be/VQqnDsV0axU?t=4965">YouTube -  Embedded Meetup vol. 7 Wrocław</a></p>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                Secure boot concept in IoT devices
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2022-06-23T00:00:00+02:00">23/06/2022
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">&#128438; Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>

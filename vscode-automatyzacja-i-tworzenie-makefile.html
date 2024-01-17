@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="Tech-Notes">
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mateusz Myalski">
+    <link rel="shortcut icon" href="https://mateuszmyalki.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalki.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalki.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalki.github.io/index.html">Tech-Notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalki.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>VSCode Automatyzacja i tworzenie Makefile</h1>
+<p>Automatyzacja kompilacji programów napisanych w języku C, lub dostęp do debuggera potrafi być nieocenione, gdy potrzebujemy przetestować krótki program na naszym komputerze. Niektóre opisy, w jaki sposób pisać proste Makefile potrafią przysporzyć bóle głowy, a integracja z VSCode zawsze była dla mnie zagadką. W tym wpisie, postaram się wyjaśnić jak w prosty sposób napisać Makefile i zautomatyzować kompilację i debuggowanie w VSCode.</p>
+<p>Przyjmijmy, że nasz folder projektowy ma następującą strukturę:</p>
+<ul>
+<li>ProjectFolder</li>
+<li>main.c</li>
+<li>utilfunc.c</li>
+<li>utilfunc.h</li>
+<li>build</li>
+</ul>
+<h2>1. Tworzenie Makefile</h2>
+<p>W tym rozdziale skupimy się na nauce pisania prostego Makefile, czyli pseudo-skryptu, który przetłumaczy nasze pliki napisane w języku C, na pliki z rozszerzeniem .o, a następnie połączy wszystkie wynikowe pliki w całość - w gotowy .exe. Dodatkowo w MakeFile możemy podać komendy, które nasz system ma po sobie wykonać np. czyszczenie projektu.</p>
+<p>Pliki MakeFile możemy wykonać korzystając z polecenia:
+<code>mingw32-make (nazwa pliku Makefile) (Etykieta podprogramu)</code></p>
+<div class="highlight"><pre><span></span><code>mingw32-make Makefile main
+</code></pre></div>
+
+<p>Wiemy już jak wykonać to co napiszemy, przejdźmy teraz do wyjaśnienia co po kolei należy zawrzeć w pliku <code>Makefile</code></p>
+<p>Plik Makefile powinien zaczynać się od nagłówka komentującego</p>
+<p><code># -*- MakeFile -*-</code>
+Warto zaznaczyć, że znaki białe są dosyć istotne w tego typu plików.</p>
+<p>Następnie określmy parę zmiennych, które ułatwią nam uniwersalizację poleceń wydawanych kompilatorowi.</p>
+<div class="highlight"><pre><span></span><code><span class="c"># -*- MakeFile -*-</span>
+<span class="nv">CC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>gcc#Informacja<span class="w"> </span>o<span class="w"> </span>tym,<span class="w"> </span>jakiego<span class="w"> </span>kompilatora<span class="w"> </span>używamy
+<span class="nv">BUILDPATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>build#Ścieżka<span class="w"> </span><span class="k">do</span><span class="w"> </span>folderu,<span class="w"> </span>gdzie<span class="w"> </span>będą<span class="w"> </span>generowane<span class="w"> </span>pliki<span class="w"> </span>.o
+<span class="nv">OUTFILENAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>main#Nazwa<span class="w"> </span>końcowego<span class="w"> </span>pliku<span class="w"> </span>.exe
+<span class="nv">FLAGS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>-Wall#Flagi<span class="w"> </span>dla<span class="w"> </span>kompilatora
+<span class="nv">DEBUGFLAGS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>-g<span class="w"> </span>-Wall#Flagi<span class="w"> </span>dla<span class="w"> </span>kompilatora<span class="w"> </span>w<span class="w"> </span>przypadku<span class="w"> </span>korzystania<span class="w"> </span>z<span class="w"> </span>debugera
+</code></pre></div>
+
+<p>Aby odwołać się potem do zmiennych wpisujemy: <code>$(nazwa_zmiennej)</code>.
+<em>Zauważ, że komentarze rozpoczynane są znakiem # stawianej zaraz po zakończeniu zmiennej. W przypadku, gdy dodasz tam inne znaki np. tab również zostaną przepisane do miejsca odwołania do zmiennej.</em></p>
+<p>Zacznijmy pisać pierwszą zależność. Struktura podprogramów wygląda następująco:</p>
+<div class="highlight"><pre><span></span><code><span class="nf">etykieta</span><span class="o">:</span><span class="w"> </span><span class="n">zale</span>ż<span class="n">no</span>ś<span class="n">ci</span>
+<span class="w">    </span>instrukcje<span class="w"> </span><span class="k">do</span><span class="w"> </span>wykonania
+</code></pre></div>
+
+<p>Etykieta, jak sama nazwa wskazuje - nazywa dany blok skryptu. Zależności określają nam, jakie podprogramy muszą zostać wykonane wcześniej, nim przejdziemy do wykonywania instrukcji. Przybliżmy do przykładem.
+Wykonujemy polecenie <code>mingw32-make Makefile AAA</code>, w pliku make mamy następujący kod:</p>
+<div class="highlight"><pre><span></span><code><span class="c"># -*- MakeFile -*-</span>
+<span class="nf">AAA</span><span class="o">:</span><span class="w"> </span><span class="n">BBB</span>.<span class="n">o</span> <span class="n">CCC</span>.<span class="n">o</span>
+<span class="w">    </span>instrukcja1
+<span class="nf">BBB.o</span><span class="o">:</span><span class="w"> </span><span class="n">BBB</span>.<span class="n">c</span>
+<span class="w">    </span>instrukcja2
+<span class="nf">CCC.o</span><span class="o">:</span><span class="w"> </span><span class="n">CCC</span>.<span class="n">c</span>
+<span class="w">    </span>instrukcja3
+</code></pre></div>
+
+<p>Wywołujemy początkowo etykietę AAA, podprogram ten ma dwie zależności BBB.o i CCC.o. Oznacza to, że nim wykonamy instrukcję 1, musimy najpierw wykonać dwa podane podprogramy. Wykona się więc podprogram BBB.o (czyli instrukcja 2) i CCC.o (czyli instrukcja 3). Dopiero po ukończeniu tych działań wykona się instrukcja numer 1. Zależności w podprogramach BBB.o i CCC.o, mówią o tym, że aby wykonać ich instrukcje, potrzebny jest plik o rozszerzeniu BBB.c i CCC.c.</p>
+<p>Wróćmy do pisania naszego prawdziwego makefile. Potrzebujemy skompilować główny kod programu, zawarty w pliku <code>main.c</code>, program korzysta z zewnętrznie dostarczonej funkcji, opisanej w pliku <code>utilfunc.c</code>. Potrzebujemy, więc dokonać kompilacji tych dwóch plików. Robiąc to ręcznie napisalibyśmy kolejno:</p>
+<div class="highlight"><pre><span></span><code>gcc -g -Wall -c main.c -o build/main.o
+gcc -g -Wall -c utilfunc.c -o build/utilfunc.o
+gcc -g -Wall build/main.o build/utilfunc.o -o main
+</code></pre></div>
+
+<p>Zapiszmy to w formie skryptu makefile, którego wykonamy poleceniem:
+<code>mingw32-make Makefile main</code></p>
+<p>Pamiętajmy, że zostanie zamienione : </p>
+<ul>
+<li>CC  na "gcc"</li>
+<li>DEBUGFLAGS na "-g -Wall"</li>
+<li>BUILDPATH na "build"</li>
+<li>OUTFILENAME na "main"</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="nf">main</span><span class="o">:</span><span class="w"> </span><span class="n">main</span>.<span class="n">o</span> <span class="n">utilfunc</span>.<span class="n">o</span>
+<span class="w">    </span><span class="k">$(</span>CC<span class="k">)</span><span class="w"> </span><span class="k">$(</span>DEBUGFLAGS<span class="k">)</span><span class="w"> </span><span class="k">$(</span>BUILDPATH<span class="k">)</span>/main.o<span class="w"> </span><span class="k">$(</span>BUILDPATH<span class="k">)</span>/utilfunc.o<span class="w"> </span>-o<span class="w"> </span><span class="k">$(</span>OUTFILENAME<span class="k">)</span><span class="w"> </span>
+
+<span class="nf">main.o</span><span class="o">:</span><span class="w"> </span><span class="n">main</span>.<span class="n">c</span>
+<span class="w">    </span><span class="k">$(</span>CC<span class="k">)</span><span class="w"> </span><span class="k">$(</span>DEBUGFLAGS<span class="k">)</span><span class="w"> </span>-c<span class="w"> </span>main.c<span class="w"> </span>-o<span class="w"> </span><span class="k">$(</span>BUILDPATH<span class="k">)</span>/main.o
+
+<span class="nf">utilfunc.o</span><span class="o">:</span><span class="w"> </span><span class="n">utilfunc</span>.<span class="n">c</span>
+<span class="w">    </span><span class="k">$(</span>CC<span class="k">)</span><span class="w"> </span><span class="k">$(</span>DEBUGFLAGS<span class="k">)</span><span class="w"> </span>-c<span class="w"> </span>utilfunc.c<span class="w"> </span>-o<span class="w"> </span><span class="k">$(</span>BUILDPATH<span class="k">)</span>/utilfunc.o
+</code></pre></div>
+
+<p>Jak sam widzisz, całe składanie gotowego pliku wykonawczego, musi zostać poprzedzone wygenerowaniem plików .o z kodu main.c i kodu w utilfunc.c.</p>
+<p>Dodajmy jeszcze możliwość czyszczenia plików wygenerowanych w folderze <code>build</code></p>
+<div class="highlight"><pre><span></span><code><span class="nf">clean</span><span class="o">:</span>
+<span class="w">    </span>del<span class="w"> </span>-f<span class="w"> </span><span class="k">$(</span>BUILDPATH<span class="k">)</span><span class="se">\*</span>.o
+</code></pre></div>
+
+<p><em>Ścieżki plików w makefile podajemy korzystając z '/', a ścieżki dla poleceń w wierszu poleceń (Windows) '\'</em>.
+Cały gotowy <code>Makefile</code>powinien prezentować się następująco:</p>
+<div class="highlight"><pre><span></span><code><span class="c"># -*- MakeFile -*-</span>
+<span class="nv">CC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>gcc#Informacja<span class="w"> </span>o<span class="w"> </span>tym,<span class="w"> </span>jakiego<span class="w"> </span>kompilatora<span class="w"> </span>używamy
+<span class="nv">BUILDPATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>build#Ścieżka<span class="w"> </span><span class="k">do</span><span class="w"> </span>folderu,<span class="w"> </span>gdzie<span class="w"> </span>będą<span class="w"> </span>generowane<span class="w"> </span>pliki<span class="w"> </span>.o
+<span class="nv">OUTFILENAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>main#Nazwa<span class="w"> </span>końcowego<span class="w"> </span>pliku<span class="w"> </span>.exe
+<span class="nv">FLAGS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>-Wall#Flagi<span class="w"> </span>dla<span class="w"> </span>kompilatora
+<span class="nv">DEBUGFLAGS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>-g<span class="w"> </span>-Wall#Flagi<span class="w"> </span>dla<span class="w"> </span>kompilatora<span class="w"> </span>w<span class="w"> </span>przypadku<span class="w"> </span>korzystania<span class="w"> </span>z<span class="w"> </span>debugera
+
+<span class="nf">main</span><span class="o">:</span><span class="w"> </span><span class="n">main</span>.<span class="n">o</span> <span class="n">utilfunc</span>.<span class="n">o</span>
+<span class="w">    </span><span class="k">$(</span>CC<span class="k">)</span><span class="w"> </span><span class="k">$(</span>DEBUGFLAGS<span class="k">)</span><span class="w"> </span><span class="k">$(</span>BUILDPATH<span class="k">)</span>/main.o<span class="w"> </span><span class="k">$(</span>BUILDPATH<span class="k">)</span>/utilfunc.o<span class="w"> </span>-o<span class="w"> </span><span class="k">$(</span>OUTFILENAME<span class="k">)</span><span class="w"> </span>
+
+<span class="nf">main.o</span><span class="o">:</span><span class="w"> </span><span class="n">main</span>.<span class="n">c</span>
+<span class="w">    </span><span class="k">$(</span>CC<span class="k">)</span><span class="w"> </span><span class="k">$(</span>DEBUGFLAGS<span class="k">)</span><span class="w"> </span>-c<span class="w"> </span>main.c<span class="w"> </span>-o<span class="w"> </span><span class="k">$(</span>BUILDPATH<span class="k">)</span>/main.o
+
+<span class="nf">utilfunc.o</span><span class="o">:</span><span class="w"> </span><span class="n">utilfunc</span>.<span class="n">c</span>
+<span class="w">    </span><span class="k">$(</span>CC<span class="k">)</span><span class="w"> </span><span class="k">$(</span>DEBUGFLAGS<span class="k">)</span><span class="w"> </span>-c<span class="w"> </span>utilfunc.c<span class="w"> </span>-o<span class="w"> </span><span class="k">$(</span>BUILDPATH<span class="k">)</span>/utilfunc.o
+
+<span class="nf">clean</span><span class="o">:</span>
+<span class="w">    </span>del<span class="w"> </span>-f<span class="w"> </span><span class="k">$(</span>BUILDPATH<span class="k">)</span><span class="se">\*</span>.o
+</code></pre></div>
+
+<p>Teraz wywołujemy polecenie:
+<code>mingw32-make Makefile main</code>, a potem chcąc wyczyścić projekt <code>mingw32-make Makefile clean</code></p>
+<p>Pliki .c również mogą być w pod folderach, wystarczy podać ich ścieżkę jak w przypadku, generowania plików .o do folderu <code>build</code>.</p>
+<p>W przypadku, gdy nie chcemy kompilować kodu do debugowania, korzystamy ze zmiennej <code>FLAGS</code>, zamiast z <code>DEBUGFLAGS</code>.</p>
+<p>Tworząc odpowiednie wersje skryptów, możemy decydować, czy uruchamiamy program w trybie do debugowania, czy normalnie. To jednak jest sprawa na osobny wpis.</p>
+<h2>2. Konfiguracja VSCode</h2>
+<p>Mamy już działający makefile. Teraz czas, na połączenie odpowiednich akcji wymaganych do kompilacji i uruchomienia kodu w VSCode.</p>
+<p><em>Pamiętaj, że musisz posiadać zainstalowane rozszerzenie C/C++ dla VSCode. Powinien on zostać Ci zaproponowany do instalacji automatycznie, jeżeli go nie posiadasz. Uważam też, że masz poprawnie skonfigurowany minGW i dodane zmienne środowiskowe do systemu. Jeżeli nie, w Internecie znajdziesz mnóstwo poradników w jaki sposób tego dokonać poprawnie.</em></p>
+<p>Rozpocznijmy od otwarcia naszego folderu z projektem w VSCode. Następnie, klikamy na ikonę z robaczkiem i naciskamy na symbol zębatki tuż obok zielonej strzałki. To wygeneruje nam plik <code>launch.json</code>.</p>
+<p>Wklejamy poniższą zawartość do pliku:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Use IntelliSense to learn about possible attributes.</span>
+<span class="w">    </span><span class="c1">// Hover to view descriptions of existing attributes.</span>
+<span class="w">    </span><span class="c1">// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387</span>
+<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;configurations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hello world&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cppdbg&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;program&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${workspaceFolder}/${fileBasenameNoExtension}.exe&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">        </span><span class="nt">&quot;stopAtEntry&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;cwd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${workspaceFolder}&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;environment&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">        </span><span class="nt">&quot;externalConsole&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;MIMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gdb&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;miDebuggerPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gdb.exe&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;setupCommands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Włącz formatowanie kodu dla gdb&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;-enable-pretty-printing&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;ignoreFailures&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div>
+
+<p>Co możemy zmienić:
+- <strong>name</strong> - Nazwa naszej konfiguracji startowej
+- <strong>program</strong> - Nazwa naszego pliku wykonalnego, który zostanie wygenerowany po kompilacji. Tutaj nazwa automatycznie jest wpisywana w zależności, od pliku, w którym klikniemy <code>F5</code>.
+- <strong>args</strong> - Argumenty przekazywane do naszego pliku .exe
+- <strong>externalConsole</strong> - Czy program ma uruchomić się wykorzystując zewnętrzną konsolę.
+- <strong>setupCommands</strong> - Argumenty przekazywane do debuggera GDB.</p>
+<p>Czas na automatyzację wykonania pliku Makefile.
+W utworzonym folderze .vscode dodajemy plik <code>tasks.json</code> i wklejamy do niego zawartość:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2.0.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;tasks&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;shell&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Build&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;build&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;isDefault&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mingw32-make&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="s2">&quot;Makefile&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="s2">&quot;main&quot;</span>
+<span class="w">            </span><span class="p">]</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>W elemencie <strong>command</strong> wpisujemy jakiego programu do przetworzenia pliku makefile będziemy wykorzystywać, a w elemencie <strong>args</strong> - argumenty, które przekażemy.
+Cała reszta może pozostać bez zmian. Tym plikiem symulujemy ręczne wpisanie w konsolę polecenia <code>mingw32-make Makefile main</code>.</p>
+<p>Aby rozpocząć kompilację naszego kodu korzystamy z kombinacji klawiszy <code>CTRL + SHIFT + B</code>.
+Następnie, aby rozpocząć debugowanie <code>F5</code>.</p>
+<p>Jeżeli chcemy, aby przed każdym uruchomieniem programu wykonywana była kompilacja, w pliku <code>launch.json</code> dodajemy linijkę:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&quot;preLaunchTask&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Build&quot;</span>
+</code></pre></div>
+
+<p>Gdzie, <code>Build</code>, jest nazwą, którą umieściliśmy w pliku <code>tasks.json</code> w polu <code>label</code>.</p>
+<p>To wszystko co potrzebne nam jest do zautomatyzowania małych projektów. Absolutnie nie uważam, że robię to w sposób uberpoprawny, aczkolwiek, dla moich zastosowań jest to idealne rozwiązanie. Do kompilacji prostego programu, składającego się np. tylko z pliku main potrzebne nam jest parę linijek. Specjalnie w poradniku postanowiłem dodać kolejny plik, aby zademonstrować, w jaki sposób łączyć poszczególne pliki w całość tworząc makefile.</p>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                VSCode Automatyzacja i tworzenie Makefile
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2019-12-23T00:00:00+01:00">23/12/2019
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">&#128438; Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>

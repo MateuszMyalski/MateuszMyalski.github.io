@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="Tech-Notes">
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mateusz Myalski">
+    <link rel="shortcut icon" href="https://mateuszmyalki.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalki.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalki.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalki.github.io/index.html">Tech-Notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalki.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>Symmetric keys</h1>
+<h2>The concept</h2>
+<p>During sharing data between two devices it is currently a standard that the data is somehow <strong>encrypted</strong>. To allow safe transmission, so third persons cannot simply read the data some kind of mechanism must be introduced. The mechanism is called <strong>symmetric encryption</strong>.</p>
+<h2>Encryption</h2>
+<p>To describe how the symmetric encryption works it is good to state two important aspect of the described mechanism:
+- the encryption and decryption is performed by using secret key,
+- the secret key is known by two devices that communicate with each other,
+- the selected algorithm is the same for encrypting the message and for decryption.</p>
+<p><img alt="Block Diagram" src="images/symmetric_keys/block_diagram.png"></p>
+<h2>Algorithms</h2>
+<p>There is many known algorithms that allows data encryption with known secret key.  Algorithms are in two types:
+- block algorithms - only even blocks of bits are encrypted,
+- stream algorithms - data can be encrypted as it flows in the stream.</p>
+<h3>DES</h3>
+<p>Old method of encryption. DES was using different variation of keys 2 or 3. Currently used widely in EMV chip cards. Not very good algorithm to secure important information.</p>
+<h3>AES</h3>
+<p>The most common and the most advanced technique. Has it's own variation of the key ARS-128, AES-192 and AES-256.</p>
+<h2>GCM - Galois Counter Mode</h2>
+<p>It is a mode of operation for symmetric-key cryptographic block cipher. This mode allows to achieve high performance and speed when encrypting/encrypting the data with inexpensive hardware resources. This mode uses initialization vector to encrypt the data and is widely used in GMAC. GCM is defined for block ciphers where block size is 128 bits. The implementation can <strong>use instruction pipeline or hardware pipeline so parallel executions</strong> of certain algorithm stages is possible. </p>
+<p>It is recommended due to the security to use different IV (Initialization Vector) when using the same key. GCM is not good selection for very short tag-lengths nor very long messages. </p>
+<p>GCM has also it's own version called <em>Sophie Germain Counter Mode</em> that uses modular arithmetic and safe prime numbers to prevent "weak keys".</p>
+<p>This method is also used to produce <strong>GMAC</strong> that produce <em>MAC</em> (Message Authentication Code). During encryption with selected mode GCM/CCM and algorithm (currently only AES is supported), the mechanism produces <strong>tag</strong> that allows to authenticate the encrypted message.</p>
+<p><img alt="Block Diagram" src="images/symmetric_keys/block_diagram_gmac.png"></p>
+<h2>Drawbacks</h2>
+<p><strong>Key Exhaustion</strong> - the secret key is leaking information that allows the attacker to reconstruct the used key. Mostly this can be visible during Side Channel Attacks by analyzing the power consumption. When the keys is used too many times on the data it is possible to match some patterns. Furthermore it is suggested that if the AES with  Galois Counter Mode (GCM) mode is used, single key should not encrypt more than 2^32 cipher blocks.</p>
+<p><strong>Attribution data</strong> - no expiration date of the key is contained in the key. Therefor by using the symmetric key it is important to rotate keys and replace them with new ones. It is also problem that the key is has no information which algorithm should be used for decryption/encryption and when it becomes invalid.</p>
+<h2>OpenSSL</h2>
+<p>Unfortunately the OpenSSL does not support GCM mode. The manual states:</p>
+<blockquote>
+<p>The <strong>enc</strong> program does not support authenticated encryption modes like CCM and GCM, and will not support such modes in the future. The <strong>enc</strong> interface by necessity must begin streaming output (e.g., to standard output when <strong>-out</strong> is not used) before the authentication tag could be validated, leading to the usage of <strong>enc</strong> in pipelines that begin processing untrusted data and are not capable of rolling back upon authentication failure.</p>
+</blockquote>
+<p>Encrypt some data with raw <strong>aes-128</strong> algorithm:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Generate 64 bits of random data</span>
+$&gt;head<span class="w"> </span>-c<span class="w"> </span><span class="m">64</span><span class="w"> </span>&lt;<span class="w"> </span>/dev/urandom<span class="w"> </span>&gt;<span class="w"> </span>data.bin<span class="w"> </span>
+
+<span class="c1"># Encrypt with key - secret_key</span>
+$&gt;openssl<span class="w"> </span>enc<span class="w"> </span>-aes128<span class="w"> </span>-in<span class="w"> </span>data.bin<span class="w"> </span>-out<span class="w"> </span>data.bin.enc<span class="w"> </span>-pass<span class="w"> </span>pass:my_secret_key
+***<span class="w"> </span>WARNING<span class="w"> </span>:<span class="w"> </span>deprecated<span class="w"> </span>key<span class="w"> </span>derivation<span class="w"> </span>used.
+Using<span class="w"> </span>-iter<span class="w"> </span>or<span class="w"> </span>-pbkdf2<span class="w"> </span>would<span class="w"> </span>be<span class="w"> </span>better.
+$&gt;du<span class="w"> </span>-b<span class="w"> </span>*
+<span class="m">64</span><span class="w">  </span>data.bin<span class="w">        </span><span class="c1"># Raw data</span>
+<span class="m">96</span><span class="w">  </span>data.bin.enc<span class="w">    </span><span class="c1"># Encrypted data</span>
+$&gt;diff<span class="w"> </span>data.bin<span class="w"> </span>data.bin.enc<span class="w"> </span>-sd
+Binary<span class="w"> </span>files<span class="w"> </span>data.bin<span class="w"> </span>and<span class="w"> </span>data.bin.enc<span class="w"> </span>differ
+
+<span class="c1"># Decrypt with key - secret_key</span>
+$&gt;openssl<span class="w"> </span>enc<span class="w"> </span>-aes128<span class="w"> </span>-d<span class="w"> </span>-in<span class="w"> </span>data.bin.enc<span class="w"> </span>-out<span class="w"> </span>data.bin.dec<span class="w"> </span>-pass<span class="w"> </span>pass:my_secret_key
+$&gt;du<span class="w"> </span>-b<span class="w"> </span>*
+<span class="m">64</span><span class="w">  </span>data.bin
+<span class="m">64</span><span class="w">  </span>data.bin.dec
+<span class="m">96</span><span class="w">  </span>data.bin.enc<span class="w">    </span><span class="c1"># Decrypted data</span>
+
+$&gt;diff<span class="w"> </span>data.bin<span class="w"> </span>data.bin.dec<span class="w"> </span>-sd
+Files<span class="w"> </span>data.bin<span class="w"> </span>and<span class="w"> </span>data.bin.dec<span class="w"> </span>are<span class="w"> </span>identical
+
+<span class="c1"># Decrypt with key - s3cret_key</span>
+$&gt;openssl<span class="w"> </span>enc<span class="w"> </span>-aes128<span class="w"> </span>-d<span class="w"> </span>-in<span class="w"> </span>data.bin.enc<span class="w"> </span>-out<span class="w"> </span>data.bin.dec.inv<span class="w"> </span>-pass<span class="w"> </span>pass:my_s3cret_key
+***<span class="w"> </span>WARNING<span class="w"> </span>:<span class="w"> </span>deprecated<span class="w"> </span>key<span class="w"> </span>derivation<span class="w"> </span>used.
+Using<span class="w"> </span>-iter<span class="w"> </span>or<span class="w"> </span>-pbkdf2<span class="w"> </span>would<span class="w"> </span>be<span class="w"> </span>better.
+bad<span class="w"> </span>decrypt
+<span class="m">139940000032064</span>:error:06065064:digital<span class="w"> </span>envelope
+routines:EVP_DecryptFinal_ex:bad<span class="w"> </span>decrypt:../crypto/evp/evp_enc.c:610:
+
+$&gt;diff<span class="w"> </span>data.bin<span class="w"> </span>data.bin.dec.inv<span class="w"> </span>-sd
+Binary<span class="w"> </span>files<span class="w"> </span>data.bin<span class="w"> </span>and<span class="w"> </span>data.bin.dec.inv<span class="w"> </span>differ
+
+$&gt;diff<span class="w"> </span>data.bin.dec<span class="w"> </span>data.bin.dec.inv<span class="w"> </span>-sd
+Binary<span class="w"> </span>files<span class="w"> </span>data.bin.dec<span class="w"> </span>and<span class="w"> </span>data.bin.dec.inv<span class="w"> </span>differ
+
+$&gt;du<span class="w"> </span>-b<span class="w"> </span>*
+<span class="m">64</span><span class="w">  </span>data.bin
+<span class="m">64</span><span class="w">  </span>data.bin.dec
+<span class="m">64</span><span class="w">  </span>data.bin.dec.inv
+<span class="m">96</span><span class="w">  </span>data.bin.enc
+</code></pre></div>
+
+<p>The conclusion of the experiment is that the encrypted image is bigger than the original content because certain padding is added (use -nopad) and salt (use -nosalt).
+Furthermore, the tool is showing the warning to not use raw aes-128 algorithm, because due to the nowadays standards this encryption is too weak. Instead during encryption multiple iteration or pbkdf2 method should be used. The PBKDF simply allows to combine multiple passwords together with random number generation to mitigate the brute-force attack method on the encrypted data.</p>
+<div class="highlight"><pre><span></span><code>$&gt;openssl<span class="w"> </span>enc<span class="w"> </span>-aes128<span class="w"> </span>-pbkdf2<span class="w"> </span>-in<span class="w"> </span>data.bin<span class="w"> </span>-out<span class="w"> </span>data.bin.enc<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-pass<span class="w"> </span>pass:my_secret_key<span class="w"> </span>-nopad<span class="w"> </span>-nosalt
+$&gt;du<span class="w"> </span>-b<span class="w"> </span>*
+<span class="m">64</span><span class="w">  </span>data.bin
+<span class="m">64</span><span class="w">  </span>data.bin.enc
+$&gt;diff<span class="w"> </span>data.bin<span class="w"> </span>data.bin.enc<span class="w"> </span>-sd
+Binary<span class="w"> </span>files<span class="w"> </span>data.bin<span class="w"> </span>and<span class="w"> </span>data.bin.enc<span class="w"> </span>differ
+</code></pre></div>
+
+<h2>Bibliography</h2>
+<ul>
+<li><a href="https://www.cryptomathic.com/news-events/blog/symmetric-key-encryption-why-where-and-how-its-used-in-banking">Symmetric Key Encryption - why, where and how it’s used in banking</a></li>
+<li><a href="https://www.cryptomathic.com/news-events/blog/symmetric-cryptography-and-key-management-considerations-on-key-exhaustion-rotation-and-security-models">Symmetric Cryptography and Key Management: Considerations on Key Exhaustion, Rotation and Security Models</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Galois/Counter_Mode">Counter Mode</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Sophie_Germain_Counter_Mode">Sophie Germain Counter Mode</a></li>
+</ul>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                Symmetric keys
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2021-03-26T00:00:00+01:00">26/03/2021
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">&#128438; Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>

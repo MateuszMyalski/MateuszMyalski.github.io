@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="Tech-Notes">
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mateusz Myalski">
+    <link rel="shortcut icon" href="https://mateuszmyalki.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalki.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalki.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalki.github.io/index.html">Tech-Notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalki.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>Pointer madness</h1>
+<p>At the beginning of the journey with C programming language, many students struggling to image what a pointer is and how to use it. Often this is the point when beginners formulate the statement:</p>
+<blockquote>
+<p>C pointers are madness – this is too hard to understand!</p>
+</blockquote>
+<p>Later, when they are told to use pointers at exams, or during exercises instead of standard arrays, they are placing stars all over the place and hope for the best.</p>
+<p>I recon, that such problems comes from not understanding fully, what simple variable is and how it translates to physical world. When software is written in C, it usually means low level device management, <strong>therefore (in my opinion) it is impossible to write good C programs without understanding what the hardware will do after executing one program line</strong>.</p>
+<h1>ABC of basic pointer usage</h1>
+<p>Before we go into explaining, how the pointers reflects the physical memory operations, we should revise how to use them in code semantics.</p>
+<h2>Pointers declarations</h2>
+<p>To store a variable’s address, we declare a pointer by using start operator <code>*</code>. We gave the information, this variable <strong>is not going to store the real value</strong>, but rather <strong>the memory address</strong>, where the real value lives. After this, we need to specify, what kind of value is stored at the pointing address <code>int</code>, <code>char</code> etc. Then the compiler will know how to interpret the value that the pointer is pointing at.</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Assign address when initializng the variable */</span>
+<span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">my_int_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="cm">/*Here put the address*/</span><span class="p">;</span>
+<span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">my_char_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="cm">/*Here put the address*/</span><span class="p">;</span>
+
+<span class="cm">/* Assign the address later in code */</span>
+<span class="n">my_int_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="cm">/*Here put the address*/</span><span class="p">;</span>
+<span class="n">my_char_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="cm">/*Here put the address*/</span><span class="p">;</span>
+</code></pre></div>
+
+<h2>Accessing the address</h2>
+<p>Now we know, how to decelerate the pointer, but how to get the actual address of the variable? We should use the ampersand operator <code>&amp;</code>. This operator is going to return the memory address that the value is stored (value lives).</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;%p&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">a</span><span class="p">);</span><span class="w"> </span><span class="c1">// This will display an address in e.g. 0x7ffc924fb7c4</span>
+</code></pre></div>
+
+<h2>Storing pointers</h2>
+<p>Combining the two information, we can finally <strong>decelerate valid pointer</strong> to variables.</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Some dummy variables */</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">int_variable</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="n">char_variable</span><span class="p">;</span>
+
+<span class="cm">/* Assign address when initializng the variable */</span>
+<span class="c1">// In e.g. (&amp;int_variable) will turn into value 0x7ffc924fb7c4 etc.</span>
+<span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">my_int_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">int_variable</span><span class="p">;</span>
+<span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">my_char_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">char_variable</span><span class="p">;</span>
+
+<span class="cm">/* Assign the address later in code */</span>
+<span class="n">my_int_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">other_int_variable</span><span class="p">;</span>
+<span class="n">my_char_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">other_char_variable</span><span class="p">;</span>
+</code></pre></div>
+
+<h2>Accessing pointers</h2>
+<p>The pointers are finally correctly stored, we can start to operate on their values that they are pointing to. To instruct the C compiler to not modify the address value, but rather the VALUE stored at the address, we are using the star <code>*</code> operator once again. The operation of accessing value, from address that the pointer is pointing to, is called <code>dereferencing</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">char</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;a&#39;</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="n">bar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;z&#39;</span><span class="p">;</span>
+<span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">my_char_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">foo</span><span class="p">;</span><span class="w"> </span><span class="c1">// Now we are pointing to `foo` variable</span>
+
+<span class="c1">// Modify the content that the pointer is poining to</span>
+<span class="p">(</span><span class="o">*</span><span class="n">foo</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;b&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Now `foo` contain letter `b`</span>
+
+<span class="c1">// Modify the address that the pointer is pointing to</span>
+<span class="n">my_char_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">bar</span><span class="p">;</span><span class="w"> </span><span class="c1">// Now we are pointing to `bar` variable</span>
+
+<span class="c1">// Modify the content that the pointer is poining to</span>
+<span class="p">(</span><span class="o">*</span><span class="n">foo</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;x&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Now `bar` contain letter `x` (dereferencion)</span>
+
+<span class="c1">// Go check out this with printf :)</span>
+</code></pre></div>
+
+<p>This is the right moment to ask yourself – what will happen, when not valid memory address pointer is going to be dereferenced? Two things can happen, the program will read garbage or will crash. Simple as it is and scary in its primitive.</p>
+<h1>Simple memory layout</h1>
+<p>It is time to move the theory into the practical world, to finally understand what there is happening under the hood.</p>
+<h2>Local vs Global</h2>
+<p>To start with, we should understand what kind of memory regions our basic C program is using, and how (in very simple way) it is placed in physical memory.</p>
+<p>Let’s imagine that we have following C program:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Global variables */</span><span class="w"> </span>
+<span class="kt">int</span><span class="w"> </span><span class="n">glob_int_var</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="n">glob_char_var</span><span class="p">;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="cm">/* Local variables */</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">loc_int_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">loc_char_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;b&#39;</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>I have used two types of variables: global and local. This is important, to understand the difference between them in perspective, where they are stored in the memory. </p>
+<p><strong>Global variables</strong> are stored in a static region of the memory. This means, that during the whole program lifetime, no one will move them from already taken position. Moreover, without the programmer knowledge, no one will try to modify it after the initialization.</p>
+<blockquote>
+<p>Static memory region initialization - global variables are always initialized to zero. This is done at the very beginning of the program start (before even starting the main).</p>
+</blockquote>
+<p><strong>Local variables</strong> are stored on “stack” memory region. Because the stack is <em>dynamically managed</em> by the C itself, all stored variables will be invalidated when the function returns. Therefore, the values stored in the stack, after exiting the function, can be changed without the programmer’s knowledge.</p>
+<h2>What pointer represents</h2>
+<p>Let’s remind that the <code>sizeof(int) == 4</code>, <code>sizeof(char) == 1</code>. Assume that <strong>one unit</strong> is <strong>1 byte</strong>. <code>int</code> and <code>char</code> are “containers” for data, different types are defining how big the “containers” are. Defined “data containers (variables)”, must be stored somewhere in the memory. People have their home addresses, likewise, variables have their memory addresses.</p>
+<p>The physical memory is organized in a matrix-like grid. To access the memory cell, we need to provide row (axis x) and column (axis y) <em>(simplification)</em>. This is done by passing a <strong>POINTER</strong> to the memory. The pointer must contain the number of the x and y coordinates. <em>That is why, the pointer types <code>sizeof</code> is related to the architecture</em> - pointer must be able to address the whole possible range to access memory regions. </p>
+<div class="highlight"><pre><span></span><code><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Ptr size: %lu&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">));</span><span class="w"> </span><span class="c1">// for 32-bit system -&gt; 4</span>
+<span class="w">                                        </span><span class="c1">// for 64-bit system -&gt; 8</span>
+</code></pre></div>
+
+<p>This clearly shows, that “the more bits”, the more you can address, the bigger memory space you can use (we won’t go into details here). Nowadays, most of the machines uses 64-bits, so the pointers use 8 bytes to address the entire memory space.</p>
+<p>To simplify things and imagine how pointer is constructed, we can say that – all 8 bytes (or 4 in case of 32-bit) are divided into two numbers, as described below.</p>
+<div class="highlight"><pre><span></span><code><span class="w">                        </span><span class="mi">8</span><span class="w"> </span><span class="nx">Bytes</span>
+<span class="o">*</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="o">|</span><span class="nx">XXXX</span><span class="w"> </span><span class="nx">XXXX</span><span class="w"> </span><span class="nx">XXXX</span><span class="w"> </span><span class="nx">XXXX</span><span class="w"> </span><span class="nx">YYYY</span><span class="w"> </span><span class="nx">YYYY</span><span class="w"> </span><span class="nx">YYYY</span><span class="w"> </span><span class="nx">YYYY</span><span class="o">|</span>
+<span class="o">^</span><span class="w">    </span><span class="o">^</span><span class="nx">_________________</span><span class="o">^</span><span class="w"> </span><span class="o">^</span><span class="nx">_________________</span><span class="o">^</span>
+<span class="o">|</span><span class="w">     </span><span class="err">\</span><span class="nx">axis</span><span class="o">-</span><span class="nx">X</span><span class="w">             </span><span class="err">\</span><span class="nx">axis</span><span class="o">-</span><span class="nx">Y</span>
+<span class="err">\</span><span class="nx">_pointer</span><span class="w"> </span><span class="k">type</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="cm">/* Global variables */</span><span class="w"> </span>
+<span class="kt">int</span><span class="w"> </span><span class="n">glob_int_var</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="n">glob_char_var</span><span class="p">;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="cm">/* Local variables */</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">loc_int_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">loc_char_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;b&#39;</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The presented code could look as following in the memory representation:</p>
+<p><img alt="image0" src="images/pointer_madness/image0.jpg"></p>
+<p><em>This represents only a small fragment of the memory (in reality there are more columns and rows :))</em></p>
+<p>Now, it is a good moment to understand the correlation between standard variable and pointer variable. </p>
+<p>To remind: currently in our “stack region” is stored:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Local variables */</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">loc_int_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="n">loc_char_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;b&#39;</span><span class="p">;</span>
+</code></pre></div>
+
+<p>… and in “static region”:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Global variables */</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">glob_int_var</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="n">glob_char_var</span><span class="p">;</span>
+</code></pre></div>
+
+<p>To revise the knowledge from the first chapter, we can relate now to the real memory organization. Accessing the address of variables is going to return:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Local variables */</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;%p&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">loc_int_var</span><span class="p">);</span><span class="w"> </span><span class="c1">// 0x0002 0005 0000 0002</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;%p&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">loc_char_var</span><span class="p">);</span><span class="w"> </span><span class="c1">// 0x0002 0002 0000 0001</span>
+
+<span class="cm">/* Global variables */</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;%p&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">glob_int_var</span><span class="p">);</span><span class="w"> </span><span class="c1">// 0x000A 0000 0000 0000</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;%p&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">glob_char_var</span><span class="p">);</span><span class="w"> </span><span class="c1">// 0x000A 0002 0000 000A</span>
+</code></pre></div>
+
+<p>In the next step, we will visualize how, in memory, declaring a pointer type is going to look:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Global variables */</span><span class="w"> </span>
+<span class="kt">int</span><span class="w"> </span><span class="n">glob_int_var</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="n">glob_char_var</span><span class="p">;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="cm">/* Local variables */</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">loc_int_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">loc_char_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;b&#39;</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">ptr_to_int</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">glob_int_var</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">ptr_to_char</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">loc_char_var</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><img alt="image1" src="images/pointer_madness/image1.jpg"></p>
+<p>This small sneak peek into the real memory, should clarify a bit, what the pointer type is and what it is storing. To simplify it even more, we emphasize that the <em>pointer type variable</em> is a container that holds address to other variables/memory cell.</p>
+<h1>Double pointers – inception</h1>
+<p>Now we are going to complicate a bit our examples. Probably the first time you have touched double pointers was when declaring main function:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// or</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">argv</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Probably right now you are wondering why these two versions of declaring <code>main</code> function works. This is going to be explained (especially <code>[]</code> operator) in further chapters. For now let’s focus how we can declare double pointers and what they are.</p>
+<p>To declare double pointer, we are going to use double starts:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">double_ptr</span><span class="p">;</span>
+</code></pre></div>
+
+<p>To translate it into human language: <strong>pointer that points to another pointer of type char</strong>.</p>
+<p>For sure, it will be simpler to see how it looks in the memory, but before, let’s try to use it in real world example. We are going to point into a pointer that points to <code>char</code> variable, to recreate a small part of the above <code>main</code> example.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">char</span><span class="w"> </span><span class="n">arg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;x&#39;</span><span class="p">;</span>
+<span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">arg_location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">arg</span><span class="p">;</span><span class="w"> </span><span class="c1">// Storing address of the &#39;arg&#39; variable</span>
+
+<span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">argv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">arg_one_location</span><span class="p">;</span><span class="w"> </span><span class="c1">// Storing address of the &#39;arg_location&#39; variable</span>
+
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;%c&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">argv</span><span class="p">)));</span><span class="w"> </span><span class="c1">// Out: &#39;x&#39;</span>
+
+<span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">argv</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;b&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Accesing the data of &#39;cool_value&#39; variable</span>
+
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;%c&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">argv</span><span class="p">)));</span><span class="w"> </span><span class="c1">// Out: &#39;b&#39;</span>
+
+<span class="kt">char</span><span class="w"> </span><span class="n">new_arg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;y&#39;</span><span class="p">;</span>
+<span class="n">arg_location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">new_arg</span><span class="p">;</span>
+
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;%c&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">argv</span><span class="p">)));</span><span class="w"> </span><span class="c1">// Out: &#39;y&#39;</span>
+</code></pre></div>
+
+<p>As you can see, without modifying the double pointer address, we are able to change the location that is going to be read after <strong>double pointer dereference</strong>.</p>
+<p>This brings a lot of potential, when in the future, we are going to use 2D arrays. Now let’s recreate it in physical memory.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">char</span><span class="w"> </span><span class="n">arg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;x&#39;</span><span class="p">;</span>
+<span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">arg_location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">arg</span><span class="p">;</span>
+
+<span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">argv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">arg_one_location</span><span class="p">;</span>
+</code></pre></div>
+
+<p><img alt="image2" src="images/pointer_madness/image2.jpg"></p>
+<h1>Pointer arithmetic</h1>
+<p>By this point we should have clear understatement:
+- what the pointer itself is, 
+- how to get the address, 
+- how pointers are stored 
+- and how to modify pointed content.</p>
+<p>The next thing, what is usually skipped during lectures, is pointer arithmetic. This chapter should provide a bit more clarity, of what is happening when numbers are added/subtracted to pointers. This should open the path to finally understand what actually an array is.</p>
+<h2>Adding/subtracting the pointer</h2>
+<p>We are going to start with the simple case study:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">bar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">foo</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Addr: %lu</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bar</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">bar</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Addr + 1: %lu</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bar</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Sizeof(int) = %u&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This snippet of code is going to print:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Addr</span><span class="o">:</span><span class="w"> </span><span class="mi">4293437832</span>
+<span class="n">Addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="w"> </span><span class="mi">4293437836</span>
+<span class="n">Sizeof</span><span class="o">(</span><span class="n">int</span><span class="o">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span>
+</code></pre></div>
+
+<p>Now let’s examine a similar snippet but with <code>char</code> type:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">bar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">foo</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Addr: %lu</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bar</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">bar</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Addr + 1: %lu</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bar</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Sizeof(char) = %u&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The printout is going to be as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Addr</span><span class="o">:</span><span class="w"> </span><span class="mi">4290288635</span>
+<span class="n">Addr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="w"> </span><span class="mi">4290288636</span>
+<span class="n">Sizeof</span><span class="o">(</span><span class="n">char</span><span class="o">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+</code></pre></div>
+
+<p>Now the “secret” about pointer arithmetic has been revealed. Take a closer look at the difference between <code>addr</code> and <code>addr +1</code>. For <code>int</code> type, the result of subtraction is <code>4293437836 - 4293437832 = 4</code> what is exactly the number of <code>sizeof(int)</code>, but for type <code>char</code> the difference is <code>4290288636 - 4290288635 = 1</code> and it is also similarly equal to <code>sizeof(char)</code>. In each case, the pointer address has been incremented only by <code>1</code>. How does it happen that we have different outcomes of two exact additions?</p>
+<p>This is the main difference between standard numbers arithmetic vs pointer arithmetic. During each addition or subtraction, the <code>sizeof</code> of type that the variable is pointing to is taken into account. This is an implicit “helper” for the programmers, when iterating through an <code>array</code> of values, which we will discuss in the next chapter.</p>
+<p>To formalize the pointer math:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Addition</span><span class="o">:</span>
+<span class="n">ptr_address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ptr_address</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="o">(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sizeof</span><span class="o">(</span><span class="n">ptr_type</span><span class="o">))</span>
+
+<span class="n">Subtraction</span><span class="o">:</span>
+<span class="n">ptr_address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ptr_address</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="o">(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sizeof</span><span class="o">(</span><span class="n">ptr_type</span><span class="o">))</span>
+</code></pre></div>
+
+<h2>Pointer comparison</h2>
+<p>This is rather simple topic, <strong>each pointer can be compared as standard number</strong>, only with one small extra – the <strong>NULL value</strong>.</p>
+<p>Imagine pointer without valid address. We need to find the way of notifying others, that the pointer is not pointing at anything useful. In C standard, it is done by what is called <code>NULL</code> pointer. </p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">my_not_ready_pointer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+
+<span class="k">if</span><span class="p">(</span><span class="n">my_not_ready_pointer</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exit</span><span class="p">(</span><span class="mi">-1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This technique is often used when checking pointers returned, or passed to the function as arguments. During the program execution: <strong>always make sure you are not trying to write or dereference invalid pointer, especially NULL one</strong> (this is also called argument’s sanitization).</p>
+<h1>1D arrays</h1>
+<p>After understanding the basics of pointer’s manipulations, we can finally get into arrays in C language. It is important for this step to understand, how incrementing/decrementing pointers works and how arrays are stored in the memory.</p>
+<h2>Declaring arrays and accessing elements</h2>
+<p>To start with, we have to make a clear statement that <strong>arrays are continues fragments of the memory that stores the desired content</strong>. This said, we can move to reminding ourselves how we usually define the array in the code?</p>
+<div class="highlight"><pre><span></span><code><span class="kt">char</span><span class="w"> </span><span class="n">char_array</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+<span class="kt">char</span><span class="w"> </span><span class="n">auto_sized_char_array</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;My string&quot;</span><span class="p">;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">int_array</span><span class="p">[</span><span class="mi">12</span><span class="p">];</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">auto_size_int_array</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="mi">-23</span><span class="p">};</span>
+</code></pre></div>
+
+<p>… and how to we access the array members – with this you should be already familiar:</p>
+<div class="highlight"><pre><span></span><code><span class="n">char_array</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;s&#39;</span><span class="p">;</span>
+<span class="n">int_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-15</span><span class="p">;</span>
+</code></pre></div>
+
+<h2>Array in memory layout</h2>
+<p>The most essential mark, that the variable is actually an ‘array’ of variables, is <code>[]</code> operator. But what it actually does? Firstly, let’s see how this example is placed in memory:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">char</span><span class="w"> </span><span class="n">foo</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Super bee&quot;</span><span class="p">;</span>
+</code></pre></div>
+
+<p><img alt="image3" src="images/pointer_madness/image3.jpg"></p>
+<p><em>Notice automatically added null terminator!</em></p>
+<p>The picture shows that this is just a contiguous chain of <code>char</code> type containers that holds the characters.</p>
+<p>Similar thing you are going to see with <code>int</code> type:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">bar</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">};</span>
+</code></pre></div>
+
+<p><img alt="image4" src="images/pointer_madness/image4.jpg"></p>
+<p>The array type variable, remembers only the <strong>beginning</strong> memory address of the array. The address can be accessed by using the array's name without <code>[]</code> operator, or accessed by the address of the first element <code>&amp;bar[0]</code> (<code>bar == &amp;bar[0]</code>). Therefore, it is important for the programmer, to not pass the end of the array. When accessing in e.g., the <code>bar</code> variable, we have used <code>bar[2]</code>. By using this notation, we have three information that the compiler can deduce where the demanded value is stored: </p>
+<ul>
+<li>type of the value,</li>
+<li>beginning of the array,</li>
+<li>index of the array.</li>
+</ul>
+<p>These three things allows calculating the exact placement of the nth variable.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">bar</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">};</span>
+<span class="c1">// bar[2] =&gt; *(bar + (sizeof(int) * 2) =</span>
+<span class="c1">// = (0x0002 0001 0000 0000) + (4 * 2)) = *(0x0002 0001 0000 0008)</span>
+
+<span class="kt">char</span><span class="w"> </span><span class="n">foo</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Super bee&quot;</span><span class="p">;</span>
+<span class="c1">// foo[5] =&gt; *(foo + (sizeof(char) * 4) = </span>
+<span class="c1">// = (0x0002 0003 0000 0001) + (1 * 5)) = *(0x0002 0003 0000 0006)</span>
+</code></pre></div>
+
+<p>Such operations can be done manually in compiler:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">bar</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">};</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="n">bar</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span><span class="w"> </span><span class="c1">// Out: 2</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Notice, that we are skipping here the <code>sizeof(int)</code>, because the compiler knows that we are using the <code>int</code> type and when adding, values implicitly are going to be multiplied by the `sizeof(int).</p>
+<p>Prove, that array is a continuous memory pool:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">bar</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">};</span>
+
+<span class="w">    </span><span class="c1">// sizeof(*bar) == sizeof(int)</span>
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span><span class="o">/</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">bar</span><span class="p">);</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;[%d] %#x</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">bar</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Out: [0] 0xffbec180</span>
+<span class="w">    </span><span class="c1">//      [1] 0xffbec184</span>
+<span class="w">    </span><span class="c1">//      [2] 0xffbec188</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><em>Addresses can be different every program run, but they should be incremental</em></p>
+<h2>Incrementing pointers to access array’s element</h2>
+<p>Knowing about described mechanisms, we can conclude, that iterating over the array can be done by simple adding values to the pointer. This leads us to the simple <em>(dangerous!)</em> function how we can iterate over a string using pointers:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">foo</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Super bee&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">cnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">foo_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">foo</span><span class="p">;</span><span class="w"> </span><span class="c1">// or char* foo_ptr = &amp;foo[0]</span>
+
+<span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="o">*</span><span class="n">foo_ptr</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cnt</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cnt</span><span class="p">);</span><span class="w"> </span><span class="c1">// Out: 9</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>In this example, we have used the compiler help to add the correct amount of bytes to our pointer. Every iteration of <code>while</code> loop and incrementing by <strong>one</strong>, <strong>one</strong> byte is going to be added (because this array is <code>char</code> type).</p>
+<p>Why does it stop iterating? Because when reaching to the <em>last</em> value of the string – the <strong>NULL TERMINATOR (\0)</strong> boolean expression gives <code>false</code>, which is terminating the <code>while</code> loop. Now imagine, someone has forgotten the null terminator 😟 – scary things happens!</p>
+<p>To split this example even more. During each iteration, four things are happening:
+1. <code>foo_ptr</code> is incremented by one (<code>foo_ptr++</code>).
+2. Incremented address is dereferenced (<code>(*foo_ptr)</code>).
+3. A boolean expression is evaluated (<code>(*foo_ptr) != '\0'</code>).
+4. In case of true, <code>cnt</code> is incremented (<code>cnt++</code>).</p>
+<h1>2D arrays</h1>
+<p>Adding another dimension does not change much, how the array is placed in the memory. <strong>The two-dimensional array is STILL a continuous memory block in memory</strong>. We are going to create a simple 2D array:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+
+<span class="c1">// Sample data</span>
+<span class="n">foo</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">234</span><span class="p">;</span>
+</code></pre></div>
+
+<p>In the memory, this is going to be represented as follows:</p>
+<p><img alt="image5" src="images/pointer_madness/image5.jpg"></p>
+<h2>Calculating the location</h2>
+<p>You probably ask yourself, how the demanded location is calculated? The overall problem is solved by simple formula.</p>
+<p>Assume <code>foo[row][col]</code>, then <code>offset = (row * row_length + col) * sizeof(type)</code>. Now, to use the calculated offset, we need to take the beginning address of our allocated memory - <code>&amp;foo[0][0]</code> or simply <code>foo</code>. Summarizing, to calculate the location, use formula as follows: <code>*(&amp;foo[0][0] + offset)</code>.</p>
+<h2>Manual index manipulation</h2>
+<p>Two-dimensional arrays, can be iterated likewise one-dimensional arrays. The story, how to perform it, is very similar. We have given row address, then we can increment the pointer to access another row index.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+
+<span class="w">    </span><span class="n">foo</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="w">    </span><span class="n">foo</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-2</span><span class="p">;</span>
+<span class="w">    </span><span class="n">foo</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-3</span><span class="p">;</span>
+<span class="w">    </span><span class="n">foo</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-4</span><span class="p">;</span>
+<span class="w">    </span><span class="n">foo</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-5</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">foo</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-999</span><span class="p">;</span><span class="w"> </span><span class="c1">// Begining of the 2rd column</span>
+
+<span class="w">    </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">foo1_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">foo</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">];</span><span class="w"> </span><span class="c1">// Accessing row&#39;s 1 address</span>
+
+<span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="n">foo1_ptr</span><span class="o">++</span><span class="p">));</span><span class="w"> </span><span class="c1">// Iterating over row 2</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="c1">// Out: -1</span>
+<span class="w">    </span><span class="c1">//      -2</span>
+<span class="w">    </span><span class="c1">//      -3</span>
+<span class="w">    </span><span class="c1">//      -4</span>
+<span class="w">    </span><span class="c1">//      -5</span>
+
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="n">foo1_ptr</span><span class="o">++</span><span class="p">));</span><span class="w"> </span><span class="c1">// Out: -999</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The above example not only presents, how to iterate over the row, but also proves that the 2D array is a continuous memory block. In the last <code>printf</code> the max index of the column overflowed to the next row, that is why we can see value <code>-999</code> in the terminal.</p>
+<h1>Structures</h1>
+<p>The possibility, of declaring own data structures, open many new possibilities. These possibilities have their own rabbit holes that must be explained in a separate story. Here, we are going to focus only on basics of how to access the structure by pointer. We are not going to get into details about all “dark” magic that can be done using pointers and structures. </p>
+<h2>Structure address</h2>
+<p>This example is going to show how to access the structure address:</p>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">z</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">short</span><span class="w"> </span><span class="n">arr</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+<span class="p">}</span><span class="w"> </span><span class="n">foo_t</span><span class="p">;</span>
+
+<span class="n">foo_t</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+
+<span class="n">foo_t</span><span class="o">*</span><span class="w"> </span><span class="n">foo_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">foo</span><span class="p">;</span>
+</code></pre></div>
+
+<p>It is also possible to get address of the members of the structure:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">foo_b_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="p">(</span><span class="n">foo</span><span class="p">.</span><span class="n">b</span><span class="p">);</span>
+<span class="kt">short</span><span class="o">*</span><span class="w"> </span><span class="n">foo_arr_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="p">(</span><span class="n">foo</span><span class="p">.</span><span class="n">arr</span><span class="p">);</span>
+</code></pre></div>
+
+<h2>Possible representation in memory</h2>
+<p>Dealing with structures, we have to remember, <strong>between fields padding can be added by the compiler</strong>. Here, we are not going to focus on it, assume that the padding is equal to 4 bytes. Padding, to 4 bytes, means – the smallest field in the structure is four bytes.</p>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">aaa</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">bbb</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">ccc</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="p">}</span><span class="w"> </span><span class="n">foo_t</span><span class="p">;</span>
+
+<span class="n">foo_t</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+</code></pre></div>
+
+<p><img alt="image6" src="images/pointer_madness/image6.jpg"></p>
+<h2>Accessing structure by pointer</h2>
+<p>When dealing with structure pointers, the C compiler provides a small helper for the developers. Before we use it, we should firstly understand from where it comes.</p>
+<p>We would like to get access to the structure region by having just the address of the beginning of the structure. We remember, from previous chapters, this can be done by <code>dereferencing</code> the pointer with <code>*</code> operator. The next operation, that should be performed, is to instruct the compilator, which field we would like to get access – to do it, on standard structure variable type, we have used <code>.</code> operator.</p>
+<p>Assume, all we have is <code>foo_t* foo_ptr = &amp;foo</code> pointer. To use in practical world the knowledge to access the <code>aaa</code> field, we can write <code>(*foo_ptr).aaa = 'a'</code>. You can notice, that writing <code>(*struct_ptr)</code> in every access to the structure member is very tedious. Here comes the language helper arrow <code>-&gt;</code> operator. Now, it is possible to put equality between these two expressions <code>(*foo_ptr).aaa == foo_ptr-&gt;aaa</code>.</p>
+<h1>Pointers as arguments</h1>
+<p>When passing arguments to the function, we often pass them by copy. When dealing with structures, we typically do not want to make a lot of copies of the same data. Arrays, even cannot be passed by copy in C language, therefore we use pointers to pass arrays and structures.</p>
+<p>When passing pointers to the functions, we give direct access to the data, so the function can operate on the data set.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Passing pointer to the value as argument</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">bee</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">val</span><span class="p">){</span>
+<span class="w">    </span><span class="c1">// Direct access to the val integer</span>
+<span class="p">}</span>
+
+<span class="c1">// Passing array as argument</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">arr</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">n_elems</span><span class="p">){</span>
+<span class="w">    </span><span class="c1">// Direct access to the arr array with n_elems</span>
+<span class="p">}</span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">foo_t</span><span class="p">;</span>
+<span class="c1">// Passing struct as argument</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">bar</span><span class="p">(</span><span class="n">foo_t</span><span class="o">*</span><span class="w"> </span><span class="n">foo</span><span class="p">){</span>
+<span class="w">    </span><span class="c1">// Direct access to the foo structure</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Notice, that every time you pass an array to the function, it is important to pass also the size of the array, because inside the function body it is not going to be possible to get the <code>sizeof(arr)</code> (it is going to return the pointer size).</p>
+<h1>Constant pointers and variables</h1>
+<p>During programming, often you would like to protect some data from modifications – you use <code>const</code> to make the data constant. The same can be done with pointers.</p>
+<h2>Constant pointer</h2>
+<p>We would like to use a pointer, which address can be modified, but we do not want to modify the content that the pointer is pointing to.</p>
+<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">bar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">foo</span><span class="p">;</span><span class="w"> </span><span class="c1">// Able to change the addres but not the foo content</span>
+</code></pre></div>
+
+<h2>Pointer to constant variable</h2>
+<p>We would like to protect the address from being modified, but we want to be able to edit the content that the pointer is pointing to.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">bar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">foo</span><span class="p">;</span><span class="w"> </span><span class="c1">// Able to change the foo contnet but not the bar address</span>
+</code></pre></div>
+
+<h2>Constant pointer to constant variable</h2>
+<p>And last version, we want to protect the address of the pointer and content that the pointer is pointing to.</p>
+<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">bar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">foo</span><span class="p">;</span><span class="w"> </span><span class="c1">// Not able to change the foo contnet and the bar address</span>
+</code></pre></div>
+
+<h2>How to read it easily?</h2>
+<p>A bit tricky huh? Here is a small trick. Read it backwards :)</p>
+<p>First example: variable named <code>bar</code>, constant (<code>const</code>) pointer(<code>*</code>) of type <code>int</code>. Constant pointer means that the address of the pointer cannot be changed.</p>
+<p>Second example: variable named <code>bar</code> pointer(<code>*</code>) of type <code>int</code> that is constant (<code>const</code>).</p>
+<p>Third example: variable named <code>bar</code> constant(<code>const</code>) pointer(<code>*</code>) of type <code>int</code> is constant(<code>const</code>)</p>
+<h1>Where to put the start?</h1>
+<p>After studying all above chapters, you finally should have rough idea – where to put the star**, when using pointers in the code. Probably, a few more exercises is going to be needed, to build a really strong base to fully understand the concept of pointers.</p>
+<p>Creating the imagination of how the physical memory is going to behave when accessing/declaring the pointer, is the key aspect in this topic. Since C language is basing on low-level concepts, they should be sometimes understood from bottom to the top.</p>
+<h1>Bibliography</h1>
+<ol>
+<li><a href="https://www.amazon.com/Understanding-Using-Pointers-Techniques-Management/dp/1449344186">Understanding and Using C Pointers: Core Techniques for Memory Management</a></li>
+</ol>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                Pointer madness
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2022-08-03T00:00:00+02:00">03/08/2022
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">&#128438; Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>

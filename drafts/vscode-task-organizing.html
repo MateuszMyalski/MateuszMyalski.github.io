@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="Tech-Notes">
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mateusz Myalski">
+    <link rel="shortcut icon" href="https://mateuszmyalki.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalki.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalki.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalki.github.io/index.html">Tech-Notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalki.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>VSCode Task organizing</h1>
+<p>Maintaining several scripts, especially in projects with numerous tasks, can be quite a challenge. In larger projects, these tasks might not be exclusively tied to the build system but could involve automating various aspects of your workflow. Wouldn't it be convenient to have a centralized hub where all these scripts are neatly organized and easily accessible within the familiar and reliable VSCode environment? This blog post explores a straightforward technique to store and manage your tasks efficiently, making your work more streamlined and less cumbersome. Read on to discover a solution that simplifies the execution of your scripts, helping you save time and boost productivity in your development projects.</p>
+<p>Rather than relying on intricate chains of raw commands within the <code>task.json</code> file stored in the <code>.vscode</code> directory, consider the simplicity and effectiveness of keeping your automation scripts separate. Utilizing familiar scripting languages like Bash or Python allows for more straightforward handling and maintenance. By creating individual scripts and invoking them through the <code>task.json</code> file with the right arguments or switches, you gain a cleaner and more organized approach. How many times have you, during repository restoration or cloning, inadvertently deleted the essential <code>.vscode</code> configuration settings? This alternative method not only ensures ease of use but also reduces the chances of accidentally losing crucial configurations, enhancing the overall reliability of your development environment.</p>
+<h1>Workspace tree</h1>
+<p>To establish an organized structure for your VSCode settings, start by creating a sample .vscode folder outside your current working repository. Using a symbolic link, effortlessly connect this directory to your working project. This approach ensures that even if you delete the sample repository, you won't lose your essential configurations since they reside in a separate directory. Below is a bash snippet demonstrating how to create the symbolic link:</p>
+<div class="highlight"><pre><span></span><code>ln<span class="w"> </span>-s<span class="w"> </span>/path/to/sample-directory/.vscode<span class="w"> </span>/path/to/your/real/.vscode
+</code></pre></div>
+
+<p>Within the <code>.vscode</code> directory, craft three pivotal files: <code>launch.json</code>, <code>settings.json</code>, and <code>tasks.json</code>.</p>
+<ul>
+<li>
+<p><code>launch.json</code>: This file is crucial for swiftly executing code, whether in debug or non-debug mode. Think of it as a task executed with a single press of a function button.</p>
+</li>
+<li>
+<p><code>settings.json</code>: This file encapsulates all workspace configurations. Useful for disabling large directories from the Git indexer, turning off unnecessary settings, or defining other locally relevant configurations.</p>
+</li>
+<li>
+<p><code>tasks.json</code>: Arguably the most important file at this stage. Here, you specify all your tasks and convenient script entry points essential for your workflow. The envisioned folder structure is illustrated above, with symbolic links ensuring accessibility and safeguarding configurations in the main folder even if the sample repository is deleted. This organized setup enhances the overall manageability and durability of your VSCode environment, facilitating a seamless development experience.</p>
+</li>
+</ul>
+<p>The structure should look as follows:</p>
+<div class="highlight"><pre><span></span><code>Main Folder
+├── .vscode
+│   ├── scripts
+│   │   ├── sample_script.sh
+│   │   └── another_script.py
+│   ├── launch.json
+│   ├── settings.json
+│   └── tasks.json
+└── sample-repository
+    ├── .vscode → Symbolic link to Main Folder/.vscode
+    │   ├── scripts
+    │   │   ├── sample_script.sh
+    │   │   └── another_script.py
+    │   ├── launch.json
+    │   ├── settings.json
+    │   └── tasks.json
+    ├── sample_file1.txt
+    └── sample_file2.txt
+</code></pre></div>
+
+<h1>The tasks.json file</h1>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                VSCode Task organizing
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2024-01-08T00:00:00+01:00">08/01/2024
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">&#128438; Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>
