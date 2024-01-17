@@ -119,14 +119,15 @@ section.post h1 {
 }
 
 section.post img {
-    max-width:100%;
+    max-width: 100%;
     display: block;
     margin: 3% auto;
 }
 
-section.post p code {
+section.post code:not(pre code) {
     border: 1px solid black;
     padding: 0px 2px;
+    word-break: break-all;
 }
 
 section.post blockquote {
@@ -159,6 +160,13 @@ footer span#heart {
     font-size: 1.2em;
     margin-left: 0.3em;
     color: var(--accent-two-color);
+}
+
+@media screen and (max-width: 900px) {
+    body {
+        min-width: 98vw;
+        max-width: 98vw;
+    }
 }
 
 @media print {
