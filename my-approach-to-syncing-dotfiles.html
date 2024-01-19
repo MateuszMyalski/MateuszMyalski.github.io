@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="Tech-Notes">
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mateusz Myalski">
+    <link rel="shortcut icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalski.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalski.github.io/index.html">Tech-Notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalski.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>My Approach to Syncing Dotfiles</h1>
+<p>Recently, I decide to tidy up my dotfiles on both my personal Linux machine and my workstation. Initially, I keep a single file in a public repository, copying and pasting bits of functions and aliases manually. However, as my configurations grow, syncing between my laptop and workstation becomes challenging.</p>
+<h2>Overcoming Challenges</h2>
+<p>The main hurdle is updating aliases at work. Manually syncing the repository and copying the necessary elements becomes cumbersome. I aim to streamline and automate the one-way syncing of my dotfiles, avoiding the need to share access to my personal repository with these devices.</p>
+<p>To automate the process, I consider setting up periodic tasks with tools like cron or checking for updates each time I open my console. However, this seems overly complex for a simple task. I prefer a straightforward approach: checking for updates automatically every N seconds, such as every 8 hours (one working day) when I open my console.</p>
+<h2>The Solution</h2>
+<p>To track the last time I check for a new version, I utilize timestamps associated with each file. In my dotfile folder, I create a file named .version containing the numeric version of the dotfiles "release." Reading the modification time allows me to calculate the time since the last remote version check. The script updates the modification time every time a remote check is performed.</p>
+<p>The challenge is how to easily check the current remote version. Instead of complex web scraping, GitHub's "raw" view provides a simple solution. Using curl to fetch information without parsing, I can compare the remote and local versions. If the local version is outdated, a message prompts the user at console startup.</p>
+<p>If the user chooses to update, the script clones the repository into a temporary directory and executes install.sh to copy all necessary files. To prevent unwanted updates, users can block version checking by manually deleting the locally stored .version file.</p>
+<p>Here's a snippet of the code performing these tasks:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">REMOTE_VERSION_FILE_URL</span><span class="o">=</span><span class="s2">&quot;https://raw.githubusercontent.com/MateuszMyalski/dotfiles/master/.dot/.version&quot;</span>
+<span class="nv">VERSION_FILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.dot/.version&quot;</span>
+<span class="nv">CHECK_UPDATE_AFTER_SECONDS</span><span class="o">=</span><span class="k">$((</span><span class="m">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">8</span><span class="k">))</span>
+
+dot_check_update<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nv">REMOTE_VERSION</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REMOTE_VERSION_FILE_URL</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="w">    </span><span class="nv">LOCAL_VERSION</span><span class="o">=</span><span class="k">$(</span>cat<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span><span class="k">)</span>
+
+<span class="w">    </span><span class="c1"># Step 3: Notify about update</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_VERSION</span><span class="s2">&quot;</span><span class="w"> </span>-lt<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REMOTE_VERSION</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;New version of dot files available!&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Remote version: </span><span class="nv">$REMOTE_VERSION</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Local version: </span><span class="nv">$LOCAL_VERSION</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;To update execute: dot_self_update&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;To stop this message remove file: </span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;-s&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Remote version: </span><span class="nv">$REMOTE_VERSION</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Local version: </span><span class="nv">$LOCAL_VERSION</span><span class="s2">&quot;</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Version up to date!&quot;</span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="m">1</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="o">}</span>
+
+<span class="c1"># Check if flag file exists</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>!<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="c1"># The update checks has been disabled</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="k">fi</span>
+
+<span class="c1"># Step 1: Check the file modification delta</span>
+calculate_mod_time_delta<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span>
+
+<span class="c1"># Step 2: curl the version from git</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$?</span><span class="s2">&quot;</span><span class="w"> </span>-gt<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CHECK_UPDATE_AFTER_SECONDS</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>dot_check_update<span class="w"> </span><span class="s2">&quot;-s&quot;</span>
+<span class="k">else</span>
+<span class="w">    </span><span class="c1"># Do not check too frequently</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="m">0</span>
+<span class="k">fi</span>
+
+touch<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<p>You can find my dotfiles on GitHub. They may not be sophisticated, but you might find some useful techniques to adapt to your "simple" dotfiles structure.</p>
+<h2>Automatic Version Incrementation</h2>
+<p>Concerned about remembering to manually increment the version number in .version? I write a simple Git hook to automate this task with every commit:</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+
+<span class="nv">VERSION_FILE</span><span class="o">=</span><span class="s2">&quot;.dot/.version&quot;</span>
+
+<span class="c1"># Check if the version file exists</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="c1"># Increment version number</span>
+<span class="w">    </span><span class="nv">current_version</span><span class="o">=</span><span class="k">$(</span>cat<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="w">    </span><span class="nv">new_version</span><span class="o">=</span><span class="k">$((</span><span class="nv">current_version</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="k">))</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$new_version</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span>
+
+<span class="w">    </span><span class="c1"># Add the version file to the staging area</span>
+<span class="w">    </span>git<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span>
+
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Version incremented to </span><span class="nv">$new_version</span><span class="s2">&quot;</span>
+<span class="k">else</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Error: </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/</span><span class="nv">$VERSION_FILE</span><span class="s2"> not found&quot;</span>
+<span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="c1"># Continue with the rest of the commit process</span>
+<span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+</code></pre></div>
+
+<p>Now, with these streamlined processes, managing and syncing dotfiles is a breeze!</p>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                My approach to syncing dotfiles
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2024-01-19T00:00:00+01:00">19/01/2024
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">&#128438; Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>
