@@ -25,6 +25,16 @@ REMOTE_VERSION_FILE_URL="https://raw.githubusercontent.com/MateuszMyalski/dotfil
 VERSION_FILE="$HOME/.dot/.version"
 CHECK_UPDATE_AFTER_SECONDS=$((60 * 60 * 8))
 
+calculate_mod_time_delta() {
+    local file="$1"
+
+    current_time=$(date +%s)
+    mod_time=$(stat -c %Y "$file")
+    time_diff=$((current_time - mod_time))
+
+    echo $time_diff
+}
+
 dot_check_update() {
     REMOTE_VERSION=$(curl -s "$REMOTE_VERSION_FILE_URL")
     LOCAL_VERSION=$(cat "$VERSION_FILE")
@@ -54,10 +64,10 @@ if [ ! -e "$VERSION_FILE" ]; then
 fi
 
 # Step 1: Check the file modification delta
-calculate_mod_time_delta "$VERSION_FILE"
+time_delta=$(calculate_mod_time_delta "$VERSION_FILE")
 
 # Step 2: curl the version from git
-if [ "$?" -gt "$CHECK_UPDATE_AFTER_SECONDS" ]; then
+if [ "$time_delta" -gt "$CHECK_UPDATE_AFTER_SECONDS" ]; then
     dot_check_update "-s"
 else
     # Do not check too frequently
