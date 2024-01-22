@@ -57,6 +57,16 @@
 <span class="nv">VERSION_FILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.dot/.version&quot;</span>
 <span class="nv">CHECK_UPDATE_AFTER_SECONDS</span><span class="o">=</span><span class="k">$((</span><span class="m">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">8</span><span class="k">))</span>
 
+calculate_mod_time_delta<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">file</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+
+<span class="w">    </span><span class="nv">current_time</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span>
+<span class="w">    </span><span class="nv">mod_time</span><span class="o">=</span><span class="k">$(</span>stat<span class="w"> </span>-c<span class="w"> </span>%Y<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$file</span><span class="s2">&quot;</span><span class="k">)</span>
+<span class="w">    </span><span class="nv">time_diff</span><span class="o">=</span><span class="k">$((</span><span class="nv">current_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">mod_time</span><span class="k">))</span>
+
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$time_diff</span>
+<span class="o">}</span>
+
 dot_check_update<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="w">    </span><span class="nv">REMOTE_VERSION</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REMOTE_VERSION_FILE_URL</span><span class="s2">&quot;</span><span class="k">)</span>
 <span class="w">    </span><span class="nv">LOCAL_VERSION</span><span class="o">=</span><span class="k">$(</span>cat<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span><span class="k">)</span>
@@ -86,10 +96,10 @@ dot_check_update<span class="o">()</span><span class="w"> </span><span class="o"
 <span class="k">fi</span>
 
 <span class="c1"># Step 1: Check the file modification delta</span>
-calculate_mod_time_delta<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span>
+<span class="nv">time_delta</span><span class="o">=</span><span class="k">$(</span>calculate_mod_time_delta<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VERSION_FILE</span><span class="s2">&quot;</span><span class="k">)</span>
 
 <span class="c1"># Step 2: curl the version from git</span>
-<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$?</span><span class="s2">&quot;</span><span class="w"> </span>-gt<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CHECK_UPDATE_AFTER_SECONDS</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$time_delta</span><span class="s2">&quot;</span><span class="w"> </span>-gt<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CHECK_UPDATE_AFTER_SECONDS</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
 <span class="w">    </span>dot_check_update<span class="w"> </span><span class="s2">&quot;-s&quot;</span>
 <span class="k">else</span>
 <span class="w">    </span><span class="c1"># Do not check too frequently</span>
