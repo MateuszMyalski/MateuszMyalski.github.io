@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="Tech-Notes">
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mateusz Myalski">
+    <link rel="shortcut icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalski.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalski.github.io/index.html">Tech-Notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalski.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>Displaying canvas within an iframe background</h1>
+<p>Despite my embedded background, I find joy in experimenting with JavaScript and the canvas element. Creating simple animations, games, or simulations is a delight, especially with the fantastic creative framework <a href="https://p5js.org/">p5.js</a>. It provides a wonderfully simple and intuitive way to interact with the canvas. It's an excellent starting point, even for crafting straightforward GUIs for devices connected through WiFi, Bluetooth, or even serial connections!</p>
+<p>But let's get straight to the point. Recently, I wanted to design a canvas where the background was another webpage. Specifically, I aimed for my canvas to be an <code>iframe</code> DOM element. While styling the elements with CSS is relatively straightforward, I quickly encountered some challenges with event listeners.</p>
+<h2>Sample App</h2>
+<p>To illustrate the issue, let's create a simple webpage where we have an iframe in the background.</p>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
+<span class="w">        </span><span class="nt">body</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="n">Arial</span><span class="p">,</span><span class="w"> </span><span class="kc">sans-serif</span><span class="p">;</span>
+<span class="w">            </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="k">overflow</span><span class="p">:</span><span class="w"> </span><span class="kc">hidden</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nt">iframe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">absolute</span><span class="p">;</span>
+<span class="w">            </span><span class="k">top</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="k">left</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
+<span class="w">            </span><span class="k">height</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
+<span class="w">            </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="w">            </span><span class="k">z-index</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nt">canvas</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">absolute</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nx">canvas</span><span class="p">;</span>
+<span class="w">        </span><span class="kd">function</span><span class="w"> </span><span class="nx">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">canvas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createCanvas</span><span class="p">(</span><span class="nx">windowWidth</span><span class="p">,</span><span class="w"> </span><span class="nx">windowHeight</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<span class="w">        </span><span class="kd">function</span><span class="w"> </span><span class="nx">draw</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">clear</span><span class="p">();</span>
+<span class="w">            </span><span class="nx">stroke</span><span class="p">(</span><span class="s2">&quot;red&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="nx">ellipse</span><span class="p">(</span><span class="nx">mouseX</span><span class="p">,</span><span class="w"> </span><span class="nx">mouseY</span><span class="p">,</span><span class="w"> </span><span class="mf">100</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span>
+<span class="w">    </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">iframe</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://en.wikipedia.org/wiki/Domestic_pigeon&quot;</span> <span class="na">frameborder</span><span class="o">=</span><span class="s">&quot;0&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">iframe</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>In this code snippet, we set up a basic HTML structure with an embedded iframe loading the Wikipedia page on domestic pigeons. The script in the head initializes the canvas using p5.js, creating a red ellipse that follows the mouse cursor. This sets the stage for the discussion on the challenges encountered when trying to interact with elements within the iframe.</p>
+<h2>Adding Event Listeners</h2>
+<p>Usually, when we want to trigger any action when the mouse is moved or a button is pressed, we add an event listener to the element. The p5 framework has built-in functions that we can implement ourselves. Let's bind key presses and releases to introduce the ability to change the applied pointer-events CSS selector at runtime. This allows us to activate pointer events on the canvas when a key is pressed.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">keyPressed</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;keyPressed&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="s2">&quot;pointer-events&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;auto&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">keyReleased</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;keyReleased&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">style</span><span class="p">(</span><span class="s2">&quot;pointer-events&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;none&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>These JavaScript functions utilize p5.js to respond to key presses and releases. When a key is pressed, it logs a message and enables pointer events on the canvas, and when a key is released, it logs another message and disables pointer events.</p>
+<h2>The Problem</h2>
+<p>Upon reloading the page and pressing any button, it seems like we've regained control! However, try left-clicking on the webpage loaded in the iframe. The events suddenly stop triggering, with no visible logs in the console, and the ellipse stops moving.</p>
+<p>To debug this problem, let's add a few additional lines of JS.</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="nb">window</span><span class="p">.</span><span class="nx">onblur</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Lost focus&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">};</span>
+
+<span class="w">    </span><span class="nb">window</span><span class="p">.</span><span class="nx">onfocus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Focused&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>These lines introduce event listeners that log messages when the window gains or loses focus, helping us understand the issue. Upon interacting with the iframe, you'll notice logs indicating the loss and regain of focus.</p>
+<h2>The Solution</h2>
+<p>To resolve this issue, we can subscribe to a cycling event to periodically change the focus back to the parent window.</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="kd">function</span><span class="w"> </span><span class="nx">checkFocus</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">activeElement</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s2">&quot;iframe&quot;</span><span class="p">)[</span><span class="mf">0</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nb">window</span><span class="p">.</span><span class="nx">focus</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nb">window</span><span class="p">.</span><span class="nx">setInterval</span><span class="p">(</span><span class="nx">checkFocus</span><span class="p">,</span><span class="w"> </span><span class="mf">300</span><span class="p">);</span><span class="w"> </span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>This JavaScript snippet continuously checks if the focus is on the iframe and refocuses on the parent window if needed. After adding this snippet, we can now click any button to trigger the keyPressed and keyReleased functions.</p>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                Displaying canvas within an iframe background
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2024-01-23T00:00:00+01:00">23/01/2024
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">&#128438; Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>
