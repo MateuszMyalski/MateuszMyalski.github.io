@@ -184,6 +184,8 @@ footer span#heart {
     }
 
     * {
+        background: none !important;
+        background-color: none !important;
         background-image: none !important;
         break-inside: avoid;
     }
