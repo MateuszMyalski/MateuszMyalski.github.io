@@ -73,6 +73,10 @@ header nav li:hover {
     font-weight: bolder;
 }
 
+section li {
+    margin-top: .5em;
+}
+
 section a {
     color: var(--accent-three-color);
     text-decoration: none;
@@ -197,6 +201,11 @@ footer span#heart {
     
     section a::after {
         content: " (" attr(href) ")";
+    }
+
+    section div.highlight {
+        overflow-y: visible;
+        overflow-wrap: break-word;
     }
 
     section.post section.meta {
