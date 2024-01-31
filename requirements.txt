@@ -1,5 +1,5 @@
 anyio==4.2.0
-backports.zoneinfo==0.2.1
+backports.zoneinfo==0.2.1;python_version<"3.9"
 blinker==1.7.0
 docutils==0.20.1
 exceptiongroup==1.2.0
