@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="Tech-Notes">
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mateusz Myalski">
+    <link rel="shortcut icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalski.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalski.github.io/index.html">Tech-Notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalski.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>Post debian minimal debian installations</h1>
+<p>As I transitioned to Debian with a minimal installation paired with the XFCE desktop environment, I realized the importance of enhancing my system for a more comprehensive user experience. While the initial minimal setup laid the foundation, I found it necessary to install additional packages to fine-tune and optimize my Debian environment. This collection of notes not only serves as a guide to replicate my current configuration but also acts as a reference for future improvements. The integration of XFCE, along with carefully chosen packages, strikes a balance between efficiency and functionality, ensuring a smooth and personalized Debian experience. I created some notes that gets into essential packages and configurations, making it a handy resource for anyone seeking to configure Debian with XFCE at an intermediate to advanced level of proficiency.</p>
+<p><strong>Disclaimer: The following packages are customized to my taste. Feel free, and encouraged, to adjust them to your preferences.</strong></p>
+<h2>1. Installing XFCE Desktop Environment</h2>
+<p>Once you complete the Debian installation from your USB/CD without selecting any desktop environment, you will need to configure it yourself. Start by installing the essential components for a minimal XFCE desktop environment. Open a terminal and execute:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libxfce4util<span class="w"> </span>thunar<span class="w"> </span>xfce4-session<span class="w"> </span>xfce4-settings<span class="w"> </span>xfconf<span class="w"> </span>xfdesktop<span class="w"> </span>xfwm4<span class="w"> </span>urxvt-unicode
+</code></pre></div>
+
+<ul>
+<li><code>libxfce4util</code> - It includes various helper functions and macros used by other XFCE components.</li>
+<li><code>Thunar</code> - Thunar provides a user-friendly interface for managing files and directories, with features like tabbed browsing, bulk renaming, and file previews. It is the default GUI file manager for XFCE</li>
+<li><code>xfce4-session</code> - Manages the user sessions, handling the startup and termination of applications and managing the overall session settings.</li>
+<li><code>xfce4-settings</code> - Allows users to configure various settings for the XFCE desktop environment, including display, keyboard, mouse, and more.</li>
+<li><code>xfconf</code> - Stores and retrieves application configuration settings. It is a key-value configuration system used by various XFCE components.</li>
+<li><code>xfdesktop</code> - Manages the desktop background, icons, and provides basic desktop management functions.</li>
+<li><code>xfwm4</code> - Manages window placement, decorations, and handles basic window management functions within the XFCE desktop environment.</li>
+<li><code>urxvt-unicode</code> - Provides a lightweight terminal emulator with support for Unicode, suitable for use within the XFCE environment.</li>
+</ul>
+<p>These packages collectively form the core components necessary for a functional and lightweight XFCE desktop environment on a Debian system. They handle various aspects of the desktop user experience, ranging from file management to window handling and configuration settings.</p>
+<h2>2. Granting Sudo Access</h2>
+<p>I discovered that my created profile is not part of the <code>sudoers</code> group, preventing me from using any other commands relevant to the <code>root</code> user for further configurations.</p>
+<div class="highlight"><pre><span></span><code>su<span class="w"> </span>-
+usermod<span class="w"> </span>-aG<span class="w"> </span>sudo<span class="w"> </span>&lt;username&gt;
+</code></pre></div>
+
+<h2>3. Configuring existing SSH keys</h2>
+<p>I typically store my private keys in a secure location, ensuring continued access when switching systems by creating backups. Place your private keys in the <code>~/.ssh</code> directory. If you haven't used the default names, remember to add them manually after each reboot, or include them in your <code>.bashrc</code> for automatic loading.</p>
+<div class="highlight"><pre><span></span><code>ssh-add<span class="w"> </span>~/.ssh/&lt;key&gt;
+</code></pre></div>
+
+<h2>4. GUI WiFi Manager</h2>
+<p>If you configured your WiFi during installation, you likely have internet access. However, changing connection settings currently requires using command-line commands, which may not be convenient if done infrequently. XFCE includes <code>nm-applet</code>, a tool that simplifies network configuration. Unfortunately, I encountered issues enabling it, necessitating manual editing of the Network Manager configuration.</p>
+<p>Begin by removing your previously configured network from <code>/etc/network/interfaces</code>. Subsequently, modify the <code>/etc/NetworkManager/NetworkManager.conf</code> file to set it as 'managed':</p>
+<div class="highlight"><pre><span></span><code><span class="k">[main]</span>
+<span class="na">plugins</span><span class="o">=</span><span class="s">ifupdown,keyfile</span>
+
+<span class="k">[ifupdown]</span>
+<span class="na">managed</span><span class="o">=</span><span class="s">true</span>
+</code></pre></div>
+
+<p>Reboot the system.</p>
+<h2>5. Audio Manager</h2>
+<p>To commence listening to audio, it is essential to install the basic packages enabling configuration of sound input and output. I recommend using <code>pulseaudio</code> as it usually suffices for this purpose.</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>pulseaudio
+</code></pre></div>
+
+<h2>6. Bluetooth Manager</h2>
+<p>I typically use my AirPods with the Linux system. The Bluetooth manager is not included by default in the minimal installation. To set it up, you need to download <code>blueman</code> or any other GUI manager. Alternatively, if you prefer, you can stick to the command line (CLI). 😊</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>bluetooth<span class="w"> </span>pulseaudio-module-bluetooth<span class="w"> </span>blueman<span class="w"> </span>bluez-firmware<span class="w"> </span>bluewho
+</code></pre></div>
+
+<ul>
+<li><code>bluetooth</code> - Essential Bluetooth utilities and tools for managing Bluetooth devices.</li>
+<li><code>pulseaudio-module-bluetooth</code> - PulseAudio extension module enabling seamless integration of Bluetooth audio devices.</li>
+<li><code>blueman</code> - GTK-based Bluetooth manager with a user-friendly graphical interface.</li>
+<li><code>bluez-firmware</code> - Firmware package for the BlueZ Bluetooth stack.</li>
+</ul>
+<h2>7. Touchpad click</h2>
+<p>Since I use a laptop for my daily activities, I am accustomed to using touchpad taps to click on items. To enable this functionality, you need to add a few configurations.</p>
+<p>based on this <a href="https://unix.stackexchange.com/questions/337008/activate-tap-to-click-on-touchpad">thread</a>.
+In the file <code>/etc/X11/xorg.conf.d/40-libinput.conf</code> add</p>
+<div class="highlight"><pre><span></span><code>Section &quot;InputClass&quot;
+        Identifier &quot;touchpad catchall&quot;
+        Driver &quot;synaptics&quot;
+        MatchIsTouchpad &quot;on&quot;
+        Option &quot;TapButton1&quot; &quot;1&quot;
+        Option &quot;TapButton2&quot; &quot;3&quot;
+</code></pre></div>
+
+<p>Reboot the system.</p>
+<h2>8. The keyring</h2>
+<p>When attempting to log in to my GitHub account to sync settings on VSCode, I encountered an error related to the keyring application. It appears that XFCE lacks a dedicated tool to store secrets on the device. A possible solution is to reuse one from GNOME.</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>gnome-keyring
+</code></pre></div>
+
+<h3>Keyring prompt</h3>
+<p>If you set up a password for the keyring, you will be prompted to enter it every time you restart the machine. There's a suggestion <a href="https://unix.stackexchange.com/questions/324843/chrome-harasses-me-for-a-keychain-password-at-startup">here</a> to set them blank. While it may not sound ideal, it is a workaround for the issue.</p>
+<h2>9. Snap store</h2>
+<p>I enjoy installing a few apps from the Snap Store, which are not available by default. To install them:</p>
+<div class="highlight"><pre><span></span><code>sudo apt install snapd
+sudo snap install core
+sudo snap install snap-store
+</code></pre></div>
+
+<h3>Adding snap do appfinder</h3>
+<p>It would be beneficial to have those installed apps also in the XFCE <code>appfinder</code>. To achieve this, simply add symbolic links to the applications.</p>
+<div class="highlight"><pre><span></span><code>ln<span class="w"> </span>-s<span class="w"> </span>/var/lib/snapd/desktop/<span class="w"> </span>~/.local/share/applications/
+</code></pre></div>
+
+<p>I attempted to set the environmental path where <code>appfinder</code> is supposed to look for applications, but so far, I haven't had any success.</p>
+<h2>10. Emojis</h2>
+<p>When I started browsing the internet, I noticed that some emojis were not displaying correctly; instead, I saw black blocks. This issue can be resolved by downloading the <code>noto-color-emoji</code> fonts.</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>fonts-noto-color-emoji
+</code></pre></div>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                Post debian minimal debian installations
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2024-01-31T00:00:00+01:00">31/01/2024
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">🖨️ Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>

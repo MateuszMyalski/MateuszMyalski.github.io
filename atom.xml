@@ -1,5 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Tech-Notes</title><link href="https://mateuszmyalski.github.io/" rel="alternate"></link><link href="https://mateuszmyalski.github.io/atom.xml" rel="self"></link><id>https://mateuszmyalski.github.io/</id><updated>2024-01-23T00:00:00+01:00</updated><subtitle>Notes collected during development, work, learning...</subtitle><entry><title>Displaying canvas within an iframe background</title><link href="https://mateuszmyalski.github.io/displaying-canvas-within-an-iframe-background.html" rel="alternate"></link><published>2024-01-23T00:00:00+01:00</published><updated>2024-01-23T00:00:00+01:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-01-23:/displaying-canvas-within-an-iframe-background.html</id><summary type="html">&lt;h1&gt;Displaying canvas within an iframe background&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Tech-Notes</title><link href="https://mateuszmyalski.github.io/" rel="alternate"></link><link href="https://mateuszmyalski.github.io/atom.xml" rel="self"></link><id>https://mateuszmyalski.github.io/</id><updated>2024-01-31T00:00:00+01:00</updated><subtitle>Notes collected during development, work, learning...</subtitle><entry><title>Post debian minimal debian installations</title><link href="https://mateuszmyalski.github.io/post-debian-minimal-debian-installations.html" rel="alternate"></link><published>2024-01-31T00:00:00+01:00</published><updated>2024-01-31T00:00:00+01:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-01-31:/post-debian-minimal-debian-installations.html</id><summary type="html">&lt;h1&gt;Post debian minimal debian installations&lt;/h1&gt;
+&lt;p&gt;As I transitioned to Debian with a minimal installation paired with the XFCE desktop environment, I realized the importance of enhancing my system for a more comprehensive user experience. While the initial minimal setup laid the foundation, I found it necessary to install additional packages …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Post debian minimal debian installations&lt;/h1&gt;
+&lt;p&gt;As I transitioned to Debian with a minimal installation paired with the XFCE desktop environment, I realized the importance of enhancing my system for a more comprehensive user experience. While the initial minimal setup laid the foundation, I found it necessary to install additional packages to fine-tune and optimize my Debian environment. This collection of notes not only serves as a guide to replicate my current configuration but also acts as a reference for future improvements. The integration of XFCE, along with carefully chosen packages, strikes a balance between efficiency and functionality, ensuring a smooth and personalized Debian experience. I created some notes that gets into essential packages and configurations, making it a handy resource for anyone seeking to configure Debian with XFCE at an intermediate to advanced level of proficiency.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Disclaimer: The following packages are customized to my taste. Feel free, and encouraged, to adjust them to your preferences.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2&gt;1. Installing XFCE Desktop Environment&lt;/h2&gt;
+&lt;p&gt;Once you complete the Debian installation from your USB/CD without selecting any desktop environment, you will need to configure it yourself. Start by installing the essential components for a minimal XFCE desktop environment. Open a terminal and execute:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;libxfce4util&lt;span class="w"&gt; &lt;/span&gt;thunar&lt;span class="w"&gt; &lt;/span&gt;xfce4-session&lt;span class="w"&gt; &lt;/span&gt;xfce4-settings&lt;span class="w"&gt; &lt;/span&gt;xfconf&lt;span class="w"&gt; &lt;/span&gt;xfdesktop&lt;span class="w"&gt; &lt;/span&gt;xfwm4&lt;span class="w"&gt; &lt;/span&gt;urxvt-unicode
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;libxfce4util&lt;/code&gt; - It includes various helper functions and macros used by other XFCE components.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Thunar&lt;/code&gt; - Thunar provides a user-friendly interface for managing files and directories, with features like tabbed browsing, bulk renaming, and file previews. It is the default GUI file manager for XFCE&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;xfce4-session&lt;/code&gt; - Manages the user sessions, handling the startup and termination of applications and managing the overall session settings.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;xfce4-settings&lt;/code&gt; - Allows users to configure various settings for the XFCE desktop environment, including display, keyboard, mouse, and more.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;xfconf&lt;/code&gt; - Stores and retrieves application configuration settings. It is a key-value configuration system used by various XFCE components.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;xfdesktop&lt;/code&gt; - Manages the desktop background, icons, and provides basic desktop management functions.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;xfwm4&lt;/code&gt; - Manages window placement, decorations, and handles basic window management functions within the XFCE desktop environment.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;urxvt-unicode&lt;/code&gt; - Provides a lightweight terminal emulator with support for Unicode, suitable for use within the XFCE environment.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These packages collectively form the core components necessary for a functional and lightweight XFCE desktop environment on a Debian system. They handle various aspects of the desktop user experience, ranging from file management to window handling and configuration settings.&lt;/p&gt;
+&lt;h2&gt;2. Granting Sudo Access&lt;/h2&gt;
+&lt;p&gt;I discovered that my created profile is not part of the &lt;code&gt;sudoers&lt;/code&gt; group, preventing me from using any other commands relevant to the &lt;code&gt;root&lt;/code&gt; user for further configurations.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;su&lt;span class="w"&gt; &lt;/span&gt;-
+usermod&lt;span class="w"&gt; &lt;/span&gt;-aG&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;username&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;3. Configuring existing SSH keys&lt;/h2&gt;
+&lt;p&gt;I typically store my private keys in a secure location, ensuring continued access when switching systems by creating backups. Place your private keys in the &lt;code&gt;~/.ssh&lt;/code&gt; directory. If you haven't used the default names, remember to add them manually after each reboot, or include them in your &lt;code&gt;.bashrc&lt;/code&gt; for automatic loading.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ssh-add&lt;span class="w"&gt; &lt;/span&gt;~/.ssh/&amp;lt;key&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;4. GUI WiFi Manager&lt;/h2&gt;
+&lt;p&gt;If you configured your WiFi during installation, you likely have internet access. However, changing connection settings currently requires using command-line commands, which may not be convenient if done infrequently. XFCE includes &lt;code&gt;nm-applet&lt;/code&gt;, a tool that simplifies network configuration. Unfortunately, I encountered issues enabling it, necessitating manual editing of the Network Manager configuration.&lt;/p&gt;
+&lt;p&gt;Begin by removing your previously configured network from &lt;code&gt;/etc/network/interfaces&lt;/code&gt;. Subsequently, modify the &lt;code&gt;/etc/NetworkManager/NetworkManager.conf&lt;/code&gt; file to set it as 'managed':&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;[main]&lt;/span&gt;
+&lt;span class="na"&gt;plugins&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;ifupdown,keyfile&lt;/span&gt;
+
+&lt;span class="k"&gt;[ifupdown]&lt;/span&gt;
+&lt;span class="na"&gt;managed&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Reboot the system.&lt;/p&gt;
+&lt;h2&gt;5. Audio Manager&lt;/h2&gt;
+&lt;p&gt;To commence listening to audio, it is essential to install the basic packages enabling configuration of sound input and output. I recommend using &lt;code&gt;pulseaudio&lt;/code&gt; as it usually suffices for this purpose.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;pulseaudio
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;6. Bluetooth Manager&lt;/h2&gt;
+&lt;p&gt;I typically use my AirPods with the Linux system. The Bluetooth manager is not included by default in the minimal installation. To set it up, you need to download &lt;code&gt;blueman&lt;/code&gt; or any other GUI manager. Alternatively, if you prefer, you can stick to the command line (CLI). 😊&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;bluetooth&lt;span class="w"&gt; &lt;/span&gt;pulseaudio-module-bluetooth&lt;span class="w"&gt; &lt;/span&gt;blueman&lt;span class="w"&gt; &lt;/span&gt;bluez-firmware&lt;span class="w"&gt; &lt;/span&gt;bluewho
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;bluetooth&lt;/code&gt; - Essential Bluetooth utilities and tools for managing Bluetooth devices.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;pulseaudio-module-bluetooth&lt;/code&gt; - PulseAudio extension module enabling seamless integration of Bluetooth audio devices.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;blueman&lt;/code&gt; - GTK-based Bluetooth manager with a user-friendly graphical interface.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;bluez-firmware&lt;/code&gt; - Firmware package for the BlueZ Bluetooth stack.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;7. Touchpad click&lt;/h2&gt;
+&lt;p&gt;Since I use a laptop for my daily activities, I am accustomed to using touchpad taps to click on items. To enable this functionality, you need to add a few configurations.&lt;/p&gt;
+&lt;p&gt;based on this &lt;a href="https://unix.stackexchange.com/questions/337008/activate-tap-to-click-on-touchpad"&gt;thread&lt;/a&gt;.
+In the file &lt;code&gt;/etc/X11/xorg.conf.d/40-libinput.conf&lt;/code&gt; add&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Section &amp;quot;InputClass&amp;quot;
+        Identifier &amp;quot;touchpad catchall&amp;quot;
+        Driver &amp;quot;synaptics&amp;quot;
+        MatchIsTouchpad &amp;quot;on&amp;quot;
+        Option &amp;quot;TapButton1&amp;quot; &amp;quot;1&amp;quot;
+        Option &amp;quot;TapButton2&amp;quot; &amp;quot;3&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Reboot the system.&lt;/p&gt;
+&lt;h2&gt;8. The keyring&lt;/h2&gt;
+&lt;p&gt;When attempting to log in to my GitHub account to sync settings on VSCode, I encountered an error related to the keyring application. It appears that XFCE lacks a dedicated tool to store secrets on the device. A possible solution is to reuse one from GNOME.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;gnome-keyring
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Keyring prompt&lt;/h3&gt;
+&lt;p&gt;If you set up a password for the keyring, you will be prompted to enter it every time you restart the machine. There's a suggestion &lt;a href="https://unix.stackexchange.com/questions/324843/chrome-harasses-me-for-a-keychain-password-at-startup"&gt;here&lt;/a&gt; to set them blank. While it may not sound ideal, it is a workaround for the issue.&lt;/p&gt;
+&lt;h2&gt;9. Snap store&lt;/h2&gt;
+&lt;p&gt;I enjoy installing a few apps from the Snap Store, which are not available by default. To install them:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo apt install snapd
+sudo snap install core
+sudo snap install snap-store
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Adding snap do appfinder&lt;/h3&gt;
+&lt;p&gt;It would be beneficial to have those installed apps also in the XFCE &lt;code&gt;appfinder&lt;/code&gt;. To achieve this, simply add symbolic links to the applications.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ln&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;/var/lib/snapd/desktop/&lt;span class="w"&gt; &lt;/span&gt;~/.local/share/applications/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I attempted to set the environmental path where &lt;code&gt;appfinder&lt;/code&gt; is supposed to look for applications, but so far, I haven't had any success.&lt;/p&gt;
+&lt;h2&gt;10. Emojis&lt;/h2&gt;
+&lt;p&gt;When I started browsing the internet, I noticed that some emojis were not displaying correctly; instead, I saw black blocks. This issue can be resolved by downloading the &lt;code&gt;noto-color-emoji&lt;/code&gt; fonts.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;fonts-noto-color-emoji
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="blogs"></category></entry><entry><title>Displaying canvas within an iframe background</title><link href="https://mateuszmyalski.github.io/displaying-canvas-within-an-iframe-background.html" rel="alternate"></link><published>2024-01-23T00:00:00+01:00</published><updated>2024-01-23T00:00:00+01:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-01-23:/displaying-canvas-within-an-iframe-background.html</id><summary type="html">&lt;h1&gt;Displaying canvas within an iframe background&lt;/h1&gt;
 &lt;p&gt;Despite my embedded background, I find joy in experimenting with JavaScript and the canvas element. Creating simple animations, games, or simulations is a delight, especially with the fantastic creative framework &lt;a href="https://p5js.org/"&gt;p5.js&lt;/a&gt;. It provides a wonderfully simple and intuitive way to interact with the …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Displaying canvas within an iframe background&lt;/h1&gt;
 &lt;p&gt;Despite my embedded background, I find joy in experimenting with JavaScript and the canvas element. Creating simple animations, games, or simulations is a delight, especially with the fantastic creative framework &lt;a href="https://p5js.org/"&gt;p5.js&lt;/a&gt;. It provides a wonderfully simple and intuitive way to interact with the canvas. It's an excellent starting point, even for crafting straightforward GUIs for devices connected through WiFi, Bluetooth, or even serial connections!&lt;/p&gt;
 &lt;p&gt;But let's get straight to the point. Recently, I wanted to design a canvas where the background was another webpage. Specifically, I aimed for my canvas to be an &lt;code&gt;iframe&lt;/code&gt; DOM element. While styling the elements with CSS is relatively straightforward, I quickly encountered some challenges with event listeners.&lt;/p&gt;
