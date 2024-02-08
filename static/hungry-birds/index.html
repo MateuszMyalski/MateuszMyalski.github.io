@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <title>Hungry Birds!</title>
+    <!-- TODO add favicon -->
+    <meta charset="utf-8" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: -1;
+        }
+
+        canvas {
+            position: absolute;
+            pointer-events: none;
+        }
+    </style>
+    <script src="scripts/mouseShaker.js"></script>
+    <script src="scripts/bird.js"></script>
+    <script src="scripts/hole.js"></script>
+    <script src="scripts/app.js"></script>
+
+</head>
+
+<body>
+    <script>
+        // When iframe is clicked it loses focus and events are no more launched from the parent site
+        // Lost almost 5h on this... :]
+        window.onblur = function () {
+            window.focus()
+        };
+
+        function checkFocus() {
+            if (document.activeElement == document.getElementsByTagName("iframe")[0]) {
+                window.focus();
+            }
+        }
+
+        window.setInterval(checkFocus, 300); 
+    </script>
+    <iframe id="bg_page" src="https://en.wikipedia.org/wiki/Domestic_pigeon" frameborder="0"></iframe>
+</body>
+
+</html>
