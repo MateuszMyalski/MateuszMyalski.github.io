@@ -12,16 +12,22 @@ As I transitioned to Debian with a minimal installation paired with the XFCE des
 Once you complete the Debian installation from your USB/CD without selecting any desktop environment, you will need to configure it yourself. Start by installing the essential components for a minimal XFCE desktop environment. Open a terminal and execute:
 
 ```bash
-sudo apt install libxfce4util thunar xfce4-session xfce4-settings xfconf xfdesktop xfwm4 urxvt-unicode
+sudo apt install xfce4-power-manager xinit nm-applet network-manager-gnome thunar xfce4-session xfce4-settings xfconf xfdesktop4 xfwm4 rxvt-unicode git make rofi
 ```
-- `libxfce4util` - It includes various helper functions and macros used by other XFCE components.
+- `xfce4-power-manager` - It also allows users to control the display backlight brightness and set power-saving modes for displays and monitors.
+- `xinit` - X display server.
+- `nm-applet` - Provides detection and configuration for systems to automatically connect to networks. 
+- `network-manager-gnome` - GUI application for displaying tray icon and manage connections.
 - `Thunar` - Thunar provides a user-friendly interface for managing files and directories, with features like tabbed browsing, bulk renaming, and file previews. It is the default GUI file manager for XFCE
 - `xfce4-session` - Manages the user sessions, handling the startup and termination of applications and managing the overall session settings.
 - `xfce4-settings` - Allows users to configure various settings for the XFCE desktop environment, including display, keyboard, mouse, and more.
 - `xfconf` - Stores and retrieves application configuration settings. It is a key-value configuration system used by various XFCE components.
 - `xfdesktop` - Manages the desktop background, icons, and provides basic desktop management functions.
 - `xfwm4` - Manages window placement, decorations, and handles basic window management functions within the XFCE desktop environment.
-- `urxvt-unicode` - Provides a lightweight terminal emulator with support for Unicode, suitable for use within the XFCE environment.
+- `rxvt-unicode` - Provides a lightweight terminal emulator with support for Unicode, suitable for use within the XFCE environment.
+- `git` - Version control software.
+- `make` - Unix build system tool.
+- `rofi` - Application launcher.
 
 These packages collectively form the core components necessary for a functional and lightweight XFCE desktop environment on a Debian system. They handle various aspects of the desktop user experience, ranging from file management to window handling and configuration settings.
 
@@ -34,16 +40,33 @@ usermod -aG sudo <username>
 ```
 
 ## 3. Configuring existing SSH keys
-I typically store my private keys in a secure location, ensuring continued access when switching systems by creating backups. Place your private keys in the `~/.ssh` directory. If you haven't used the default names, remember to add them manually after each reboot, or include them in your `.bashrc` for automatic loading.
+I typically store my private keys in a secure location, ensuring continued access when switching systems by creating backups. Place your private keys in the `~/.ssh` directory. If you haven't used the default names (`id_rsa`), remember to add them manually after each reboot, or include them in your `.bashrc` for automatic loading.
 
 ```bash
 ssh-add ~/.ssh/<key>
 ```
 
+Usually when ou create the file by yourself, the chmod permissions are set to 644, this is too wide from private key. Change it to 600.
+
+```bash
+chmod 600 id_rsa
+```
+
 ## 4. GUI WiFi Manager
 If you configured your WiFi during installation, you likely have internet access. However, changing connection settings currently requires using command-line commands, which may not be convenient if done infrequently. XFCE includes `nm-applet`, a tool that simplifies network configuration. Unfortunately, I encountered issues enabling it, necessitating manual editing of the Network Manager configuration.
 
-Begin by removing your previously configured network from `/etc/network/interfaces`. Subsequently, modify the `/etc/NetworkManager/NetworkManager.conf` file to set it as 'managed':
+Begin by removing your previously configured network from `/etc/network/interfaces`.
+You wil find  something similar:
+
+```
+# The primary network interface
+allow-hotplug wlp0s20f3
+iface wlp0s20f3 inet dhcp
+	wpa-ssid wifi-name
+	wpa-psk  wifi-password
+```
+
+Subsequently, modify the `/etc/NetworkManager/NetworkManager.conf` file to set it as 'managed':
 
 ```
 [main]
@@ -56,22 +79,21 @@ managed=true
 Reboot the system.
 
 ## 5. Audio Manager
-To commence listening to audio, it is essential to install the basic packages enabling configuration of sound input and output. I recommend using `pulseaudio` as it usually suffices for this purpose.
+To commence listening to audio, it is essential to install the basic packages enabling configuration of sound input and output. I recommend using `pulseaudio` as it usually suffices for this purpose and `xfce4-pulseaudio-plugin` for displaying the tray icon.
 
 ```bash
-sudo apt install pulseaudio
+sudo apt install pulseaudio xfce4-pulseaudio-plugin
 ```
 
 ## 6. Bluetooth Manager
 I typically use my AirPods with the Linux system. The Bluetooth manager is not included by default in the minimal installation. To set it up, you need to download `blueman` or any other GUI manager. Alternatively, if you prefer, you can stick to the command line (CLI). 😊
 
 ```bash
-sudo apt install bluetooth pulseaudio-module-bluetooth blueman bluez-firmware bluewho
+sudo apt install bluetooth pulseaudio-module-bluetooth blueman
 ```
 - `bluetooth` - Essential Bluetooth utilities and tools for managing Bluetooth devices.
 - `pulseaudio-module-bluetooth` - PulseAudio extension module enabling seamless integration of Bluetooth audio devices.
 - `blueman` - GTK-based Bluetooth manager with a user-friendly graphical interface.
-- `bluez-firmware` - Firmware package for the BlueZ Bluetooth stack.
 
 ## 7. Touchpad click
 Since I use a laptop for my daily activities, I am accustomed to using touchpad taps to click on items. To enable this functionality, you need to add a few configurations.
@@ -108,14 +130,12 @@ sudo snap install core
 sudo snap install snap-store
 ```
 
-### Adding snap do appfinder
-It would be beneficial to have those installed apps also in the XFCE `appfinder`. To achieve this, simply add symbolic links to the applications.
+### Making snap applications visible for the system
+To achieve this, simply add symbolic links to the applications.
 
 ```bash
 ln -s /var/lib/snapd/desktop/ ~/.local/share/applications/
 ```
-
-I attempted to set the environmental path where `appfinder` is supposed to look for applications, but so far, I haven't had any success.
 
 ## 10. Emojis
 When I started browsing the internet, I noticed that some emojis were not displaying correctly; instead, I saw black blocks. This issue can be resolved by downloading the `noto-color-emoji` fonts.
