@@ -1,5 +1,215 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Tech-Notes</title><link href="https://mateuszmyalski.github.io/" rel="alternate"></link><link href="https://mateuszmyalski.github.io/atom.xml" rel="self"></link><id>https://mateuszmyalski.github.io/</id><updated>2024-01-31T00:00:00+01:00</updated><subtitle>Notes collected during development, work, learning...</subtitle><entry><title>Post configuration for minimal debian installation</title><link href="https://mateuszmyalski.github.io/post-configuration-for-minimal-debian-installation.html" rel="alternate"></link><published>2024-01-31T00:00:00+01:00</published><updated>2024-01-31T00:00:00+01:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-01-31:/post-configuration-for-minimal-debian-installation.html</id><summary type="html">&lt;h1&gt;Post configuration for minimal debian installation&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Tech-Notes</title><link href="https://mateuszmyalski.github.io/" rel="alternate"></link><link href="https://mateuszmyalski.github.io/atom.xml" rel="self"></link><id>https://mateuszmyalski.github.io/</id><updated>2024-02-19T00:00:00+01:00</updated><subtitle>Notes collected during development, work, learning...</subtitle><entry><title>VSCode Language Server Development</title><link href="https://mateuszmyalski.github.io/vscode-language-server-development.html" rel="alternate"></link><published>2024-02-19T00:00:00+01:00</published><updated>2024-02-19T00:00:00+01:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-02-19:/vscode-language-server-development.html</id><summary type="html">&lt;h1&gt;VSCode Language Server Development&lt;/h1&gt;
+&lt;p&gt;Programming languages come with their own semantics and features, and programmers often rely on hints and checkers provided by their Integrated Development Environment (IDE) to speed up development and troubleshoot code. However, implementing every possible semantic feature directly into an IDE for all programming languages would …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;VSCode Language Server Development&lt;/h1&gt;
+&lt;p&gt;Programming languages come with their own semantics and features, and programmers often rely on hints and checkers provided by their Integrated Development Environment (IDE) to speed up development and troubleshoot code. However, implementing every possible semantic feature directly into an IDE for all programming languages would not be optimal. Therefore, the Language Server Protocol (LSP) was created as a layer between the user interface and the IDE. The server provides necessary functionalities often visible when searching symbols or writing function prototypes, etc.&lt;/p&gt;
+&lt;p&gt;This paper aims to provide a practical approach to developing your first LSP that interacts with both the user and the IDE. I will describe the conventions used in VSCode npm packages for extension development. By the end of this read, you will have a good starting point to implement your own ideas within the event-based environment of the LSP. I will also provide interesting resources for finding examples and describing possibilities you might be seeking on the internet, gathering some examples to implement various functionalities. Here, I've done it all for you!&lt;/p&gt;
+&lt;h2&gt;What is the LSP&lt;/h2&gt;
+&lt;p&gt;The Language Server Protocol (LSP) server is thoroughly described on the official &lt;a href="https://code.visualstudio.com/api/language-extensions/language-server-extension-guide"&gt;Microsoft webpage&lt;/a&gt;. Understanding its intricacies is crucial, but let's focus on the high-level overview.&lt;/p&gt;
+&lt;p&gt;When a client performs actions like code highlighting or file editing, it often requires advanced features such as autocompletion in languages like C, JavaScript, or Python. To cater to these needs, the LSP acts as an intermediary. It facilitates communication between the client and various language servers, enabling seamless integration of language-specific functionalities into the development environment.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;Languages&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="n"&gt;Methods&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;textDocument&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;didClose&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+&lt;span class="n"&gt;JS&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-------&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;textDocument&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;documentLink&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;textDocument&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;references&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+&lt;span class="n"&gt;Python&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;---&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;textDocument&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;hover&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-----&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;LSP&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;textDocument&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;completion&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+&lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;--------&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;textDocument&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;inlayHint&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;textDocument&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;didOpen&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;All available methods are thoroughly described in the &lt;a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/"&gt;official documentation&lt;/a&gt;. The documentation outlines various requests and responses in corresponding chapters.&lt;/p&gt;
+&lt;p&gt;For practical implementation guidance, I found it immensely useful to draw inspiration from the following resources:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/microsoft/vscode-languageserver-node/blob/main/client-node-tests/src/servers/testServer.ts"&gt;vscode-languageserver-node/testServer.ts&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample"&gt;vscode-extension-samples/lsp-sample&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It's worth noting that messages can be sent using four different standards:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kr"&gt;declare&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;enum&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;TransportKind&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;stdio&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;ipc&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;pipe&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;socket&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;3&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I am going to focus on using the &lt;code&gt;ipc&lt;/code&gt; method of transporting messages between the client and LSP.&lt;/p&gt;
+&lt;p&gt;In Visual Studio Code (VSCode), messages between the client (VSCode) and the language server are typically sent using JSON-RPC (Remote Procedure Call) over the chosen IPC (Inter-Process Communication) mechanism. JSON-RPC is a lightweight remote procedure call protocol utilizing JSON for data serialization.&lt;/p&gt;
+&lt;p&gt;Messages are formatted as JSON objects containing fields such as &lt;code&gt;jsonrpc&lt;/code&gt;, &lt;code&gt;method&lt;/code&gt;, &lt;code&gt;params&lt;/code&gt;, and &lt;code&gt;id&lt;/code&gt;. These fields specify the JSON-RPC version, the method being called or responded to, any parameters associated with the method, and an identifier for the message (typically used for correlating responses with requests). Then, they are serialized and transmitted.&lt;/p&gt;
+&lt;p&gt;To put this into an example, imagine you are currently editing an open file. The client sends a notification method to our server with the message ID &lt;code&gt;textDocument/didChange&lt;/code&gt;, along with corresponding parameters. However, before this happens, the server needs to inform the client that it is capable of handling such a message, which is described as follows:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;textDocumentSync&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;TextDocumentSyncKind.Incremental&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This informs our client that we are capable of handling text document events and to send only changes instead of the full document, as it would be with the option &lt;code&gt;TextDocumentSyncKind.Full&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;With this minimal theory in place, we are now prepared to exchange a few logs.&lt;/p&gt;
+&lt;h2&gt;Minimal environment set-up&lt;/h2&gt;
+&lt;p&gt;To start, we need to set up a TypeScript environment. This requires having Node.js installed.
+To install node:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo apt install node
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Clone the minimal LSP development environment from the public GitHub repository &lt;a href="https://github.com/semanticart/minimum-viable-vscode-language-server-extension"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Once cloned, you'll find the following directories:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.vscode&lt;/code&gt;: Contains all necessary shortcuts configuration, enabling you to easily hit 'F5' to start debugging.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;client&lt;/code&gt;: Contains all client-side related operations, responsible for setting up the connection with our LSP.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;server&lt;/code&gt;: Houses our LSP related source files.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;After cloning the repository, it's recommended to update the versions of &lt;code&gt;vscode-languageserver&lt;/code&gt; in &lt;code&gt;server/package.json&lt;/code&gt; and &lt;code&gt;vscode-languageclient&lt;/code&gt; in &lt;code&gt;client/package.json&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;To prepare the environment for further development, execute &lt;code&gt;npm install&lt;/code&gt;. To debug, simply hit &lt;code&gt;F5&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Client set-up&lt;/h2&gt;
+&lt;p&gt;We begin by examining our client-side setup. Here, we need to configure the client settings and establish a connection with the LSP.&lt;/p&gt;
+&lt;p&gt;The "extension" must cover two functions that will be called by VSCode when enabling our extension: &lt;code&gt;activate&lt;/code&gt; and &lt;code&gt;deactivate&lt;/code&gt;. We need to provide implementations for these two functions.&lt;/p&gt;
+&lt;p&gt;The activation method should consist of the following steps:
+1. Specify server options:
+   1. Where is the LSP script located?
+   2. How do we want to run the server?
+   3. How do we exchange messages?
+2. Set up our client and point it to the server configuration.
+3. Register any event handling functions (which will be described later in the chapter about sending custom requests from server to client).
+4. Start the client.&lt;/p&gt;
+&lt;p&gt;During deactivation, we should close all used resources and stop our client session.&lt;/p&gt;
+&lt;p&gt;Minimal client set-up is showed in &lt;a href="https://github.com/semanticart/minimum-viable-vscode-language-server-extension/blob/main/client/src/extension.ts"&gt;GitHub: minimum-viable-vscode-language-server-extension&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;Server set-up&lt;/h2&gt;
+&lt;p&gt;We are creating the connection object with:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;createConnection&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;ProposedFeatures&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;all&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;then we need to specify the first event that will occure where the client will establish the connection.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;onInitialize&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nx"&gt;params&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;InitializeParams&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;result&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;InitializeResult&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;capabilities&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="cm"&gt;/* Here we list all methods the server can handle */&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;result&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The client will wait for the set of capabilities that our server will handle to send only those messages that we really care about.&lt;/p&gt;
+&lt;p&gt;Once we specify this event, we can start listening for any incoming connections:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listen&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Minimal server set-up is showed in &lt;a href="https://github.com/semanticart/minimum-viable-vscode-language-server-extension/blob/main/server/src/server.ts"&gt;GitHub: minimum-viable-vscode-language-server-extension&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;Debugging&lt;/h2&gt;
+&lt;p&gt;The very first thing I tried to do when I started to work with LSP was to display some logs, to better understand the events and parameters that I received. This truly helped me to understand the overall flow of the LSP.&lt;/p&gt;
+&lt;p&gt;Since we are working with multiple applications running at the same time, I had some trouble finding the correct methods of sending logs and notifications.&lt;/p&gt;
+&lt;h3&gt;Logs form server side&lt;/h3&gt;
+&lt;p&gt;&lt;img alt="Server Side Logs" src="images/VSCode_language_server_development/server_side_logs.png"&gt;&lt;/p&gt;
+&lt;p&gt;They are going to be visible in the newly opened VSCode window.&lt;/p&gt;
+&lt;h4&gt;Notification&lt;/h4&gt;
+&lt;p&gt;The most visible log is to send a notification to our client from the server side.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;window&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;showInformationMessage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Notification&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Console log&lt;/h3&gt;
+&lt;p&gt;Another practical way of logging information would be to send it to a terminal.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;onInitialize &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Logs from client side&lt;/h2&gt;
+&lt;h4&gt;Default console log&lt;/h4&gt;
+&lt;p&gt;We can use debug terminal to send logs:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Init!&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;They are going to be visible in the "Debug Console" in the window where you started the debugging.&lt;/p&gt;
+&lt;h4&gt;Own console instance&lt;/h4&gt;
+&lt;p&gt;We can create our own custom message stream:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;orange&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;vscode&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;window&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createOutputChannel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;My custom terminal&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nx"&gt;orange&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;appendLine&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Log line!&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;They are going to be visible in the new opened VSCode window. You need to change the selected terminal as showed on previous screenshot.&lt;/p&gt;
+&lt;h2&gt;Event cooking-book&lt;/h2&gt;
+&lt;p&gt;Events I used and were handy while my development.&lt;/p&gt;
+&lt;h3&gt;Document&lt;/h3&gt;
+&lt;p&gt;Instruct the server about capabilities:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;textDocumentSync&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;TextDocumentSyncKind.Incremental&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To handle document related events first create object for text documents manager, attach established connection and start listening any text document related events.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;documents&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;TextDocuments&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;TextDocument&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;TextDocuments&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;TextDocument&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nx"&gt;documents&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h4&gt;onDidChangeContent&lt;/h4&gt;
+&lt;p&gt;Triggered every time when the we edit the file content.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;documents&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;onDidChangeContent&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nx"&gt;_change&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;onDidChangeContent&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Completion&lt;/h3&gt;
+&lt;p&gt;Instruct server about capabilities:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;completionProvider&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;resolveProvider&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;triggerCharacters&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;[&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;You can specify in which key the completion list should be showed &lt;code&gt;triggerCharacters&lt;/code&gt;.&lt;/p&gt;
+&lt;h4&gt;onCompletion&lt;/h4&gt;
+&lt;p&gt;The list after you hit &lt;code&gt;ctrl + space&lt;/code&gt; will be constructed from the array you return.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;onCompletion&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nx"&gt;_textDocumentPosition&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;CompletionParams&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;CompletionItem&lt;/span&gt;&lt;span class="p"&gt;[]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;onCompletion&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;label&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Label A&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;insertText&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;text&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Links&lt;/h3&gt;
+&lt;p&gt;Instruct server about capabilities:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;documentLinkProvider&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;resolveProvider&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;true&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Links can be created by specifying the range of characters that are supposed to be interactive. These links are created using &lt;code&gt;onDocumentLinks&lt;/code&gt; and can later handled one by one with &lt;code&gt;onDocumentLinkResolve&lt;/code&gt;.&lt;/p&gt;
+&lt;h3&gt;onDocumentLinks&lt;/h3&gt;
+&lt;p&gt;Assign ranges of characters to links:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;onDocumentLinks&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nx"&gt;_params&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nx"&gt;DocumentLink&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;create&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Range&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;create&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;onDocumentLinkResolve&lt;/h3&gt;
+&lt;p&gt;This event will be triggered when user clicks on the link with &lt;code&gt;Ctrl + click&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;onDocumentLinkResolve&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nx"&gt;link&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;onDocumentLinkResolve&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;URI&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;URI&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;file&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;path_to_file.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toString&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;link&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;It is possible to read the current workspaces URI which is passed as parrem in &lt;code&gt;onInitialize&lt;/code&gt; event &lt;code&gt;params.workspaceFolders[0].URI&lt;/code&gt;.&lt;/p&gt;
+&lt;h3&gt;Custom requests&lt;/h3&gt;
+&lt;p&gt;It is possible to send custom requests or notifications from server to client and other way round.&lt;/p&gt;
+&lt;h4&gt;sendRequest&lt;/h4&gt;
+&lt;p&gt;You can send request from server to client with &lt;code&gt;sendRequest&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;params&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{};&lt;/span&gt;
+&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;sendRequest&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;customMethod/eventName&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;params&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;In case the request suppose to return some value you can assign it to the variable as from usuall function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;params&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{};&lt;/span&gt;
+&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;connection&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;sendRequest&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;customMethod/eventName&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;params&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h4&gt;onRequest&lt;/h4&gt;
+&lt;p&gt;To receive custom request on client side you can use &lt;code&gt;onRequest&lt;/code&gt; event.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;client&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;onRequest&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;customMethod/eventName&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;params&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;any&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;My custom event!&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;custom&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;label&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;response&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To return data from completed request just return the object or value as in normal function.&lt;/p&gt;</content><category term="blogs"></category></entry><entry><title>Post configuration for minimal debian installation</title><link href="https://mateuszmyalski.github.io/post-configuration-for-minimal-debian-installation.html" rel="alternate"></link><published>2024-01-31T00:00:00+01:00</published><updated>2024-01-31T00:00:00+01:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-01-31:/post-configuration-for-minimal-debian-installation.html</id><summary type="html">&lt;h1&gt;Post configuration for minimal debian installation&lt;/h1&gt;
 &lt;p&gt;As I transitioned to Debian with a minimal installation paired with the XFCE desktop environment, I realized the importance of enhancing my system for a more comprehensive user experience. While the initial minimal setup laid the foundation, I found it necessary to install additional …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Post configuration for minimal debian installation&lt;/h1&gt;
 &lt;p&gt;As I transitioned to Debian with a minimal installation paired with the XFCE desktop environment, I realized the importance of enhancing my system for a more comprehensive user experience. While the initial minimal setup laid the foundation, I found it necessary to install additional packages to fine-tune and optimize my Debian environment. This collection of notes not only serves as a guide to replicate my current configuration but also acts as a reference for future improvements. The integration of XFCE, along with carefully chosen packages, strikes a balance between efficiency and functionality, ensuring a smooth and personalized Debian experience. I created some notes that gets into essential packages and configurations, making it a handy resource for anyone seeking to configure Debian with XFCE at an intermediate to advanced level of proficiency.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Disclaimer: The following packages are customized to my taste. Feel free, and encouraged, to adjust them to your preferences.&lt;/strong&gt;&lt;/p&gt;

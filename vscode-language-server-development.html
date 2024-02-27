@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="Tech-Notes">
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mateusz Myalski">
+    <link rel="shortcut icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalski.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalski.github.io/index.html">Tech-Notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalski.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>VSCode Language Server Development</h1>
+<p>Programming languages come with their own semantics and features, and programmers often rely on hints and checkers provided by their Integrated Development Environment (IDE) to speed up development and troubleshoot code. However, implementing every possible semantic feature directly into an IDE for all programming languages would not be optimal. Therefore, the Language Server Protocol (LSP) was created as a layer between the user interface and the IDE. The server provides necessary functionalities often visible when searching symbols or writing function prototypes, etc.</p>
+<p>This paper aims to provide a practical approach to developing your first LSP that interacts with both the user and the IDE. I will describe the conventions used in VSCode npm packages for extension development. By the end of this read, you will have a good starting point to implement your own ideas within the event-based environment of the LSP. I will also provide interesting resources for finding examples and describing possibilities you might be seeking on the internet, gathering some examples to implement various functionalities. Here, I've done it all for you!</p>
+<h2>What is the LSP</h2>
+<p>The Language Server Protocol (LSP) server is thoroughly described on the official <a href="https://code.visualstudio.com/api/language-extensions/language-server-extension-guide">Microsoft webpage</a>. Understanding its intricacies is crucial, but let's focus on the high-level overview.</p>
+<p>When a client performs actions like code highlighting or file editing, it often requires advanced features such as autocompletion in languages like C, JavaScript, or Python. To cater to these needs, the LSP acts as an intermediary. It facilitates communication between the client and various language servers, enabling seamless integration of language-specific functionalities into the development environment.</p>
+<div class="highlight"><pre><span></span><code><span class="n">Languages</span><span class="o">:</span><span class="w">            </span><span class="n">Methods</span><span class="o">:</span>
+<span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">didClose</span><span class="w">     </span><span class="o">|</span>
+<span class="n">JS</span><span class="w"> </span><span class="o">-------&gt;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">documentLink</span><span class="w"> </span><span class="o">|</span>
+<span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">references</span><span class="w">   </span><span class="o">|</span>
+<span class="n">Python</span><span class="w"> </span><span class="o">---&gt;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">hover</span><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="o">-----&gt;</span><span class="w"> </span><span class="n">LSP</span>
+<span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">completion</span><span class="w">   </span><span class="o">|</span>
+<span class="n">C</span><span class="w"> </span><span class="o">--------&gt;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">inlayHint</span><span class="w">    </span><span class="o">|</span>
+<span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">didOpen</span><span class="w">      </span><span class="o">|</span>
+</code></pre></div>
+
+<p>All available methods are thoroughly described in the <a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/">official documentation</a>. The documentation outlines various requests and responses in corresponding chapters.</p>
+<p>For practical implementation guidance, I found it immensely useful to draw inspiration from the following resources:</p>
+<ul>
+<li><a href="https://github.com/microsoft/vscode-languageserver-node/blob/main/client-node-tests/src/servers/testServer.ts">vscode-languageserver-node/testServer.ts</a></li>
+<li><a href="https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample">vscode-extension-samples/lsp-sample</a></li>
+</ul>
+<p>It's worth noting that messages can be sent using four different standards:</p>
+<div class="highlight"><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kr">declare</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="nx">TransportKind</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">stdio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">ipc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">pipe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>I am going to focus on using the <code>ipc</code> method of transporting messages between the client and LSP.</p>
+<p>In Visual Studio Code (VSCode), messages between the client (VSCode) and the language server are typically sent using JSON-RPC (Remote Procedure Call) over the chosen IPC (Inter-Process Communication) mechanism. JSON-RPC is a lightweight remote procedure call protocol utilizing JSON for data serialization.</p>
+<p>Messages are formatted as JSON objects containing fields such as <code>jsonrpc</code>, <code>method</code>, <code>params</code>, and <code>id</code>. These fields specify the JSON-RPC version, the method being called or responded to, any parameters associated with the method, and an identifier for the message (typically used for correlating responses with requests). Then, they are serialized and transmitted.</p>
+<p>To put this into an example, imagine you are currently editing an open file. The client sends a notification method to our server with the message ID <code>textDocument/didChange</code>, along with corresponding parameters. However, before this happens, the server needs to inform the client that it is capable of handling such a message, which is described as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">textDocumentSync</span><span class="o">:</span><span class="w"> </span><span class="kt">TextDocumentSyncKind.Incremental</span><span class="p">,</span>
+</code></pre></div>
+
+<p>This informs our client that we are capable of handling text document events and to send only changes instead of the full document, as it would be with the option <code>TextDocumentSyncKind.Full</code>.</p>
+<p>With this minimal theory in place, we are now prepared to exchange a few logs.</p>
+<h2>Minimal environment set-up</h2>
+<p>To start, we need to set up a TypeScript environment. This requires having Node.js installed.
+To install node:</p>
+<div class="highlight"><pre><span></span><code>sudo apt install node
+</code></pre></div>
+
+<p>Clone the minimal LSP development environment from the public GitHub repository <a href="https://github.com/semanticart/minimum-viable-vscode-language-server-extension">here</a>.</p>
+<p>Once cloned, you'll find the following directories:</p>
+<ul>
+<li><code>.vscode</code>: Contains all necessary shortcuts configuration, enabling you to easily hit 'F5' to start debugging.</li>
+<li><code>client</code>: Contains all client-side related operations, responsible for setting up the connection with our LSP.</li>
+<li><code>server</code>: Houses our LSP related source files.</li>
+</ul>
+<p>After cloning the repository, it's recommended to update the versions of <code>vscode-languageserver</code> in <code>server/package.json</code> and <code>vscode-languageclient</code> in <code>client/package.json</code>.</p>
+<p>To prepare the environment for further development, execute <code>npm install</code>. To debug, simply hit <code>F5</code>.</p>
+<h2>Client set-up</h2>
+<p>We begin by examining our client-side setup. Here, we need to configure the client settings and establish a connection with the LSP.</p>
+<p>The "extension" must cover two functions that will be called by VSCode when enabling our extension: <code>activate</code> and <code>deactivate</code>. We need to provide implementations for these two functions.</p>
+<p>The activation method should consist of the following steps:
+1. Specify server options:
+   1. Where is the LSP script located?
+   2. How do we want to run the server?
+   3. How do we exchange messages?
+2. Set up our client and point it to the server configuration.
+3. Register any event handling functions (which will be described later in the chapter about sending custom requests from server to client).
+4. Start the client.</p>
+<p>During deactivation, we should close all used resources and stop our client session.</p>
+<p>Minimal client set-up is showed in <a href="https://github.com/semanticart/minimum-viable-vscode-language-server-extension/blob/main/client/src/extension.ts">GitHub: minimum-viable-vscode-language-server-extension</a></p>
+<h2>Server set-up</h2>
+<p>We are creating the connection object with:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">connection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createConnection</span><span class="p">(</span><span class="nx">ProposedFeatures</span><span class="p">.</span><span class="nx">all</span><span class="p">);</span>
+</code></pre></div>
+
+<p>then we need to specify the first event that will occure where the client will establish the connection.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">connection</span><span class="p">.</span><span class="nx">onInitialize</span><span class="p">((</span><span class="nx">params</span><span class="o">:</span><span class="w"> </span><span class="kt">InitializeParams</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="o">:</span><span class="w"> </span><span class="kt">InitializeResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">capabilities</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="cm">/* Here we list all methods the server can handle */</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">  </span><span class="p">};</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">result</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>The client will wait for the set of capabilities that our server will handle to send only those messages that we really care about.</p>
+<p>Once we specify this event, we can start listening for any incoming connections:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">connection</span><span class="p">.</span><span class="nx">listen</span><span class="p">();</span>
+</code></pre></div>
+
+<p>Minimal server set-up is showed in <a href="https://github.com/semanticart/minimum-viable-vscode-language-server-extension/blob/main/server/src/server.ts">GitHub: minimum-viable-vscode-language-server-extension</a></p>
+<h2>Debugging</h2>
+<p>The very first thing I tried to do when I started to work with LSP was to display some logs, to better understand the events and parameters that I received. This truly helped me to understand the overall flow of the LSP.</p>
+<p>Since we are working with multiple applications running at the same time, I had some trouble finding the correct methods of sending logs and notifications.</p>
+<h3>Logs form server side</h3>
+<p><img alt="Server Side Logs" src="images/VSCode_language_server_development/server_side_logs.png"></p>
+<p>They are going to be visible in the newly opened VSCode window.</p>
+<h4>Notification</h4>
+<p>The most visible log is to send a notification to our client from the server side.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">connection</span><span class="p">.</span><span class="nb">window</span><span class="p">.</span><span class="nx">showInformationMessage</span><span class="p">(</span><span class="s2">&quot;Notification&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<h3>Console log</h3>
+<p>Another practical way of logging information would be to send it to a terminal.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">connection</span><span class="p">.</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;onInitialize &quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<h2>Logs from client side</h2>
+<h4>Default console log</h4>
+<p>We can use debug terminal to send logs:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Init!&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>They are going to be visible in the "Debug Console" in the window where you started the debugging.</p>
+<h4>Own console instance</h4>
+<p>We can create our own custom message stream:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nx">orange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">vscode</span><span class="p">.</span><span class="nb">window</span><span class="p">.</span><span class="nx">createOutputChannel</span><span class="p">(</span><span class="s2">&quot;My custom terminal&quot;</span><span class="p">);</span>
+<span class="nx">orange</span><span class="p">.</span><span class="nx">appendLine</span><span class="p">(</span><span class="s2">&quot;Log line!&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>They are going to be visible in the new opened VSCode window. You need to change the selected terminal as showed on previous screenshot.</p>
+<h2>Event cooking-book</h2>
+<p>Events I used and were handy while my development.</p>
+<h3>Document</h3>
+<p>Instruct the server about capabilities:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">textDocumentSync</span><span class="o">:</span><span class="w"> </span><span class="kt">TextDocumentSyncKind.Incremental</span><span class="p">,</span>
+</code></pre></div>
+
+<p>To handle document related events first create object for text documents manager, attach established connection and start listening any text document related events.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">documents</span><span class="o">:</span><span class="w"> </span><span class="kt">TextDocuments</span><span class="o">&lt;</span><span class="nx">TextDocument</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TextDocuments</span><span class="p">(</span><span class="nx">TextDocument</span><span class="p">);</span>
+<span class="nx">documents</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">connection</span><span class="p">);</span>
+</code></pre></div>
+
+<h4>onDidChangeContent</h4>
+<p>Triggered every time when the we edit the file content.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">documents</span><span class="p">.</span><span class="nx">onDidChangeContent</span><span class="p">((</span><span class="nx">_change</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">connection</span><span class="p">.</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;onDidChangeContent&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="p">);</span>
+</code></pre></div>
+
+<h3>Completion</h3>
+<p>Instruct server about capabilities:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">completionProvider</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">resolveProvider</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">triggerCharacters</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;[&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>You can specify in which key the completion list should be showed <code>triggerCharacters</code>.</p>
+<h4>onCompletion</h4>
+<p>The list after you hit <code>ctrl + space</code> will be constructed from the array you return.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">connection</span><span class="p">.</span><span class="nx">onCompletion</span><span class="p">((</span><span class="nx">_textDocumentPosition</span><span class="o">:</span><span class="w"> </span><span class="kt">CompletionParams</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nx">CompletionItem</span><span class="p">[]</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">connection</span><span class="p">.</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;onCompletion&quot;</span><span class="p">);</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nx">label</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Label A&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">insertText</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;text&#39;</span><span class="p">},</span>
+<span class="w">      </span><span class="p">]</span>
+<span class="w">  </span><span class="p">});</span>
+</code></pre></div>
+
+<h3>Links</h3>
+<p>Instruct server about capabilities:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">documentLinkProvider</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">resolveProvider</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Links can be created by specifying the range of characters that are supposed to be interactive. These links are created using <code>onDocumentLinks</code> and can later handled one by one with <code>onDocumentLinkResolve</code>.</p>
+<h3>onDocumentLinks</h3>
+<p>Assign ranges of characters to links:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">connection</span><span class="p">.</span><span class="nx">onDocumentLinks</span><span class="p">((</span><span class="nx">_params</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="nx">DocumentLink</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">Range</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="p">))</span>
+<span class="w">    </span><span class="p">];</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<h3>onDocumentLinkResolve</h3>
+<p>This event will be triggered when user clicks on the link with <code>Ctrl + click</code></p>
+<div class="highlight"><pre><span></span><code><span class="nx">connection</span><span class="p">.</span><span class="nx">onDocumentLinkResolve</span><span class="p">((</span><span class="nx">link</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">connection</span><span class="p">.</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;onDocumentLinkResolve&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">connection</span><span class="p">.</span><span class="nx">URI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">URI</span><span class="p">.</span><span class="nx">file</span><span class="p">(</span><span class="s2">&quot;path_to_file.txt&quot;</span><span class="p">).</span><span class="nx">toString</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">link</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>It is possible to read the current workspaces URI which is passed as parrem in <code>onInitialize</code> event <code>params.workspaceFolders[0].URI</code>.</p>
+<h3>Custom requests</h3>
+<p>It is possible to send custom requests or notifications from server to client and other way round.</p>
+<h4>sendRequest</h4>
+<p>You can send request from server to client with <code>sendRequest</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="nx">connection</span><span class="p">.</span><span class="nx">sendRequest</span><span class="p">(</span><span class="s2">&quot;customMethod/eventName&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">params</span><span class="p">);</span>
+</code></pre></div>
+
+<p>In case the request suppose to return some value you can assign it to the variable as from usuall function.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">connection</span><span class="p">.</span><span class="nx">sendRequest</span><span class="p">(</span><span class="s2">&quot;customMethod/eventName&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">params</span><span class="p">);</span>
+</code></pre></div>
+
+<h4>onRequest</h4>
+<p>To receive custom request on client side you can use <code>onRequest</code> event.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">client</span><span class="p">.</span><span class="nx">onRequest</span><span class="p">(</span><span class="s2">&quot;customMethod/eventName&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">params</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;My custom event!&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">custom</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;label&quot;</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>To return data from completed request just return the object or value as in normal function.</p>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                VSCode Language Server Development
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2024-02-19T00:00:00+01:00">19/02/2024
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">🖨️ Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>
