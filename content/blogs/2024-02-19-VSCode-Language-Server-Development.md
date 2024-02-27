@@ -2,7 +2,6 @@
 title: VSCode Language Server Development
 date: 2024-02-19
 layout: post
-status: draft
 ---
 # VSCode Language Server Development
 
@@ -246,11 +245,20 @@ const params = {};
 connection.sendRequest("customMethod/eventName", params);
 ```
 
+In case the request suppose to return some value you can assign it to the variable as from usuall function.
+```ts
+const params = {};
+const response = connection.sendRequest("customMethod/eventName", params);
+```
+
 #### onRequest
 To receive custom request on client side you can use `onRequest` event.
 ```ts
 client.onRequest("customMethod/eventName", (params: any) => {
     console.log("My custom event!");
+    const response = { custom: "label" };
+    return response
 });
 ```
 
+To return data from completed request just return the object or value as in normal function.
