@@ -48,18 +48,24 @@
 <p><strong>Disclaimer: The following packages are customized to my taste. Feel free, and encouraged, to adjust them to your preferences.</strong></p>
 <h2>1. Installing XFCE Desktop Environment</h2>
 <p>Once you complete the Debian installation from your USB/CD without selecting any desktop environment, you will need to configure it yourself. Start by installing the essential components for a minimal XFCE desktop environment. Open a terminal and execute:</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libxfce4util<span class="w"> </span>thunar<span class="w"> </span>xfce4-session<span class="w"> </span>xfce4-settings<span class="w"> </span>xfconf<span class="w"> </span>xfdesktop<span class="w"> </span>xfwm4<span class="w"> </span>urxvt-unicode
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>xfce4-power-manager<span class="w"> </span>xinit<span class="w"> </span>nm-applet<span class="w"> </span>network-manager-gnome<span class="w"> </span>thunar<span class="w"> </span>xfce4-session<span class="w"> </span>xfce4-settings<span class="w"> </span>xfconf<span class="w"> </span>xfdesktop4<span class="w"> </span>xfwm4<span class="w"> </span>rxvt-unicode<span class="w"> </span>git<span class="w"> </span>make<span class="w"> </span>rofi
 </code></pre></div>
 
 <ul>
-<li><code>libxfce4util</code> - It includes various helper functions and macros used by other XFCE components.</li>
+<li><code>xfce4-power-manager</code> - It also allows users to control the display backlight brightness and set power-saving modes for displays and monitors.</li>
+<li><code>xinit</code> - X display server.</li>
+<li><code>nm-applet</code> - Provides detection and configuration for systems to automatically connect to networks. </li>
+<li><code>network-manager-gnome</code> - GUI application for displaying tray icon and manage connections.</li>
 <li><code>Thunar</code> - Thunar provides a user-friendly interface for managing files and directories, with features like tabbed browsing, bulk renaming, and file previews. It is the default GUI file manager for XFCE</li>
 <li><code>xfce4-session</code> - Manages the user sessions, handling the startup and termination of applications and managing the overall session settings.</li>
 <li><code>xfce4-settings</code> - Allows users to configure various settings for the XFCE desktop environment, including display, keyboard, mouse, and more.</li>
 <li><code>xfconf</code> - Stores and retrieves application configuration settings. It is a key-value configuration system used by various XFCE components.</li>
 <li><code>xfdesktop</code> - Manages the desktop background, icons, and provides basic desktop management functions.</li>
 <li><code>xfwm4</code> - Manages window placement, decorations, and handles basic window management functions within the XFCE desktop environment.</li>
-<li><code>urxvt-unicode</code> - Provides a lightweight terminal emulator with support for Unicode, suitable for use within the XFCE environment.</li>
+<li><code>rxvt-unicode</code> - Provides a lightweight terminal emulator with support for Unicode, suitable for use within the XFCE environment.</li>
+<li><code>git</code> - Version control software.</li>
+<li><code>make</code> - Unix build system tool.</li>
+<li><code>rofi</code> - Application launcher.</li>
 </ul>
 <p>These packages collectively form the core components necessary for a functional and lightweight XFCE desktop environment on a Debian system. They handle various aspects of the desktop user experience, ranging from file management to window handling and configuration settings.</p>
 <h2>2. Granting Sudo Access</h2>
@@ -69,13 +75,26 @@ usermod<span class="w"> </span>-aG<span class="w"> </span>sudo<span class="w"> <
 </code></pre></div>
 
 <h2>3. Configuring existing SSH keys</h2>
-<p>I typically store my private keys in a secure location, ensuring continued access when switching systems by creating backups. Place your private keys in the <code>~/.ssh</code> directory. If you haven't used the default names, remember to add them manually after each reboot, or include them in your <code>.bashrc</code> for automatic loading.</p>
+<p>I typically store my private keys in a secure location, ensuring continued access when switching systems by creating backups. Place your private keys in the <code>~/.ssh</code> directory. If you haven't used the default names (<code>id_rsa</code>), remember to add them manually after each reboot, or include them in your <code>.bashrc</code> for automatic loading.</p>
 <div class="highlight"><pre><span></span><code>ssh-add<span class="w"> </span>~/.ssh/&lt;key&gt;
+</code></pre></div>
+
+<p>Usually when ou create the file by yourself, the chmod permissions are set to 644, this is too wide from private key. Change it to 600.</p>
+<div class="highlight"><pre><span></span><code>chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>id_rsa
 </code></pre></div>
 
 <h2>4. GUI WiFi Manager</h2>
 <p>If you configured your WiFi during installation, you likely have internet access. However, changing connection settings currently requires using command-line commands, which may not be convenient if done infrequently. XFCE includes <code>nm-applet</code>, a tool that simplifies network configuration. Unfortunately, I encountered issues enabling it, necessitating manual editing of the Network Manager configuration.</p>
-<p>Begin by removing your previously configured network from <code>/etc/network/interfaces</code>. Subsequently, modify the <code>/etc/NetworkManager/NetworkManager.conf</code> file to set it as 'managed':</p>
+<p>Begin by removing your previously configured network from <code>/etc/network/interfaces</code>.
+You wil find  something similar:</p>
+<div class="highlight"><pre><span></span><code># The primary network interface
+allow-hotplug wlp0s20f3
+iface wlp0s20f3 inet dhcp
+    wpa-ssid wifi-name
+    wpa-psk  wifi-password
+</code></pre></div>
+
+<p>Subsequently, modify the <code>/etc/NetworkManager/NetworkManager.conf</code> file to set it as 'managed':</p>
 <div class="highlight"><pre><span></span><code><span class="k">[main]</span>
 <span class="na">plugins</span><span class="o">=</span><span class="s">ifupdown,keyfile</span>
 
@@ -85,20 +104,19 @@ usermod<span class="w"> </span>-aG<span class="w"> </span>sudo<span class="w"> <
 
 <p>Reboot the system.</p>
 <h2>5. Audio Manager</h2>
-<p>To commence listening to audio, it is essential to install the basic packages enabling configuration of sound input and output. I recommend using <code>pulseaudio</code> as it usually suffices for this purpose.</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>pulseaudio
+<p>To commence listening to audio, it is essential to install the basic packages enabling configuration of sound input and output. I recommend using <code>pulseaudio</code> as it usually suffices for this purpose and <code>xfce4-pulseaudio-plugin</code> for displaying the tray icon.</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>pulseaudio<span class="w"> </span>xfce4-pulseaudio-plugin
 </code></pre></div>
 
 <h2>6. Bluetooth Manager</h2>
 <p>I typically use my AirPods with the Linux system. The Bluetooth manager is not included by default in the minimal installation. To set it up, you need to download <code>blueman</code> or any other GUI manager. Alternatively, if you prefer, you can stick to the command line (CLI). 😊</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>bluetooth<span class="w"> </span>pulseaudio-module-bluetooth<span class="w"> </span>blueman<span class="w"> </span>bluez-firmware<span class="w"> </span>bluewho
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>bluetooth<span class="w"> </span>pulseaudio-module-bluetooth<span class="w"> </span>blueman
 </code></pre></div>
 
 <ul>
 <li><code>bluetooth</code> - Essential Bluetooth utilities and tools for managing Bluetooth devices.</li>
 <li><code>pulseaudio-module-bluetooth</code> - PulseAudio extension module enabling seamless integration of Bluetooth audio devices.</li>
 <li><code>blueman</code> - GTK-based Bluetooth manager with a user-friendly graphical interface.</li>
-<li><code>bluez-firmware</code> - Firmware package for the BlueZ Bluetooth stack.</li>
 </ul>
 <h2>7. Touchpad click</h2>
 <p>Since I use a laptop for my daily activities, I am accustomed to using touchpad taps to click on items. To enable this functionality, you need to add a few configurations.</p>
@@ -127,12 +145,11 @@ sudo snap install core
 sudo snap install snap-store
 </code></pre></div>
 
-<h3>Adding snap do appfinder</h3>
-<p>It would be beneficial to have those installed apps also in the XFCE <code>appfinder</code>. To achieve this, simply add symbolic links to the applications.</p>
+<h3>Making snap applications visible for the system</h3>
+<p>To achieve this, simply add symbolic links to the applications.</p>
 <div class="highlight"><pre><span></span><code>ln<span class="w"> </span>-s<span class="w"> </span>/var/lib/snapd/desktop/<span class="w"> </span>~/.local/share/applications/
 </code></pre></div>
 
-<p>I attempted to set the environmental path where <code>appfinder</code> is supposed to look for applications, but so far, I haven't had any success.</p>
 <h2>10. Emojis</h2>
 <p>When I started browsing the internet, I noticed that some emojis were not displaying correctly; instead, I saw black blocks. This issue can be resolved by downloading the <code>noto-color-emoji</code> fonts.</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>fonts-noto-color-emoji
