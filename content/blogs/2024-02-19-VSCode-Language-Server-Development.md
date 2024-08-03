@@ -15,7 +15,7 @@ The Language Server Protocol (LSP) server is thoroughly described on the officia
 
 When a client performs actions like code highlighting or file editing, it often requires advanced features such as autocompletion in languages like C, JavaScript, or Python. To cater to these needs, the LSP acts as an intermediary. It facilitates communication between the client and various language servers, enabling seamless integration of language-specific functionalities into the development environment.
 
-```
+<pre class="ascii center">
 Languages:            Methods:
             | textDocument/didClose     |
 JS -------> | textDocument/documentLink |
@@ -24,7 +24,7 @@ Python ---> | textDocument/hover        | -----> LSP
             | textDocument/completion   |
 C --------> | textDocument/inlayHint    |
             | textDocument/didOpen      |
-```
+</pre>
 All available methods are thoroughly described in the [official documentation](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/). The documentation outlines various requests and responses in corresponding chapters.
 
 For practical implementation guidance, I found it immensely useful to draw inspiration from the following resources:
