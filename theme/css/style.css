@@ -137,7 +137,7 @@ section.post img {
 section.post code:not(pre code) {
     border: 1px solid black;
     padding: 0px 2px;
-    word-break: break-all;
+    white-space:nowrap;
 }
 
 section.post blockquote {
@@ -178,7 +178,7 @@ pre.ascii.center {
     margin: 0 auto;
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 700px) {
     body {
         min-width: 98vw;
         max-width: 98vw;
