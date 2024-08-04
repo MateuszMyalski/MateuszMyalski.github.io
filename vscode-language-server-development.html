@@ -49,16 +49,16 @@
 <h2>What is the LSP</h2>
 <p>The Language Server Protocol (LSP) server is thoroughly described on the official <a href="https://code.visualstudio.com/api/language-extensions/language-server-extension-guide">Microsoft webpage</a>. Understanding its intricacies is crucial, but let's focus on the high-level overview.</p>
 <p>When a client performs actions like code highlighting or file editing, it often requires advanced features such as autocompletion in languages like C, JavaScript, or Python. To cater to these needs, the LSP acts as an intermediary. It facilitates communication between the client and various language servers, enabling seamless integration of language-specific functionalities into the development environment.</p>
-<div class="highlight"><pre><span></span><code><span class="n">Languages</span><span class="o">:</span><span class="w">            </span><span class="n">Methods</span><span class="o">:</span>
-<span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">didClose</span><span class="w">     </span><span class="o">|</span>
-<span class="n">JS</span><span class="w"> </span><span class="o">-------&gt;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">documentLink</span><span class="w"> </span><span class="o">|</span>
-<span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">references</span><span class="w">   </span><span class="o">|</span>
-<span class="n">Python</span><span class="w"> </span><span class="o">---&gt;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">hover</span><span class="w">        </span><span class="o">|</span><span class="w"> </span><span class="o">-----&gt;</span><span class="w"> </span><span class="n">LSP</span>
-<span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">completion</span><span class="w">   </span><span class="o">|</span>
-<span class="n">C</span><span class="w"> </span><span class="o">--------&gt;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">inlayHint</span><span class="w">    </span><span class="o">|</span>
-<span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">textDocument</span><span class="o">/</span><span class="n">didOpen</span><span class="w">      </span><span class="o">|</span>
-</code></pre></div>
-
+<pre class="ascii center">
+Languages:            Methods:
+            | textDocument/didClose     |
+JS -------> | textDocument/documentLink |
+            | textDocument/references   |
+Python ---> | textDocument/hover        | -----> LSP
+            | textDocument/completion   |
+C --------> | textDocument/inlayHint    |
+            | textDocument/didOpen      |
+</pre>
 <p>All available methods are thoroughly described in the <a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/">official documentation</a>. The documentation outlines various requests and responses in corresponding chapters.</p>
 <p>For practical implementation guidance, I found it immensely useful to draw inspiration from the following resources:</p>
 <ul>
