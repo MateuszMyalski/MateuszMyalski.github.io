@@ -7,6 +7,9 @@ layout: post
 
 In today’s tech-driven world, we often assume that solving a problem requires a sophisticated programmable circuit or the latest microcontroller. However, this isn't always the case. Sometimes, the most effective solutions come from a simpler approach, one that leverages tried-and-true electronic components and a bit of creativity. With a few standard ICs, some components lying around the workshop, and a home-soldered PCB, it’s possible to create devices that are not only functional but also elegantly straightforward. This approach strips away the complexity and highlights the beauty of traditional electronics, reminding us that innovation doesn’t always require cutting-edge technology—just a bit of ingenuity and a steady soldering hand.
 
+## Disclaimer
+**This circuit involves high voltage and should only be handled by individuals with proper certifications. If you're not experienced in working with mains power, seek assistance from a certified professional.**
+
 ## Situation: problem of leaking exhaust gas
 
 Recently, there was installed a new ecological heating system in my basement, which was supposed to offer both efficiency and environmental benefits. However, as the hot weather arrived, an unexpected problem emerged. The system was designed with a fixed-speed fan, and it lacked the capability to self-regulate based on the current temperature or gas levels. As a result, when the temperature rises, the fan fails to adjust accordingly, causing an accumulation of smoke in the fire chamber.
