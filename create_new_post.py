@@ -19,7 +19,7 @@ def create_blog_post(title):
     # Create the front-matter content
     front_matter_header = f"""\
 ---
-title: "{title}"
+title: {title}
 date: {current_date}
 layout: post
 status: draft
