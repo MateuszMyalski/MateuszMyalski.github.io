@@ -1,6 +1,6 @@
 import os
 AUTHOR = "Mateusz Myalski"
-SITENAME = "Tech-Notes"
+SITENAME = "eSDE-notes"
 SITEURL = os.getcwd() + "/output"
 SITESUBTITLE = "Notes collected during development, work, learning..."
 
