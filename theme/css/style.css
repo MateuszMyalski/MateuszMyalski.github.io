@@ -118,9 +118,8 @@ section.meta a {
 }
 
 section.post em {
-    background-color: var(--accent-two-color);
     font-family: monospace;
-    font-style: normal;
+    font-style: italic;
     padding: 0px 2px;
 }
 

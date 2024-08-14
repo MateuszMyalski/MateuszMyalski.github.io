@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Tech-Notes</title><link href="https://mateuszmyalski.github.io/" rel="alternate"></link><link href="https://mateuszmyalski.github.io/atom.xml" rel="self"></link><id>https://mateuszmyalski.github.io/</id><updated>2024-08-03T00:00:00+02:00</updated><subtitle>Notes collected during development, work, learning...</subtitle><entry><title>Fan controller for CO2 sensor</title><link href="https://mateuszmyalski.github.io/fan-controller-for-co2-sensor.html" rel="alternate"></link><published>2024-08-03T00:00:00+02:00</published><updated>2024-08-03T00:00:00+02:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-08-03:/fan-controller-for-co2-sensor.html</id><summary type="html">&lt;h1&gt;Fan controller for CO2 sensor&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>eSDE-notes</title><link href="https://mateuszmyalski.github.io/" rel="alternate"></link><link href="https://mateuszmyalski.github.io/atom.xml" rel="self"></link><id>https://mateuszmyalski.github.io/</id><updated>2024-08-03T00:00:00+02:00</updated><subtitle>Notes collected during development, work, learning...</subtitle><entry><title>Fan controller for CO2 sensor</title><link href="https://mateuszmyalski.github.io/fan-controller-for-co2-sensor.html" rel="alternate"></link><published>2024-08-03T00:00:00+02:00</published><updated>2024-08-03T00:00:00+02:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-08-03:/fan-controller-for-co2-sensor.html</id><summary type="html">&lt;h1&gt;Fan controller for CO2 sensor&lt;/h1&gt;
 &lt;p&gt;In today’s tech-driven world, we often assume that solving a problem requires a sophisticated programmable circuit or the latest microcontroller. However, this isn't always the case. Sometimes, the most effective solutions come from a simpler approach, one that leverages tried-and-true electronic components and a …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Fan controller for CO2 sensor&lt;/h1&gt;
 &lt;p&gt;In today’s tech-driven world, we often assume that solving a problem requires a sophisticated programmable circuit or the latest microcontroller. However, this isn't always the case. Sometimes, the most effective solutions come from a simpler approach, one that leverages tried-and-true electronic components and a bit of creativity. With a few standard ICs, some components lying around the workshop, and a home-soldered PCB, it’s possible to create devices that are not only functional but also elegantly straightforward. This approach strips away the complexity and highlights the beauty of traditional electronics, reminding us that innovation doesn’t always require cutting-edge technology—just a bit of ingenuity and a steady soldering hand.&lt;/p&gt;
 &lt;h2&gt;Disclaimer&lt;/h2&gt;
@@ -1325,7 +1325,7 @@ To organize the DFD, usually, two tables are created; “Table of assets” and 
 &lt;h1&gt;Where to put the start?&lt;/h1&gt;
 &lt;p&gt;After studying all above chapters, you finally should have rough idea – where to put the star**, when using pointers in the code. Probably, a few more exercises is going to be needed, to build a really strong base to fully understand the concept of pointers.&lt;/p&gt;
 &lt;p&gt;Creating the imagination of how the physical memory is going to behave when accessing/declaring the pointer, is the key aspect in this topic. Since C language is basing on low-level concepts, they should be sometimes understood from bottom to the top.&lt;/p&gt;
-&lt;h1&gt;Bibliography&lt;/h1&gt;
+&lt;h1&gt;References&lt;/h1&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;a href="https://www.amazon.com/Understanding-Using-Pointers-Techniques-Management/dp/1449344186"&gt;Understanding and Using C Pointers: Core Techniques for Memory Management&lt;/a&gt;&lt;/li&gt;
 &lt;/ol&gt;</content><category term="blogs"></category></entry><entry><title>STM development on linux</title><link href="https://mateuszmyalski.github.io/stm-development-on-linux.html" rel="alternate"></link><published>2022-07-03T00:00:00+02:00</published><updated>2022-07-03T00:00:00+02:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2022-07-03:/stm-development-on-linux.html</id><summary type="html">&lt;h1&gt;STM development on linux&lt;/h1&gt;
@@ -1529,7 +1529,7 @@ Run:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt-get&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;libncurses5&lt;span class="w"&gt; &lt;/span&gt;libncurses5:i386
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;h2&gt;Bibliography&lt;/h2&gt;
+&lt;h2&gt;References&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="http://pacinispace.blogspot.com/2020/02/stm32cubeide-st-link-gdb-server-on-linux.html"&gt;STM32CubeIDE programmer and ST-LINK GDB server on Linux&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</content><category term="blogs"></category></entry><entry><title>Secure boot concept in IoT devices</title><link href="https://mateuszmyalski.github.io/secure-boot-concept-in-iot-devices.html" rel="alternate"></link><published>2022-06-23T00:00:00+02:00</published><updated>2022-06-23T00:00:00+02:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2022-06-23:/secure-boot-concept-in-iot-devices.html</id><summary type="html">&lt;h1&gt;Secure boot concept in IoT devices&lt;/h1&gt;
@@ -1764,7 +1764,7 @@ The interaction between non-secure regions and secure regions can be only done v
 Implementing security features often comes with performance penalties, for the client sake and product quality it is recommended to track how extra clock cycles a certain feature adds to the execution time. Sometimes it is worth to give the decision if new introduced mechanics should be on or off for the client.&lt;/p&gt;
 &lt;h1&gt;Summary&lt;/h1&gt;
 &lt;p&gt;The above considerations, about the embedded system security designs and techniques, should allow developers to understand the very basics of security certification processes. Every touched attack vectors and possible mitigation, barely scratches the amount of knowledge gathered by specialists in these topics. Therefore, it is highly suggested to deepen the knowledge that is shared in books, documents, blogs, articles and meet-ups.&lt;/p&gt;
-&lt;h1&gt;Bibliography&lt;/h1&gt;
+&lt;h1&gt;References&lt;/h1&gt;
 &lt;p&gt;These notes have been written with help of the following sources:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;a href="https://ris.utwente.nl/ws/portalfiles/portal/89170348/"&gt;Security in Embedded Hardware - Daniel Ziener - Computer Architecture for Embedded Systems University of Twente&lt;/a&gt;&lt;/li&gt;
@@ -1865,7 +1865,7 @@ $&amp;gt;diff&lt;span class="w"&gt; &lt;/span&gt;data.bin&lt;span class="w"&gt; 
 Binary&lt;span class="w"&gt; &lt;/span&gt;files&lt;span class="w"&gt; &lt;/span&gt;data.bin&lt;span class="w"&gt; &lt;/span&gt;and&lt;span class="w"&gt; &lt;/span&gt;data.bin.enc&lt;span class="w"&gt; &lt;/span&gt;differ
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;h2&gt;Bibliography&lt;/h2&gt;
+&lt;h2&gt;References&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://www.cryptomathic.com/news-events/blog/symmetric-key-encryption-why-where-and-how-its-used-in-banking"&gt;Symmetric Key Encryption - why, where and how it’s used in banking&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://www.cryptomathic.com/news-events/blog/symmetric-cryptography-and-key-management-considerations-on-key-exhaustion-rotation-and-security-models"&gt;Symmetric Cryptography and Key Management: Considerations on Key Exhaustion, Rotation and Security Models&lt;/a&gt;&lt;/li&gt;
