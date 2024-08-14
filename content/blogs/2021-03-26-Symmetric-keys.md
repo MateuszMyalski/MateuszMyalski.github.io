@@ -105,7 +105,7 @@ $>diff data.bin data.bin.enc -sd
 Binary files data.bin and data.bin.enc differ
 ```
 
-## Bibliography
+## References
 - [Symmetric Key Encryption - why, where and how it’s used in banking](https://www.cryptomathic.com/news-events/blog/symmetric-key-encryption-why-where-and-how-its-used-in-banking)
 - [Symmetric Cryptography and Key Management: Considerations on Key Exhaustion, Rotation and Security Models](https://www.cryptomathic.com/news-events/blog/symmetric-cryptography-and-key-management-considerations-on-key-exhaustion-rotation-and-security-models)
 - [Counter Mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode)

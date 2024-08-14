@@ -213,5 +213,5 @@ Run:
 sudo apt-get install libncurses5 libncurses5:i386
 ```
 
-## Bibliography
+## References
 - [STM32CubeIDE programmer and ST-LINK GDB server on Linux](http://pacinispace.blogspot.com/2020/02/stm32cubeide-st-link-gdb-server-on-linux.html)

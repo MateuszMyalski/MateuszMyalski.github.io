@@ -633,5 +633,5 @@ After studying all above chapters, you finally should have rough idea – where 
 
 Creating the imagination of how the physical memory is going to behave when accessing/declaring the pointer, is the key aspect in this topic. Since C language is basing on low-level concepts, they should be sometimes understood from bottom to the top.
 
-# Bibliography
+# References
 1. [Understanding and Using C Pointers: Core Techniques for Memory Management](https://www.amazon.com/Understanding-Using-Pointers-Techniques-Management/dp/1449344186)

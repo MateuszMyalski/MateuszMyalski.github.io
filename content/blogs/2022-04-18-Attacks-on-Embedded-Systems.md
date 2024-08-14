@@ -138,7 +138,7 @@ Implementing security features often comes with performance penalties, for the c
 # Summary
 The above considerations, about the embedded system security designs and techniques, should allow developers to understand the very basics of security certification processes. Every touched attack vectors and possible mitigation, barely scratches the amount of knowledge gathered by specialists in these topics. Therefore, it is highly suggested to deepen the knowledge that is shared in books, documents, blogs, articles and meet-ups.
 
-# Bibliography 
+# References 
 These notes have been written with help of the following sources:
 
 1. [Security in Embedded Hardware - Daniel Ziener - Computer Architecture for Embedded Systems University of Twente](https://ris.utwente.nl/ws/portalfiles/portal/89170348/)
