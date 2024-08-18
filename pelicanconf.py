@@ -4,6 +4,10 @@ SITENAME = "eSDE-notes"
 SITEURL = os.getcwd() + "/output"
 SITESUBTITLE = "Notes collected during development, work, learning..."
 
+PLUGINS = [
+    'extended_sitemap'
+]
+
 PATH = "content"
 ARTICLE_PATHS = [
     "blogs",
