@@ -28,8 +28,8 @@
 &lt;img alt="ITU-T_Figure 7-1" src="images/H.264_stream_data_format_-_Access_unit_and_NAL_unit/ITU-T_Figure 7-1.png"&gt;
 &lt;center&gt;&lt;em&gt;ITU-T Figure 7-1 – Structure of an access unit not containing any NAL units with nal_unit_type equal to 0, 7, 8, or in the range of 12 to 18, inclusive, or in the range of 20 to 31, inclusive&lt;/em&gt;&lt;/center&gt;&lt;/p&gt;
 &lt;h2&gt;Descriptors&lt;/h2&gt;
-&lt;p&gt;The descriptors are used to describe the type used in the NAL units. The descriptor contain two parts: value type and number of bits used by the type.
-The number of bits are marked with number or letter:&lt;/p&gt;
+&lt;p&gt;The descriptors are used to describe the type used in the NAL units. The descriptor contains two parts: value type and number of bits used by the type.
+The number of bits is marked with number or letter:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;n&lt;/strong&gt; - specifies concrete &lt;code&gt;n&lt;/code&gt; amount of bits depending on different variable,&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;v&lt;/strong&gt; - variable-length,&lt;/li&gt;
