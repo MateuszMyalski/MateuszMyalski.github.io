@@ -28,7 +28,8 @@ Sources that I recon are worth to be read when you are interested in embedded sy
 -   [Secure Application Programming in the Presence of Side Channel Attacks](https://www.riscure.com/uploads/2018/11/201708_Riscure_Whitepaper_Side_Channel_Patterns.pdf)
 -   [Embedded Systems Architecture, Daniele Lacamera](https://www.packtpub.com/product/embedded-systems-architecture/9781788832502)
 -   [Design Patterns for Embedded Systems in C: An Embedded Software Engineering Toolkit, Bruce Powel Douglass](https://www.amazon.pl/Design-Patterns-Embedded-Systems-Engineering/dp/1856177076)
--   [TCP/IP Illustrated, Vol. 1: The Protocols, W. Richard Stevens](https://www.amazon.com/TCP-Illustrated-Vol-Addison-Wesley-Professional/dp/0201633469)  
+-   [TCP/IP Illustrated, Vol. 1: The Protocols, W. Richard Stevens](https://www.amazon.com/TCP-Illustrated-Vol-Addison-Wesley-Professional/dp/0201633469)
+-   [ITU-T Rec. H.264 (06/2019) Advanced video coding for generic audiovisual services](https://www.itu.int/rec/T-REC-H.264)
 
 Other:
 
