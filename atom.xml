@@ -847,28 +847,34 @@ The top of the three threat models are: STRIDE, PASTA and OCTAVE.&lt;/p&gt;
 &lt;p&gt;In PASTA model, the strategy is a bit different, especially with comparison to the STRIDE model. PASTA is an acronym that stands for Process for Attack Simulation and Threat Analysis. It is a 7-step risk-based threat modeling framework.&lt;/p&gt;
 &lt;p&gt;The full documentation about PASTA thread modeling can be read in &lt;a href="https://about.gitlab.com/handbook/security/threat_modeling/"&gt;GITLAB’s security handbook&lt;/a&gt;.&lt;/p&gt;
 &lt;h3&gt;1. Define objectives&lt;/h3&gt;
-&lt;p&gt;The initial stage focus on finding the business requirements based on regulations instead of right away identifying assets and threads. The analysis consist understanding of:
-- Business Objectives
-- Market Use Cases
-- Security Requirements
-- Compliance Requirements
-- Business Impact Analysis&lt;/p&gt;
+&lt;p&gt;The initial stage focus on finding the business requirements based on regulations instead of right away identifying assets and threads. The analysis consist understanding of:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Business Objectives&lt;/li&gt;
+&lt;li&gt;Market Use Cases&lt;/li&gt;
+&lt;li&gt;Security Requirements&lt;/li&gt;
+&lt;li&gt;Compliance Requirements&lt;/li&gt;
+&lt;li&gt;Business Impact Analysis&lt;/li&gt;
+&lt;/ul&gt;
 &lt;p&gt;By starting the work from understanding the environment in which risks are taken, it is possible to define priorities based on facts instead of rough estimates taken mostly from the gut feeling. Concrete values, statistics, metrics of the market enables to create data driven reports which are more trustworthy and supports future decision-making.&lt;/p&gt;
 &lt;h3&gt;2. Define technical scope&lt;/h3&gt;
-&lt;p&gt;Second stage is identifying the technical project scope, distinguish which part of code is maintained and what needs to be upgraded. Then the analysis proceeds with the application decomposition, where assets, actors and use cases are examined. This includes:
-- Identifying Application boundaries
-- Identify Application Dependencies From Network Environment
-- Identify Application Dependencies from Servers
-- Identifying Application Dependencies from Software&lt;/p&gt;
-&lt;p&gt;During the stage, execution engineers tries to &lt;strong&gt;enumerate&lt;/strong&gt;:
-- used frameworks with versions,
-- components of the application,
-- services which the application interacts,
-- binaries supplied and created used on the production,
-- used libraries with versions,
-- actors of the system,
-- use cases of the application,
-- abuse cases (like in e.g. authentications, transactions).&lt;/p&gt;
+&lt;p&gt;Second stage is identifying the technical project scope, distinguish which part of code is maintained and what needs to be upgraded. Then the analysis proceeds with the application decomposition, where assets, actors and use cases are examined. This includes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Identifying Application boundaries&lt;/li&gt;
+&lt;li&gt;Identify Application Dependencies From Network Environment&lt;/li&gt;
+&lt;li&gt;Identify Application Dependencies from Servers&lt;/li&gt;
+&lt;li&gt;Identifying Application Dependencies from Software&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;During the stage, execution engineers tries to &lt;strong&gt;enumerate&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;used frameworks with versions,&lt;/li&gt;
+&lt;li&gt;components of the application,&lt;/li&gt;
+&lt;li&gt;services which the application interacts,&lt;/li&gt;
+&lt;li&gt;binaries supplied and created used on the production,&lt;/li&gt;
+&lt;li&gt;used libraries with versions,&lt;/li&gt;
+&lt;li&gt;actors of the system,&lt;/li&gt;
+&lt;li&gt;use cases of the application,&lt;/li&gt;
+&lt;li&gt;abuse cases (like in e.g. authentications, transactions).&lt;/li&gt;
+&lt;/ul&gt;
 &lt;p&gt;Understanding the real technical scope offers the potential of limiting the range of risk assessment of our application. We can base on third-party certificates supplied with the products and base on their good reputation. Moreover, despite relaying on someone’s else work, it is still necessary to include risks based on previous incidents and reports. By defining the project boundaries, we divide the work and organize next steps of the product security analysis.&lt;/p&gt;
 &lt;h3&gt;3. Software decomposition - Data Flow Diagram (DFD)&lt;/h3&gt;
 &lt;p&gt;In the realm of software development, understanding the intricacies of an application's functionality is essential. Application decomposition, the process of breaking down a complex software system into smaller, manageable components, is a fundamental step in achieving this understanding. One powerful tool in this process is the Data Flow Diagram (DFD), which provides a visual representation of how data moves within a system, clarifying its operation, and helping to identify key actors, assets, and data repositories involved. We will delve into the process of creating a DFD diagram to map the flow of an application, thereby visually elucidating its core functions.&lt;/p&gt;
@@ -907,11 +913,13 @@ To organize the DFD, usually, two tables are created; “Table of assets” and 
 &lt;p&gt;Environmental Score Metrics - environmental Score Metrics allow for customization of the CVSS score to align with an organization's unique environment. They take into account the organization's specific requirements for confidentiality, integrity, and availability. These metrics result in adjusted scores, including the Modified Base Score and Modified Temporal Score, based on the context of the organization.&lt;/p&gt;
 &lt;h4&gt;&lt;strong&gt;CWE&lt;/strong&gt;&lt;/h4&gt;
 &lt;p&gt;CWE is a community-driven initiative that aims to identify and categorize common software weaknesses or vulnerabilities that can lead to security issues. It provides a comprehensive list of known software weaknesses, each assigned a unique identifier and description. CWE helps developers, security analysts, and organizations understand and address vulnerabilities in their software by providing a common language and taxonomy for discussing weaknesses.&lt;/p&gt;
-&lt;p&gt;The CWE data base can be found under following web page: &lt;a href="https://cwe.mitre.org/data/definitions/1194.html"&gt;https://cwe.mitre.org/&lt;/a&gt;. The page can be searched by several perspective, such by:
-- Software Development.
-- Hardware Design,
-- Research Concepts,
-- Other Criteria.&lt;/p&gt;
+&lt;p&gt;The CWE data base can be found under following web page: &lt;a href="https://cwe.mitre.org/data/definitions/1194.html"&gt;https://cwe.mitre.org/&lt;/a&gt;. The page can be searched by several perspective, such by:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Software Development.&lt;/li&gt;
+&lt;li&gt;Hardware Design,&lt;/li&gt;
+&lt;li&gt;Research Concepts,&lt;/li&gt;
+&lt;li&gt;Other Criteria.&lt;/li&gt;
+&lt;/ul&gt;
 &lt;p&gt;Each CWE record is defined by unique CWE number in e.g. “CWE-1190” what translates into “DMA Device Enabled Too Early in Boot Phase”. The record has description about potential attack vectors, common consequences and related attack patterns (CAPEC). The most important benefit of using CWE data base is categorization of the threats and links to reference information about risks. This allows to search for much brother scope of attacks in difference to CVE collection.&lt;/p&gt;
 &lt;p&gt;&lt;img alt="CWE" src="images/PASTA_security_assessment/CWE.png"&gt;&lt;/p&gt;
 &lt;h4&gt;&lt;strong&gt;MITRE ATT&amp;amp;CK&lt;/strong&gt;&lt;/h4&gt;
