@@ -66,6 +66,7 @@ The full documentation about PASTA thread modeling can be read in [GITLAB’s se
 ### 1. Define objectives
 
 The initial stage focus on finding the business requirements based on regulations instead of right away identifying assets and threads. The analysis consist understanding of:
+
 - Business Objectives
 - Market Use Cases
 - Security Requirements
@@ -77,12 +78,14 @@ By starting the work from understanding the environment in which risks are taken
 ### 2. Define technical scope
 
 Second stage is identifying the technical project scope, distinguish which part of code is maintained and what needs to be upgraded. Then the analysis proceeds with the application decomposition, where assets, actors and use cases are examined. This includes:
+
 - Identifying Application boundaries
 - Identify Application Dependencies From Network Environment
 - Identify Application Dependencies from Servers
 - Identifying Application Dependencies from Software
 
 During the stage, execution engineers tries to **enumerate**:
+
 - used frameworks with versions,
 - components of the application,
 - services which the application interacts,
@@ -158,6 +161,7 @@ Environmental Score Metrics - environmental Score Metrics allow for customizatio
 CWE is a community-driven initiative that aims to identify and categorize common software weaknesses or vulnerabilities that can lead to security issues. It provides a comprehensive list of known software weaknesses, each assigned a unique identifier and description. CWE helps developers, security analysts, and organizations understand and address vulnerabilities in their software by providing a common language and taxonomy for discussing weaknesses.
 
 The CWE data base can be found under following web page: [https://cwe.mitre.org/](https://cwe.mitre.org/data/definitions/1194.html). The page can be searched by several perspective, such by:
+
 - Software Development.
 - Hardware Design,
 - Research Concepts,
