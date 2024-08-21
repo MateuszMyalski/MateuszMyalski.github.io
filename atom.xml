@@ -1,5 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>eSDE-notes</title><link href="https://mateuszmyalski.github.io/" rel="alternate"></link><link href="https://mateuszmyalski.github.io/atom.xml" rel="self"></link><id>https://mateuszmyalski.github.io/</id><updated>2024-08-14T00:00:00+02:00</updated><subtitle>Notes collected during development, work, learning...</subtitle><entry><title>H.264 Data format - Access unit and NAL unit</title><link href="https://mateuszmyalski.github.io/h264-data-format-access-unit-and-nal-unit.html" rel="alternate"></link><published>2024-08-14T00:00:00+02:00</published><updated>2024-08-14T00:00:00+02:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-08-14:/h264-data-format-access-unit-and-nal-unit.html</id><summary type="html">&lt;h1&gt;H.264 Data format - Access unit and NAL unit&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>eSDE-notes</title><link href="https://mateuszmyalski.github.io/" rel="alternate"></link><link href="https://mateuszmyalski.github.io/atom.xml" rel="self"></link><id>https://mateuszmyalski.github.io/</id><updated>2024-08-19T00:00:00+02:00</updated><subtitle>Notes collected during development, work, learning...</subtitle><entry><title>Configuring openOCD with FTDI JTAG interface</title><link href="https://mateuszmyalski.github.io/configuring-openocd-with-ftdi-jtag-interface.html" rel="alternate"></link><published>2024-08-19T00:00:00+02:00</published><updated>2024-08-19T00:00:00+02:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-08-19:/configuring-openocd-with-ftdi-jtag-interface.html</id><summary type="html">&lt;h1&gt;Configuring openOCD with FTDI&lt;/h1&gt;
+&lt;p&gt;The FTDI chips are not only good for transcoding USB/UART transmissions; higher versions extend the feature list to emulate JTAG interfaces. There are many versions of the chip available on the market, but when it comes to the JTAG interface, it all boils down to …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Configuring openOCD with FTDI&lt;/h1&gt;
+&lt;p&gt;The FTDI chips are not only good for transcoding USB/UART transmissions; higher versions extend the feature list to emulate JTAG interfaces. There are many versions of the chip available on the market, but when it comes to the JTAG interface, it all boils down to configuring the ports and setting up the GDB server hosted by software like OpenOCD.&lt;/p&gt;
+&lt;p&gt;The largest version of the chip is the FT4232H, which allows emulation of up to two JTAG interfaces on the &lt;code&gt;ADBUS&lt;/code&gt; and &lt;code&gt;BDBUS&lt;/code&gt; ports. We will use this chip as an example for writing an OpenOCD configuration to utilize one of the JTAG interfaces.&lt;/p&gt;
+&lt;pre class="ascii center"&gt;
++-----+---------+-----------+--------+
+| Pin |  Name   | JTAG Port |  MSSE  |
++-----+---------+-----------+--------+
+| 16  | ADBUS0  |         0 | TCK    |
+| 17  | ADBUS1  |         0 | TDI    |
+| 18  | ADBUS2  |         0 | TDO    |
+| 19  | ADBUS3  |         0 | TMS    |
++-----+---------+-----------+--------+
+| 26  | BDBUS0  |         1 | TCK    |
+| 27  | BDBUS1  |         1 | TDI    |
+| 28  | BDBUS2  |         1 | TDO    |
+| 29  | BDBUS3  |         1 | TMS    |
++-----+---------+-----------+--------+
+&lt;/pre&gt;
+
+&lt;p&gt;Each port consist four (3 - mandatory, and 1 - optional ) JTAG connectors:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;TCK&lt;/strong&gt; - Test clock &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TDI&lt;/strong&gt; - Test data input &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TDO&lt;/strong&gt; - Test data output &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TMS&lt;/strong&gt; - Test mode select (optional)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The optional &lt;strong&gt;TRST&lt;/strong&gt; (test reset) dedicated pin is not supported by the JTAG emulation peripheral. OpenOCD requires to specify the &lt;code&gt;nTRST&lt;/code&gt; signal to operate correctly, therefore we need to allocate one more GPIO.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The driver uses a signal abstraction to enable Tcl configuration files to define outputs for one or several FTDI GPIO. These outputs can then be controlled using the ftdi set_signal command. Special signal names are reserved for nTRST, nSRST and LED (for blink) so that they, if defined, will be used for their customary purpose. Inputs can be read using the ftdi get_signal command.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;For this purpose we are going to use &lt;code&gt;ADBUS4&lt;/code&gt; as the &lt;code&gt;nTRST&lt;/code&gt; signal, and instruct OpenOCD about the reset method by using &lt;code&gt;reset_config trst_only&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Writing the openOCD configuration file&lt;/h2&gt;
+&lt;h3&gt;Defining the FTDI chip&lt;/h3&gt;
+&lt;p&gt;First, OpenOCD needs to be informed that we will use an FTDI chip as the driver for our communication. This is done by setting the &lt;code&gt;adapter driver&lt;/code&gt; to &lt;code&gt;ftdi&lt;/code&gt;, resulting in the command &lt;code&gt;adapter driver ftdi&lt;/code&gt;. Next, we specify the transport layer, which in this case is JTAG, using the command &lt;code&gt;transport select jtag&lt;/code&gt;. We also need to set the operating speed in kHz with &lt;code&gt;adapter speed 10000&lt;/code&gt;. If there are issues with connection stability, such as when using long wires, the speed should be decreased. Lastly, before we move on to pin configuration, we need to specify the VID (Vendor ID) and PID (Product ID) of the FTDI chip, which can be found in the datasheet for the part. The documentation provides the following statement:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If no EEPROM is connected (or the EEPROM is blank), the FT4232H uses its built-in default VID (0403), PID (6011) Product Description and Power Descriptor Value. In this case, the device will not have a serial number as part of the USB descriptor.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Basing on that we can specify the FTDI VID and PID with &lt;code&gt;ftdi_vid_pid &amp;lt;VID&amp;gt; &amp;lt;PID&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;h3&gt;Defining used JTAG peripheral&lt;/h3&gt;
+&lt;p&gt;The configuration needs to be aware which JTAG peripheral available on the FTDI chip supposed to be used by the session. In FT4232H we have two possibilities, either port 0 or 1. We can select the port with &lt;code&gt;ftdi_channel &amp;lt;port&amp;gt;&lt;/code&gt;. In case FTDI with only one JTAG is used this configuration is not necessary.&lt;/p&gt;
+&lt;h3&gt;Configuring pins&lt;/h3&gt;
+&lt;p&gt;To configure the GPIO pin direction, OpenOCD uses the &lt;code&gt;ftdi_layout_init&lt;/code&gt; and &lt;code&gt;ftdi_layout_signal&lt;/code&gt; functions.&lt;/p&gt;
+&lt;p&gt;First, we define the direction of the pins on the port using &lt;code&gt;ftdi_layout_init&lt;/code&gt;, where &lt;code&gt;1&lt;/code&gt; means output and &lt;code&gt;0&lt;/code&gt; means input. We also need to define the default state as the second argument. All port pins will be set to low, except for &lt;strong&gt;TMS&lt;/strong&gt;, which will be set to high. This results in the configuration line:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ftdi_layout_init 0xfb 0x08
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;It's also important to define the &lt;code&gt;nTRST&lt;/code&gt; signal, which is used to trigger the device reset. To instruct OpenOCD where to find the signal, we use &lt;code&gt;ftdi_layout_signal&lt;/code&gt;. We need to specify the name of the signal, mask for the data bit, and enable open collector mode for the pin.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;nTRST&lt;/code&gt; signal will use &lt;code&gt;ADBUS4&lt;/code&gt;, which translates to the mask &lt;code&gt;0x0010&lt;/code&gt; (the mask accounts for all available ports). The open collector output type will be the same as the data mask. This results in the following command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ftdi_layout_signal nTRST -data 0x0010 -oe 0x0010
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To make this clearer, we can construct a diagram of used masks.&lt;/p&gt;
+&lt;pre class="ascii center"&gt;
+Pin name  | ADBUS7 | ADBUS6 | ADBUS5 | ADBUS4 | ADBUS3 | ADBUS2 | ADBUS1 | ADBUS0 | Mask
+Direction |  OUT 1 |  OUT 1 |  OUT 1 |  OUT 1 |  IN  0 |  OUT 1 |  OUT 1 |  OUT 1 | 0xfb
+State     |      0 |      0 |      0 |      0 |      1 |      0 |      0 |      0 | 0x08
+Data      |      0 |      0 |      0 |      1 |      0 |      0 |      0 |      0 | 0x0010
+OC En.    |      0 |      0 |      0 |      1 |      0 |      0 |      0 |      0 | 0x0010
+&lt;/pre&gt;
+
+&lt;h2&gt;Final configuration for FTDI&lt;/h2&gt;
+&lt;p&gt;To conclude all necessary configuration that must be added to the openOCD config files we end up with example script:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;adapter driver ftdi
+transport select jtag
+adapter speed 10000
+ftdi_vid_pid 0x0403 0x6011
+ftdi_channel 0
+ftdi_layout_init 0xfb 0x08
+ftdi_layout_signal nTRST -data 0x0010 -oe 0x0010
+reset_config trst_only
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally, you must add all configuration related to the MCU architecture that is going to be used.&lt;/p&gt;
+&lt;h1&gt;Sources&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="https://ftdichip.com/wp-content/uploads/2020/08/DS_FT4232H.pdf"&gt;FT4232H - Datasheet&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://openocd.org/doc/html/Debug-Adapter-Configuration.html"&gt;OpenOCD Debug Adapter Configuration - Manual&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/STMicroelectronics/OpenOCD/tree/openocd-cubeide-r6/tcl/interface/ftdi"&gt;STMicroelectronics OpenOCD - examples&lt;/a&gt; &lt;/li&gt;
+&lt;/ol&gt;</content><category term="blogs"></category></entry><entry><title>H.264 Data format - Access unit and NAL unit</title><link href="https://mateuszmyalski.github.io/h264-data-format-access-unit-and-nal-unit.html" rel="alternate"></link><published>2024-08-14T00:00:00+02:00</published><updated>2024-08-14T00:00:00+02:00</updated><author><name>Mateusz Myalski</name></author><id>tag:mateuszmyalski.github.io,2024-08-14:/h264-data-format-access-unit-and-nal-unit.html</id><summary type="html">&lt;h1&gt;H.264 Data format - Access unit and NAL unit&lt;/h1&gt;
 &lt;p&gt;H.264, also known as Advanced Video Coding (AVC), is one of the most widely used video compression standards in the world. Developed by the ITU-T Video Coding Experts Group and the ISO/IEC Moving Picture Experts Group, H.264 is …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;H.264 Data format - Access unit and NAL unit&lt;/h1&gt;
 &lt;p&gt;H.264, also known as Advanced Video Coding (AVC), is one of the most widely used video compression standards in the world. Developed by the ITU-T Video Coding Experts Group and the ISO/IEC Moving Picture Experts Group, H.264 is designed to deliver high-quality video at lower bitrates, making it ideal for streaming applications.&lt;/p&gt;
 &lt;p&gt;This codec achieves its efficiency through a variety of techniques, including predictive coding, motion compensation, and variable block-size segmentation. H.264 organizes video data into Access Units, which are composed of Network Abstraction Layer (NAL) units. These NAL units carry the actual encoded video data along with necessary metadata, allowing for flexible and efficient video streaming.&lt;/p&gt;

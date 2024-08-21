@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="eSDE-notes">
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <link rel="shortcut icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalski.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalski.github.io/index.html">eSDE-notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalski.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>Configuring openOCD with FTDI</h1>
+<p>The FTDI chips are not only good for transcoding USB/UART transmissions; higher versions extend the feature list to emulate JTAG interfaces. There are many versions of the chip available on the market, but when it comes to the JTAG interface, it all boils down to configuring the ports and setting up the GDB server hosted by software like OpenOCD.</p>
+<p>The largest version of the chip is the FT4232H, which allows emulation of up to two JTAG interfaces on the <code>ADBUS</code> and <code>BDBUS</code> ports. We will use this chip as an example for writing an OpenOCD configuration to utilize one of the JTAG interfaces.</p>
+<pre class="ascii center">
++-----+---------+-----------+--------+
+| Pin |  Name   | JTAG Port |  MSSE  |
++-----+---------+-----------+--------+
+| 16  | ADBUS0  |         0 | TCK    |
+| 17  | ADBUS1  |         0 | TDI    |
+| 18  | ADBUS2  |         0 | TDO    |
+| 19  | ADBUS3  |         0 | TMS    |
++-----+---------+-----------+--------+
+| 26  | BDBUS0  |         1 | TCK    |
+| 27  | BDBUS1  |         1 | TDI    |
+| 28  | BDBUS2  |         1 | TDO    |
+| 29  | BDBUS3  |         1 | TMS    |
++-----+---------+-----------+--------+
+</pre>
+
+<p>Each port consist four (3 - mandatory, and 1 - optional ) JTAG connectors:</p>
+<ul>
+<li><strong>TCK</strong> - Test clock </li>
+<li><strong>TDI</strong> - Test data input </li>
+<li><strong>TDO</strong> - Test data output </li>
+<li><strong>TMS</strong> - Test mode select (optional)</li>
+</ul>
+<p>The optional <strong>TRST</strong> (test reset) dedicated pin is not supported by the JTAG emulation peripheral. OpenOCD requires to specify the <code>nTRST</code> signal to operate correctly, therefore we need to allocate one more GPIO.</p>
+<blockquote>
+<p>The driver uses a signal abstraction to enable Tcl configuration files to define outputs for one or several FTDI GPIO. These outputs can then be controlled using the ftdi set_signal command. Special signal names are reserved for nTRST, nSRST and LED (for blink) so that they, if defined, will be used for their customary purpose. Inputs can be read using the ftdi get_signal command.</p>
+</blockquote>
+<p>For this purpose we are going to use <code>ADBUS4</code> as the <code>nTRST</code> signal, and instruct OpenOCD about the reset method by using <code>reset_config trst_only</code>.</p>
+<h2>Writing the openOCD configuration file</h2>
+<h3>Defining the FTDI chip</h3>
+<p>First, OpenOCD needs to be informed that we will use an FTDI chip as the driver for our communication. This is done by setting the <code>adapter driver</code> to <code>ftdi</code>, resulting in the command <code>adapter driver ftdi</code>. Next, we specify the transport layer, which in this case is JTAG, using the command <code>transport select jtag</code>. We also need to set the operating speed in kHz with <code>adapter speed 10000</code>. If there are issues with connection stability, such as when using long wires, the speed should be decreased. Lastly, before we move on to pin configuration, we need to specify the VID (Vendor ID) and PID (Product ID) of the FTDI chip, which can be found in the datasheet for the part. The documentation provides the following statement:</p>
+<blockquote>
+<p>If no EEPROM is connected (or the EEPROM is blank), the FT4232H uses its built-in default VID (0403), PID (6011) Product Description and Power Descriptor Value. In this case, the device will not have a serial number as part of the USB descriptor.</p>
+</blockquote>
+<p>Basing on that we can specify the FTDI VID and PID with <code>ftdi_vid_pid &lt;VID&gt; &lt;PID&gt;</code>.</p>
+<h3>Defining used JTAG peripheral</h3>
+<p>The configuration needs to be aware which JTAG peripheral available on the FTDI chip supposed to be used by the session. In FT4232H we have two possibilities, either port 0 or 1. We can select the port with <code>ftdi_channel &lt;port&gt;</code>. In case FTDI with only one JTAG is used this configuration is not necessary.</p>
+<h3>Configuring pins</h3>
+<p>To configure the GPIO pin direction, OpenOCD uses the <code>ftdi_layout_init</code> and <code>ftdi_layout_signal</code> functions.</p>
+<p>First, we define the direction of the pins on the port using <code>ftdi_layout_init</code>, where <code>1</code> means output and <code>0</code> means input. We also need to define the default state as the second argument. All port pins will be set to low, except for <strong>TMS</strong>, which will be set to high. This results in the configuration line:</p>
+<div class="highlight"><pre><span></span><code>ftdi_layout_init 0xfb 0x08
+</code></pre></div>
+
+<p>It's also important to define the <code>nTRST</code> signal, which is used to trigger the device reset. To instruct OpenOCD where to find the signal, we use <code>ftdi_layout_signal</code>. We need to specify the name of the signal, mask for the data bit, and enable open collector mode for the pin.</p>
+<p>The <code>nTRST</code> signal will use <code>ADBUS4</code>, which translates to the mask <code>0x0010</code> (the mask accounts for all available ports). The open collector output type will be the same as the data mask. This results in the following command:</p>
+<div class="highlight"><pre><span></span><code>ftdi_layout_signal nTRST -data 0x0010 -oe 0x0010
+</code></pre></div>
+
+<p>To make this clearer, we can construct a diagram of used masks.</p>
+<pre class="ascii center">
+Pin name  | ADBUS7 | ADBUS6 | ADBUS5 | ADBUS4 | ADBUS3 | ADBUS2 | ADBUS1 | ADBUS0 | Mask
+Direction |  OUT 1 |  OUT 1 |  OUT 1 |  OUT 1 |  IN  0 |  OUT 1 |  OUT 1 |  OUT 1 | 0xfb
+State     |      0 |      0 |      0 |      0 |      1 |      0 |      0 |      0 | 0x08
+Data      |      0 |      0 |      0 |      1 |      0 |      0 |      0 |      0 | 0x0010
+OC En.    |      0 |      0 |      0 |      1 |      0 |      0 |      0 |      0 | 0x0010
+</pre>
+
+<h2>Final configuration for FTDI</h2>
+<p>To conclude all necessary configuration that must be added to the openOCD config files we end up with example script:</p>
+<div class="highlight"><pre><span></span><code>adapter driver ftdi
+transport select jtag
+adapter speed 10000
+ftdi_vid_pid 0x0403 0x6011
+ftdi_channel 0
+ftdi_layout_init 0xfb 0x08
+ftdi_layout_signal nTRST -data 0x0010 -oe 0x0010
+reset_config trst_only
+</code></pre></div>
+
+<p>Finally, you must add all configuration related to the MCU architecture that is going to be used.</p>
+<h1>Sources</h1>
+<ol>
+<li><a href="https://ftdichip.com/wp-content/uploads/2020/08/DS_FT4232H.pdf">FT4232H - Datasheet</a></li>
+<li><a href="https://openocd.org/doc/html/Debug-Adapter-Configuration.html">OpenOCD Debug Adapter Configuration - Manual</a></li>
+<li><a href="https://github.com/STMicroelectronics/OpenOCD/tree/openocd-cubeide-r6/tcl/interface/ftdi">STMicroelectronics OpenOCD - examples</a> </li>
+</ol>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                Configuring openOCD with FTDI JTAG interface
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2024-08-19T00:00:00+02:00">19/08/2024
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">🖨️ Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>
