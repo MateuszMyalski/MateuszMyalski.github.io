@@ -24,7 +24,7 @@ Before enrolling into creating the threat model for the product, we should be ab
 This stated question needs to be answered based on facts and data. This means, before having; conceptual drawings, architecture defined and drawn on the white-board we cannot answer this question. Starting the threat modeling, before completing the system design, will be a rabbit hole and there is high probability that many vulnerabilities will be missed.
 Likewise, the product should have defined business impact. To finish proper threat modeling, it will be necessary to prioritize and measure the impact of vulnerabilities. This cannot be done without the business context. The good example would be to answer the question:
 
-> How _____ will impact the company ?
+> How _____ will impact the company?
 
 How leaking the user’s color preference will impact the company? Data leakage is not that good, but user's color preference information is not usually something you would like to hide from your neighbors. Let’s say it does not impact the companies' good name much.
 What, about: How leaking the user's Wi-Fi password will impact the company? This sounds serious. Leaked Wi-Fi credentials can enable attackers to reach for most sophisticated tools to get accounts data etc. A highly popular product that leaks the user’s password can be a big hit for the budged.
@@ -114,6 +114,7 @@ Continuing with the embedded devices scenario, data repositories might include a
 DFD diagrams attempt to illustrate how data is transported between different parts of an application. The primary objective of this illustration is to explicitly demonstrate when data crosses trust boundaries. Trust boundaries are conventional limits that highlight regions of the application that may potentially suffer from vulnerabilities and be susceptible to attack vectors.
 Data transfers between nodes usually is also correlated with control mechanisms that protects transmissions and helps to mitigate attack vectors. Prepared diagram with all mentioned elements give opportunity to find possible issues and safety negligence.
 To organize the DFD, usually, two tables are created; “Table of assets” and “Table of controls”. This allows to use short symbols on diagram instead repeating full name which may darken the overall picture.
+
 - **Table of assets** (A01, A02, A03, …, An) consists data parts, data chunks, group of data etc.
 - **Table of controls** (C01, C02, C03, …, Cn) consist cryptographic algorithms, CRCs, keys, hashes etc.
 
@@ -132,18 +133,18 @@ Another possibility is reaching to Common Vulnerabilities Enumeration (CVE) that
 #### **CVE**
 The CVE is a standardized system for identifying and naming security vulnerabilities in software and hardware products. CVE is a community-driven effort that aims to provide a common language and reference point for discussing and sharing information about security vulnerabilities across the cyber security community. CVE focused on identifying and uniquely naming specific instances of security vulnerabilities in software, hardware, or systems. It provides a standardized reference point for discussing and sharing information about individual security vulnerabilities.
 
-The CVE can be found on https://www.cve.org/ web page. The database is designed to be searched by having concrete CVE number that links to the full description of discovered vulnerability in concrete product, but can be also searched by keywords.
+The CVE can be found on [https://www.cve.org/](https://www.cve.org/) web page. The database is designed to be searched by having concrete CVE number that links to the full description of discovered vulnerability in concrete product, but can be also searched by keywords.
 
 The popular CVE number lately was log4j issue that impacted most of the devices with installed Apache server. This issue has been described and posted with unique ID - ”CVE-2021-44228”. By looking up this CVE number it is possible to gather some more data about where it was found, what does in impact, who discovered the issue, what product versions is vulnerable and other reference links that tells some more background details about situation.
 
 ![CVE](images/PASTA_security_assessment/CVE.png)
 
-The CVE database i also extended into NVD data base https://nvd.nist.gov/, where more details about found volunerabilites can be found together with CVSS scoring, references etc.
+The CVE database i also extended into NVD data base [https://nvd.nist.gov/](https://nvd.nist.gov/), where more details about found vulnerabilities can be found together with CVSS scoring, references etc.
 
 #### **CVSS**
 Where CVSS is a standardized system for assessing and quantifying the severity of security vulnerabilities in software, hardware, or systems. It provides a numerical score, known as the CVSS score, that represents the severity of a vulnerability. The CVSS score is calculated based on several factors, including the impact of the vulnerability, the ease of exploitation, and the scope of the vulnerability.
 
-The CVSS score can be calculated by the web-based calculator https://www.first.org/cvss/calculator/4.0 or existing metrics can be searched by using [https://www.cvedetails.com/](https://www.cvedetails.com/cve/CVE-2021-44228/?q=CVE-2021-44228) site, or NVD https://nvd.nist.gov/. To continue with above example let’s check how the “log4j” vulnerability has been measured by using CVSS scoring.
+The CVSS score can be calculated by the web-based calculator [https://www.first.org/cvss/calculator/4.0](https://www.first.org/cvss/calculator/4.0) or existing metrics can be searched by using [https://www.cvedetails.com/](https://www.cvedetails.com/cve/CVE-2021-44228/?q=CVE-2021-44228) site, or NVD [https://nvd.nist.gov/](https://nvd.nist.gov/). To continue with above example let’s check how the “log4j” vulnerability has been measured by using CVSS scoring.
 
 ![CVSS](images//PASTA_security_assessment/CVSS.png)
 
@@ -181,7 +182,7 @@ Each technique record includes a dedicated section describing the approach, prov
 
 ![MITTRE ATT&CK](images/PASTA_security_assessment/MITRE_ATTACK.png)
 
-The database has interactive tool that allows you to create dynamic matrix stating all necessary information about analyzed techniques on the picture - https://mitre-attack.github.io/attack-navigator/. It is possible to toggle the techniques, mark probabilities, add notes, add links and add own metadata. All these information are propagated through techniques so it is much easier to relate to those information in next stages of the security analysis.
+The database has interactive tool that allows you to create dynamic matrix stating all necessary information about analyzed techniques on the picture - [https://mitre-attack.github.io/attack-navigator/](https://mitre-attack.github.io/attack-navigator/). It is possible to toggle the techniques, mark probabilities, add notes, add links and add own metadata. All these information are propagated through techniques so it is much easier to relate to those information in next stages of the security analysis.
 
 #### **Attack Trees**
 Attack trees are a graphical representation and analysis tool used in the field of information security and cybersecurity to model and analyze potential threats and vulnerabilities within a system. They provide a structured way to depict and analyze different attack scenarios and their associated risks. Attack trees help security professionals and organizations understand the various ways in which an attacker could compromise a system, allowing them to prioritize security measures and develop effective countermeasures.
@@ -197,7 +198,7 @@ Here's how attack trees work:
 
 Attack trees are a valuable tool for risk assessment, threat modeling, and decision-making in cybersecurity. They can help organizations anticipate and plan for potential security breaches, making it easier to allocate resources and implement countermeasures to protect their systems and data. Additionally, they can be used to communicate security risks and concerns to non-technical stakeholders in a more accessible and visual manner.
 
-To create attack tree you should first define what kind of objective attacker can try to achieve. For this example, let the main goal be “Overwrite firmware image”. The next step should bring ideas how it can be achieved. The goal can be achieved by “Dumping the FLASH memory”, “Spying the SPI line”, “Overtaking OTA image”. This step should be repeated as long as no other methods are discovered. Each leaf level means additional attack level. Most likely the tree will not be symmetrical and some attack techniques will require more steps than other. Every branch within the tree must be distinct, and there must be no circular patterns in the design. As described above, attack trees should also provide information about: likehood (l), victim impact (v), resource points (r) and time (t). To construct such trees open-source tools can be used, such AT-AT [https://github.com/yathuvaran/AT-AT](https://github.com/yathuvaran/AT-AT/tree/main), or online based tools https://attacktree.online/.
+To create attack tree you should first define what kind of objective attacker can try to achieve. For this example, let the main goal be “Overwrite firmware image”. The next step should bring ideas how it can be achieved. The goal can be achieved by “Dumping the FLASH memory”, “Spying the SPI line”, “Overtaking OTA image”. This step should be repeated as long as no other methods are discovered. Each leaf level means additional attack level. Most likely the tree will not be symmetrical and some attack techniques will require more steps than other. Every branch within the tree must be distinct, and there must be no circular patterns in the design. As described above, attack trees should also provide information about: likehood (l), victim impact (v), resource points (r) and time (t). To construct such trees open-source tools can be used, such AT-AT [https://github.com/yathuvaran/AT-AT](https://github.com/yathuvaran/AT-AT/tree/main), or online based tools [https://attacktree.online/](https://attacktree.online/).
 
 ![Attack tree](images/PASTA_security_assessment/attack-tree.png)
 

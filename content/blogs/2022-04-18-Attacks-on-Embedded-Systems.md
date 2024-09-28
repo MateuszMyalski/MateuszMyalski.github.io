@@ -13,6 +13,7 @@ This paper combine described problems and solutions, found in many publications 
 During designing software, especially embedded software – that interact with physical structures installed on the board, is necessary to organize all assets flow. Understanding and presenting it on diagram flow helps investigate potential security flaws. The whole system should be divided into “trust regions” and take under consideration any possible vector attacks during the data transmission. Therefor, it is useful to prepare clear documentation how data is protected during the data exchange.
 
 Data flow can be separated into:
+
 - internal flow – inside in integrated circuit,
 - middleware flow – between other integrated circuits (e.g. SoC  and external flash),
 - external flow – between the device and other device/cloud.
@@ -117,9 +118,6 @@ In GCC look for: `-fcf-protection=[full|branch|return|none|check]`
 ## Trustzone
 The ARM introduced new idea of splitting the memory and peripherals access for secure and insecure software. Such mechanism is transparent for developers. The basic usage of such feature is to load known and verified software to the secure part of the memory and load other binaries into the not secure fragments. This way, it is possible to block access to other parts of the memory or peripherals and enforce it by hardware. Isolating potentially dangerous software from the other chip parts, disallows an attacker to interact with on-chip structures and perform R/W operations on secured memory.
 The interaction between non-secure regions and secure regions can be only done via “legalized” API.
-
-![ARM TrustZone](https://www.digikey.pl/-/mediaimages/Article%20Library/TechZone%20Articles/2020/July/How%20to%20Use%20TrustZone%20to%20Secure%20IoT%20Devices/article-2020july-how-to-use-trustzone-fig1.jpg?la=en&ts=13860fd6-5d85-44c1-a3b7-360ff24f4128)
-*image source: digikey.pl*
 
 ## TOC
 Resources that can be potentially exploited with such attack vector should be locked during the time they are processed. The lock mechanism can be implemented by moving/copying the resources to the safe memory regions, using spinlocks or disallowing any access for third party software. 
