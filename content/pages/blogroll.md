@@ -1,6 +1,6 @@
 ---
 layout: page
-title: I read
+title: Blogroll
 ---
 
 Internet is full of junk nowadays. I started to collect my own feed of interesting technical blogs to read.
@@ -37,5 +37,6 @@ Here is list of similar blogs.
 - [https://dotat.at/@/](https://dotat.at/@/)
 - [https://fabiensanglard.net/](https://fabiensanglard.net/)
 - [https://www.evilsocket.net/](https://www.evilsocket.net/)
+- [https://0x44.cc/](https://0x44.cc/)
 
    
