@@ -36,7 +36,6 @@ Here is list of similar blogs.
 - [https://lemire.me/blog/](https://lemire.me/blog/)
 - [https://dotat.at/@/](https://dotat.at/@/)
 - [https://fabiensanglard.net/](https://fabiensanglard.net/)
-- [https://mateuszmyalski.github.io/](https://mateuszmyalski.github.io/)
 - [https://www.evilsocket.net/](https://www.evilsocket.net/)
 
    
