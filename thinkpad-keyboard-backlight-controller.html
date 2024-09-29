@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="eSDE-notes">
+    <title>eSDE-notes</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <link rel="shortcut icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalski.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalski.github.io/index.html">eSDE-notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalski.github.io/pages/blogroll.html">Blogroll</a>
+            </li>
+            <li>
+                <a href="https://mateuszmyalski.github.io/pages/compendium.html">Compendium</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>Thinkpad keyboard backlight controller</h1>
+<p>Some time ago, I posted some notes about setting up a <a href="https://mateuszmyalski.github.io/post-configuration-for-minimal-debian-installation.html">minimal Debian installation</a> installation. This came in handy when I was setting up my work environment on my refurbished Thinkpad T14s, which is now my personal workstation. It's my first Thinkpad, and I really like these products!</p>
+<p>When I was deciding on a new laptop for personal projects, I didn’t want to spend too much money on equipment that I would mostly use from the command-line interface (CLI). Buying a refurbished laptop is not only more economical but also ecological, as you gain access to business-quality parts that typically last longer than those designed for the standard consumer market.</p>
+<p>Now, back to the main topic.</p>
+<p>To learn more about Linux and find inspiration for my next small project, I decided to improve how the keyboard backlight works on my laptop. I wanted full control over the brightness customization and system scheduling, so the backlight would activate when I started typing. Typically, available drivers trigger the backlight only after typing begins, which is often too late when I’m in a very dark room. I also wanted the backlight to activate when moving the mouse or touchpad. To save battery, my ideal setup would minimally illuminate the keyboard just enough to see the keys before I begin typing.</p>
+<p>As you can probably guess, I couldn’t find such a controller. So, that’s why...</p>
+<h2>I created my own controller</h2>
+<p>The controller provides the ability to manage the backlight of ThinkPad keyboards, with integrated Systemd support. It offers extensive features, including event-based backlight control, automatic brightness adjustments, and scheduling.</p>
+<p>I coded this in bare C language without relying on any additional libraries. I don’t like tooling that forces me to set up a special environment just to blink an LED. For now, I’ve decided not to introduce any command-line configurations, as that would complicate the program unnecessarily. After all, how often do you really change your keyboard backlight?</p>
+<p>The controller also allows you to disable the keyboard backlight based on time and battery level, preventing unnecessary battery drain when the LEDs would barely be visible during the day. Configuration is straightforward: all you need to do is edit the <code>config.h</code> header file, recompile the program, and reinstall the Systemd module. Everything can be done using the already-prepared Makefile.</p>
+<p>The controller is available on my <a href="https://github.com/MateuszMyalski/thinkpad-keybacklight">github repository</a>, feel free to test it!</p>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                Thinkpad keyboard backlight controller
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2024-09-29T00:00:00+02:00">29/09/2024
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">🖨️ Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>
