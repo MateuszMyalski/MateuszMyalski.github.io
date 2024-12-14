@@ -22,6 +22,7 @@ function renderRecipeList() {
 
         const recipeElement = document.createElement('div');
         recipeElement.className = 'recipe-item';
+        recipeElement.id = recipeKey;
         recipeElement.innerHTML = `
             <h3>${recipe.name}</h3>
             <p>${recipe.description}</p>
@@ -30,25 +31,45 @@ function renderRecipeList() {
         recipeElement.onclick = () => displayRecipeDetails(recipeKey);
         recipeListElement.appendChild(recipeElement);
     }
+    displayRecipeDetails(Object.keys(recipesData)[0]);
 }
 
 // Display recipe details
 function displayRecipeDetails(recipeKey) {
+    if (selectedRecipeKey) {
+        document.getElementById(selectedRecipeKey).classList.remove('active');
+    }
+    document.getElementById(recipeKey).classList.add('active');
+
     selectedRecipeKey = recipeKey;
     const recipe = recipesData[recipeKey];
 
     const recipeDetailsElement = document.getElementById('recipe-details');
+    // Generate the ingredients list
+    const ingredientsList = Object.entries(recipe.products)
+        .map(([productKey, quantity]) => {
+            const product = productsData[productKey];
+            if (typeof product.size === 'string') {
+                quantity = product.size;
+            }
+
+            const productName = product ? product.name : `Unknown (${productKey})`;
+            const productUnit = product ? product.unit : "Unknown unit";
+            return `<li>${productName}: ${quantity} ${productUnit}</li>`;
+        })
+        .join('');
+
+    // Update the recipe details HTML
     recipeDetailsElement.innerHTML = `
         <h3>${recipe.name}</h3>
         <p>${recipe.description}</p>
         <p>Portions: ${recipe.portions}</p>
         <h4>Ingredients:</h4>
         <ul>
-            ${Object.entries(recipe.products).map(([productKey, quantity]) => `
-                <li>${productsData[productKey].name}: ${quantity} ${productsData[productKey].unit}</li>
-            `).join('')}
+            ${ingredientsList}
         </ul>
     `;
+
 
     document.getElementById('add-recipe-button').style.display = 'block';
 }
@@ -117,15 +138,24 @@ function updateProductSummary() {
 
     for (const [recipeKey, recipeCount] of Object.entries(addedRecipes)) {
         for (const [productKey, quantity] of Object.entries(recipesData[recipeKey].products)) {
-            productQuantities[productKey] = Math.ceil(
-                (productQuantities[productKey] || 0) + quantity * recipeCount / productsData[productKey].size
-            ) * productsData[productKey].size;
+            if (typeof productsData[productKey].size === 'string') {
+                productQuantities[productKey] = productsData[productKey].size;
+            } else {
+                productQuantities[productKey] = Math.ceil(
+                    (productQuantities[productKey] || 0) + quantity * recipeCount / productsData[productKey].size
+                ) * productsData[productKey].size;
+            }
         }
     }
-
     productSummaryElement.value = Object.entries(productQuantities)
-        .map(([productKey, quantity]) => `${productsData[productKey].name}: ${quantity.toFixed(2)} ${productsData[productKey].unit}`)
-        .join('\n');
+        .map(([productKey, quantity]) => {
+            if (typeof quantity !== 'string') {
+                quantity = ": " + quantity.toFixed(2);
+            } else {
+                quantity = "";
+            }
+            return `${productsData[productKey].name}${quantity} ${productsData[productKey].unit}`;
+        }).join('\n');
 }
 
 // Copy product list to clipboard

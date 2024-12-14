@@ -1,0 +1,226 @@
+{
+    "recipes": {
+        "pasta_bolognese": {
+            "name": "Pasta Bolognese",
+            "description": "A classic Italian pasta dish with a rich meat sauce.",
+            "portions": 4,
+            "products": {
+                "spaghetti": 0.5,
+                "ground_beef": 0.3,
+                "tomato_sauce": 0.25
+            }
+        },
+        "chicken_salad": {
+            "name": "Chicken Salad",
+            "description": "A healthy and refreshing salad with chicken and parmesan.",
+            "portions": 2,
+            "products": {
+                "chicken_breast": 0.2,
+                "lettuce": 0.3,
+                "olive_oil": 0.05,
+                "parmesan": 0.1
+            }
+        },
+        "vegetable_soup": {
+            "name": "Vegetable Soup",
+            "description": "A warm and hearty soup with fresh vegetables.",
+            "portions": 6,
+            "products": {
+                "carrots": 0.2,
+                "potatoes": 0.3,
+                "onion": 0.15,
+                "vegetable_stock": 1
+            }
+        },
+        "fruit_smoothie": {
+            "name": "Fruit Smoothie",
+            "description": "A delicious and nutritious blend of fruits and milk.",
+            "portions": 2,
+            "products": {
+                "banana": 2,
+                "strawberries": 0.3,
+                "milk": 0.25
+            }
+        },
+        "grilled_cheese": {
+            "name": "Grilled Cheese",
+            "description": "A simple and satisfying grilled cheese sandwich.",
+            "portions": 1,
+            "products": {
+                "bread": 2,
+                "cheese": 0.15,
+                "butter": 0.05
+            }
+        },
+        "omelette": {
+            "name": "Omelette",
+            "description": "A fluffy omelette with cheese and milk.",
+            "portions": 1,
+            "products": {
+                "eggs": 3,
+                "milk": 0.1,
+                "cheese": 0.1
+            }
+        },
+        "beef_stew": {
+            "name": "Beef Stew",
+            "description": "A rich and hearty stew with tender beef and vegetables.",
+            "portions": 5,
+            "products": {
+                "beef": 0.5,
+                "carrots": 0.2,
+                "potatoes": 0.3,
+                "onion": 0.2
+            }
+        },
+        "pancakes": {
+            "name": "Pancakes",
+            "description": "Fluffy pancakes perfect for a sweet breakfast.",
+            "portions": 4,
+            "products": {
+                "flour": 0.2,
+                "milk": 0.3,
+                "eggs": 2
+            }
+        },
+        "caesar_salad": {
+            "name": "Caesar Salad",
+            "description": "A classic Caesar salad with chicken and croutons.",
+            "portions": 3,
+            "products": {
+                "lettuce": 0.5,
+                "chicken_breast": 0.2,
+                "croutons": 0.1,
+                "parmesan": 0.05
+            }
+        },
+        "vegetable_curry": {
+            "name": "Vegetable Curry",
+            "description": "A flavorful curry with potatoes and carrots.",
+            "portions": 4,
+            "products": {
+                "potatoes": 0.4,
+                "carrots": 0.2,
+                "coconut_milk": 0.3,
+                "curry_powder": 0.05
+            }
+        }
+    },
+    "products": {
+        "spaghetti": {
+            "name": "spaghetti",
+            "size": 1,
+            "unit": "kg"
+        },
+        "ground_beef": {
+            "name": "ground beef",
+            "size": 0.5,
+            "unit": "kg"
+        },
+        "tomato_sauce": {
+            "name": "tomato sauce",
+            "size": 1,
+            "unit": "l"
+        },
+        "chicken_breast": {
+            "name": "chicken breast",
+            "size": 1,
+            "unit": "kg"
+        },
+        "lettuce": {
+            "name": "lettuce",
+            "size": 0.5,
+            "unit": "kg"
+        },
+        "olive_oil": {
+            "name": "olive oil",
+            "size": 0.5,
+            "unit": "l"
+        },
+        "parmesan": {
+            "name": "parmesan",
+            "size": 0.2,
+            "unit": "kg"
+        },
+        "carrots": {
+            "name": "carrots",
+            "size": 1,
+            "unit": "kg"
+        },
+        "potatoes": {
+            "name": "potatoes",
+            "size": 1,
+            "unit": "kg"
+        },
+        "onion": {
+            "name": "onion",
+            "size": 1,
+            "unit": "kg"
+        },
+        "vegetable_stock": {
+            "name": "vegetable stock",
+            "size": 1,
+            "unit": "l"
+        },
+        "banana": {
+            "name": "banana",
+            "size": 1,
+            "unit": "kg"
+        },
+        "strawberries": {
+            "name": "strawberries",
+            "size": 0.5,
+            "unit": "kg"
+        },
+        "milk": {
+            "name": "milk",
+            "size": 1,
+            "unit": "l"
+        },
+        "bread": {
+            "name": "bread",
+            "size": 1,
+            "unit": "loaf"
+        },
+        "cheese": {
+            "name": "cheese",
+            "size": 0.5,
+            "unit": "kg"
+        },
+        "butter": {
+            "name": "butter",
+            "size": 0.5,
+            "unit": "kg"
+        },
+        "eggs": {
+            "name": "eggs",
+            "size": 12,
+            "unit": "pieces"
+        },
+        "beef": {
+            "name": "beef",
+            "size": 1,
+            "unit": "kg"
+        },
+        "flour": {
+            "name": "flour",
+            "size": 1,
+            "unit": "kg"
+        },
+        "croutons": {
+            "name": "croutons",
+            "size": 0.2,
+            "unit": "kg"
+        },
+        "coconut_milk": {
+            "name": "coconut milk",
+            "size": 1,
+            "unit": "l"
+        },
+        "curry_powder": {
+            "name": "curry powder",
+            "size": 0.1,
+            "unit": "kg"
+        }
+    }
+}

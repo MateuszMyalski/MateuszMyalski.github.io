@@ -1,226 +1,852 @@
 {
-    "recipes": {
-        "pasta_bolognese": {
-            "name": "Pasta Bolognese",
-            "description": "A classic Italian pasta dish with a rich meat sauce.",
-            "portions": 4,
-            "products": {
-                "spaghetti": 0.5,
-                "ground_beef": 0.3,
-                "tomato_sauce": 0.25
-            }
-        },
-        "chicken_salad": {
-            "name": "Chicken Salad",
-            "description": "A healthy and refreshing salad with chicken and parmesan.",
-            "portions": 2,
-            "products": {
-                "chicken_breast": 0.2,
-                "lettuce": 0.3,
-                "olive_oil": 0.05,
-                "parmesan": 0.1
-            }
-        },
-        "vegetable_soup": {
-            "name": "Vegetable Soup",
-            "description": "A warm and hearty soup with fresh vegetables.",
-            "portions": 6,
-            "products": {
-                "carrots": 0.2,
-                "potatoes": 0.3,
-                "onion": 0.15,
-                "vegetable_stock": 1
-            }
-        },
-        "fruit_smoothie": {
-            "name": "Fruit Smoothie",
-            "description": "A delicious and nutritious blend of fruits and milk.",
-            "portions": 2,
-            "products": {
-                "banana": 2,
-                "strawberries": 0.3,
-                "milk": 0.25
-            }
-        },
-        "grilled_cheese": {
-            "name": "Grilled Cheese",
-            "description": "A simple and satisfying grilled cheese sandwich.",
-            "portions": 1,
-            "products": {
-                "bread": 2,
-                "cheese": 0.15,
-                "butter": 0.05
-            }
-        },
-        "omelette": {
-            "name": "Omelette",
-            "description": "A fluffy omelette with cheese and milk.",
-            "portions": 1,
-            "products": {
-                "eggs": 3,
-                "milk": 0.1,
-                "cheese": 0.1
-            }
-        },
-        "beef_stew": {
-            "name": "Beef Stew",
-            "description": "A rich and hearty stew with tender beef and vegetables.",
-            "portions": 5,
-            "products": {
-                "beef": 0.5,
-                "carrots": 0.2,
-                "potatoes": 0.3,
-                "onion": 0.2
-            }
-        },
-        "pancakes": {
-            "name": "Pancakes",
-            "description": "Fluffy pancakes perfect for a sweet breakfast.",
-            "portions": 4,
-            "products": {
-                "flour": 0.2,
-                "milk": 0.3,
-                "eggs": 2
-            }
-        },
-        "caesar_salad": {
-            "name": "Caesar Salad",
-            "description": "A classic Caesar salad with chicken and croutons.",
-            "portions": 3,
-            "products": {
-                "lettuce": 0.5,
-                "chicken_breast": 0.2,
-                "croutons": 0.1,
-                "parmesan": 0.05
-            }
-        },
-        "vegetable_curry": {
-            "name": "Vegetable Curry",
-            "description": "A flavorful curry with potatoes and carrots.",
-            "portions": 4,
-            "products": {
-                "potatoes": 0.4,
-                "carrots": 0.2,
-                "coconut_milk": 0.3,
-                "curry_powder": 0.05
-            }
-        }
+  "recipes": {
+    "pizza_pinsa": {
+      "name": "Pizza Pinsa",
+      "description": "",
+      "portions": 2,
+      "products": {
+        "koncentrat_pomidorowy": 1,
+        "pinsa": 1,
+        "szynka": 0.5,
+        "ser_tarty": 0.2
+      }
     },
-    "products": {
-        "spaghetti": {
-            "name": "spaghetti",
-            "size": 1,
-            "unit": "kg"
-        },
-        "ground_beef": {
-            "name": "ground beef",
-            "size": 0.5,
-            "unit": "kg"
-        },
-        "tomato_sauce": {
-            "name": "tomato sauce",
-            "size": 1,
-            "unit": "l"
-        },
-        "chicken_breast": {
-            "name": "chicken breast",
-            "size": 1,
-            "unit": "kg"
-        },
-        "lettuce": {
-            "name": "lettuce",
-            "size": 0.5,
-            "unit": "kg"
-        },
-        "olive_oil": {
-            "name": "olive oil",
-            "size": 0.5,
-            "unit": "l"
-        },
-        "parmesan": {
-            "name": "parmesan",
-            "size": 0.2,
-            "unit": "kg"
-        },
-        "carrots": {
-            "name": "carrots",
-            "size": 1,
-            "unit": "kg"
-        },
-        "potatoes": {
-            "name": "potatoes",
-            "size": 1,
-            "unit": "kg"
-        },
-        "onion": {
-            "name": "onion",
-            "size": 1,
-            "unit": "kg"
-        },
-        "vegetable_stock": {
-            "name": "vegetable stock",
-            "size": 1,
-            "unit": "l"
-        },
-        "banana": {
-            "name": "banana",
-            "size": 1,
-            "unit": "kg"
-        },
-        "strawberries": {
-            "name": "strawberries",
-            "size": 0.5,
-            "unit": "kg"
-        },
-        "milk": {
-            "name": "milk",
-            "size": 1,
-            "unit": "l"
-        },
-        "bread": {
-            "name": "bread",
-            "size": 1,
-            "unit": "loaf"
-        },
-        "cheese": {
-            "name": "cheese",
-            "size": 0.5,
-            "unit": "kg"
-        },
-        "butter": {
-            "name": "butter",
-            "size": 0.5,
-            "unit": "kg"
-        },
-        "eggs": {
-            "name": "eggs",
-            "size": 12,
-            "unit": "pieces"
-        },
-        "beef": {
-            "name": "beef",
-            "size": 1,
-            "unit": "kg"
-        },
-        "flour": {
-            "name": "flour",
-            "size": 1,
-            "unit": "kg"
-        },
-        "croutons": {
-            "name": "croutons",
-            "size": 0.2,
-            "unit": "kg"
-        },
-        "coconut_milk": {
-            "name": "coconut milk",
-            "size": 1,
-            "unit": "l"
-        },
-        "curry_powder": {
-            "name": "curry powder",
-            "size": 0.1,
-            "unit": "kg"
-        }
+    "mielone": {
+      "name": "Kotlety mielone (karminadle) z ziemniakami",
+      "description": "",
+      "portions": 4,
+      "products": {
+        "mieso_mielone": 200,
+        "ziemniaki": 0.5
+      }
+    },
+    "spaghetti_tofu": {
+      "name": "Spaghetti z tofu",
+      "description": "",
+      "portions": 2,
+      "products": {
+        "spaghetti": 0.2,
+        "tofu": 1,
+        "passata": 1,
+        "pieprz": 1,
+        "sol": 1
+      }
+    },
+    "krokiety_barszcz": {
+      "name": "Krokiety z barszczem",
+      "description": "",
+      "portions": 2,
+      "products": {
+        "barszcz": 0.1,
+        "krokiety": 4
+      }
+    },
+    "wrapy_kfc": {
+      "name": "Wrapy KFC z frytkami",
+      "description": "",
+      "portions": 4,
+      "products": {
+        "tortilla": 4,
+        "piers_kurczak": 0.5,
+        "ser_tarty": 0.2,
+        "ogorek_konswerowy": 0.2,
+        "ogorek_szklarniowy": 1,
+        "pomidor": 1,
+        "majonez": 1,
+        "keptuch": 1,
+        "maka": 1,
+        "jajko": 2,
+        "panko": 1,
+        "frytki": 0.4
+      }
+    },
+    "zupa_krem_z_dyni": {
+      "name": "Zupa krem z dyni",
+      "description": "",
+      "portions": 6,
+      "products": {
+        "dynia": 1,
+        "cebula": 1,
+        "ziemniaki": 0.4,
+        "czosnek": 2,
+        "builon_warzywny": 1,
+        "smietanka_30": 100,
+        "maslo": 1,
+        "sol": 1,
+        "pieprz": 1,
+        "przyprawa_curry": 1,
+        "chleb_tostowy": 0.2,
+        "ser_zolty": 0.2
+      }
+    },
+    "spaghetti_miesem_mielonym": {
+      "name": "Spaghetti z mięsem mielonym",
+      "description": "",
+      "portions": 2,
+      "products": {
+        "spaghetti": 0.2,
+        "tofu": 1,
+        "mieso_mielone": 200,
+        "passata": 1,
+        "pieprz": 1,
+        "sol": 1
+      }
+    },
+    "zapiekanki_na_bagietce": {
+      "name": "Zapiekanki na bagietce z pieczarkami i serem",
+      "description": "",
+      "portions": 2,
+      "products": {
+        "bagietka": 1,
+        "ser_tarty": 0.3,
+        "pieczarki": 100
+      }
+    },
+    "kurczak_z_sosem_kurkowym": {
+      "name": "Kurczak z sosem kurkowym i makaronem",
+      "description": "TBD",
+      "portions": 0,
+      "products": {}
+    },
+    "makaron_twarog": {
+      "name": "Makaron z serem i twarogiem",
+      "description": "",
+      "portions": 2,
+      "products": {
+        "makaron_swiderki": 200,
+        "maslo": 1,
+        "cukier": 1,
+        "twarog": 250
+      }
+    },
+    "butter_chicken": {
+      "name": "Ryż z kurczakiem maślanym",
+      "description": "",
+      "portions": 2,
+      "products": {
+        "pasta_butter_chicken": 1,
+        "piers_kurczak": 0.25,
+        "imbir": 1,
+        "mleczko_kokosowe": 1,
+        "curry": 1,
+        "pieprz": 1,
+        "papryka_czerowna": 1,
+        "cebula": 1,
+        "czosnek": 2,
+        "sol": 1
+      }
+    },
+    "ryz_zapiekany_jablka": {
+      "name": "Ryż zapiekany z jabłkami",
+      "description": "",
+      "portions": 4,
+      "products": {
+        "ryz": 200,
+        "mleko": 0.5,
+        "cukier": 1,
+        "maslo": 1,
+        "cukier_wanilinowy": 1,
+        "jablko": 1,
+        "cynamon": 1,
+        "cytryna": 1
+      }
+    },
+    "makaron_kurczak_susz_pom": {
+      "name": "Makaron z kurczakiem pesto i suszonymi pomidorami",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "makaron_pesto_pom_tunczyk": {
+      "name": "Makaron z pesto pomidrami i tuńczykiem",
+      "description": "TBD",
+      "portions": 2,
+      "products": {}
+    },
+    "quesadille": {
+      "name": "Quesadille",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "ziemniaki_fasolka_jajka": {
+      "name": "Ziemniaki z fasolką i jakiem",
+      "description": "TBD",
+      "portions": 2,
+      "products": {}
+    },
+    "ryba_warzywa": {
+      "name": "Ryba z warzywami",
+      "description": "TBD",
+      "portions": 2,
+      "products": {}
+    },
+    "kotlet_schabowe_ziemniaki_salatka": {
+      "name": "Kotlet Schabowy z ziemniakami i sałatką",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "kotlet_drobiowy_ziemniaki_salatka": {
+      "name": "Kotlet drobiowy z ziemniakami i sałatką",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "racuchy_jablka": {
+      "name": "Racuchy z jabłkami",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "zupa_buraczkowa": {
+      "name": "Zupa buraczkowa z tostem",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "nalesniki_slodko": {
+      "name": "Naleśniki z serem i owocami",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "lazanki": {
+      "name": "Łazanki",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "leniwe_golabki": {
+      "name": "Leniwe golabki",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "pierogi_paczka": {
+      "name": "Pierogi z paczki",
+      "description": "TBD",
+      "portions": 2,
+      "products": {}
+    },
+    "faszerowana_cukinia_kasza_warzywa": {
+      "name": "Faszerowana cukinia z kaszą i warzywami",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "salatka_kurczak": {
+      "name": "Sałatka z kurczakiem i mozarellą, makaronem w sosie musztardowym",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "curry_kurczak": {
+      "name": "Curry z kurczakiem i ryżem",
+      "description": "",
+      "portions": 4,
+      "products": {
+        "cebula": 1,
+        "papryka_czerowna": 1,
+        "czosnek": 2,
+        "mrozona_fasolka_szparakowa": 0.3,
+        "cukinia": 0.5,
+        "mieszanka_chinska": 0.2,
+        "olej": 1,
+        "piers_kurczak": 0.25,
+        "curry": 0.2,
+        "cytryna": 0.3,
+        "mleczko_kokosowe": 500,
+        "chilli": 1,
+        "ryz": 0.2
+      }
+    },
+    "lazania": {
+      "name": "Lazania",
+      "description": "TBD",
+      "portions": 4,
+      "products": {}
+    },
+    "big_oat_cookie": {
+      "name": "Big Oat Cookie",
+      "description": "TBD",
+      "portions": 2,
+      "products": {}
+    },
+    "omlet_warzywny": {
+      "name": "Omlet z warzywami",
+      "description": "",
+      "portions": 2,
+      "products": {
+        "sol": 1,
+        "pieprz": 1,
+        "cebula": 1,
+        "jajka": 4,
+        "ser_tarty": 0.1,
+        "olej": 1,
+        "maslo": 1,
+        "pieczarki": 100,
+        "papryka_czerowna": 1,
+        "suszone_pomidory": 0.1
+      }
+    },
+    "coconut_chia_pudidng": {
+      "name": "Coconut chia pudding",
+      "description": "",
+      "portions": 2,
+      "products": {
+        "mleczko_kokosowe": 0.3,
+        "chia": 50,
+        "erytrytol": 1,
+        "wiorki_kokosowe": 1
+      }
+    },
+    "chaczapuri_adzarksu": {
+      "name": "Chaczapuri po Adżarski",
+      "description": "",
+      "portions": 4,
+      "products": {
+        "maka_przenna": 500,
+        "mleko": 200,
+        "drozdze": 25,
+        "sol": 1,
+        "cukier": 1,
+        "olej": 1,
+        "jajka": 5,
+        "ser_feta": 200,
+        "mozarella": 200,
+        "ser_zolty": 0.2,
+        "maslo": 1
+      }
+    },
+    "kurczak_slodko_kwasny": {
+      "name": "Kurczak z warzywami w sosie słodko-kwaśnym",
+      "description": "",
+      "portions": 4,
+      "products": {
+        "ryz": 200,
+        "piers_kurczak": 0.5,
+        "cebula": 1,
+        "olej": 1,
+        "mieszanka_chinska": 0.3,
+        "imbir": 1,
+        "skrobia_ziemniaczana": 0.2,
+        "papryka_slodka": 1,
+        "papryka_ostra": 1,
+        "papryka_wędzona": 1,
+        "czosnek": 2,
+        "sól": 1,
+        "pieprz": 1,
+        "koncentrat_pomidorowy": 1,
+        "ananas_puszka": 1
+      }
+    },
+    "leczo": {
+      "name": "Leczo",
+      "description": "",
+      "portions": 4,
+      "products": {
+        "cukinia": 2,
+        "cebula": 1,
+        "passata": 1,
+        "kielbasa": 1,
+        "papryka_zolta": 1,
+        "papryka_czerowna": 1,
+        "czosnek": 2,
+        "olej":1,
+        "sol": 1,
+        "pieprz": 1,
+        "oregano": 1,
+        "papryka_ostra": 1
+      }
+    },
+    "krem_botwinka": {
+      "name": "Krem z botwinki",
+      "description": "",
+      "portions": 4,
+      "products": {
+        "burak_mlody": 4,
+        "marchewka": 2,
+        "pietruszka": 1,
+        "cebula": 1,
+        "sol": 1,
+        "pieprz": 1,
+        "czosnek_granulowany": 1,
+        "majeranek": 1,
+        "olej": 1,
+        "smietanka_18": 330
+      }
+    },
+    "zupa_rosol": {
+      "name": "Zupa rosół",
+      "description": "",
+      "portions": 4,
+      "products": {
+        "wloszczyzna": 1,
+        "pieprz_kolorowy": 1,
+        "udka_kurczak": 500,
+        "sol": 1,
+        "pieprz": 1,
+        "ziola_anglieskie": 1,
+        "lisc_laurowy": 1
+      }
     }
+  },
+  "products": {
+    "koncentrat_pomidorowy": {
+      "name": "Koncentrat pomidorowy",
+      "size": 1,
+      "unit": "szt."
+    },
+    "pinsa": {
+      "name": "Pinsa",
+      "size": 1,
+      "unit": "opk."
+    },
+    "szynka": {
+      "name": "Szynka",
+      "size": 1,
+      "unit": "opk."
+    },
+    "keptuch": {
+      "name": "Kempucz",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "ser_tarty": {
+      "name": "Ser tarty",
+      "size": 1,
+      "unit": "opk."
+    },
+    "mieso_mielone": {
+      "name": "Mięso mielone",
+      "size": 1,
+      "unit": "kg"
+    },
+    "ziemniaki": {
+      "name": "Ziemniaki",
+      "size": 1,
+      "unit": "kg"
+    },
+    "spaghetti": {
+      "name": "Spaghetti",
+      "size": 1,
+      "unit": "opk."
+    },
+    "tofu": {
+      "name": "Tofu",
+      "size": 1,
+      "unit": "opk."
+    },
+    "passata": {
+      "name": "Passata",
+      "size": 1,
+      "unit": "but."
+    },
+    "barszcz": {
+      "name": "Barszcz czerwony",
+      "size": 1,
+      "unit": "opk."
+    },
+    "krokiety": {
+      "name": "Krokiety",
+      "size": 1,
+      "unit": "szt."
+    },
+    "tortilla": {
+      "name": "Tortilla",
+      "size": 1,
+      "unit": "szt."
+    },
+    "piers_kurczak": {
+      "name": "Pierś z kurczaka",
+      "size": 0.5,
+      "unit": "kg"
+    },
+    "ogorek_konserwowy": {
+      "name": "Ogórek konserwowy",
+      "size": 1,
+      "unit": "słoik"
+    },
+    "ogorek_szklarniowy": {
+      "name": "Ogórek szklarniowy",
+      "size": 1,
+      "unit": "szt."
+    },
+    "pomidor": {
+      "name": "Pomidor",
+      "size": 1,
+      "unit": "szt."
+    },
+    "majonez": {
+      "name": "Majonez",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "maka": {
+      "name": "Mąka",
+      "size": 1,
+      "unit": "kg"
+    },
+    "jajko": {
+      "name": "Jajko",
+      "size": 1,
+      "unit": "szt."
+    },
+    "panko": {
+      "name": "Panko",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "frytki": {
+      "name": "Frytki",
+      "size": 1,
+      "unit": "kg"
+    },
+    "dynia": {
+      "name": "Dynia",
+      "size": 1,
+      "unit": "kg"
+    },
+    "cebula": {
+      "name": "Cebula",
+      "size": 1,
+      "unit": "szt."
+    },
+    "czosnek": {
+      "name": "Czosnek",
+      "size": 1,
+      "unit": "ząbek"
+    },
+    "oliwa": {
+      "name": "Oliwa z oliwek",
+      "size": "",
+      "unit": ""
+    },
+    "pieprz": {
+      "name": "Pieprz",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "sol": {
+      "name": "Sól",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "bazylia": {
+      "name": "Bazylia",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "oregano": {
+      "name": "Oregano",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "cukinia": {
+      "name": "Cukinia",
+      "size": 1,
+      "unit": "szt."
+    },
+    "papryka": {
+      "name": "Papryka",
+      "size": 1,
+      "unit": "szt."
+    },
+    "marchew": {
+      "name": "Marchew",
+      "size": 1,
+      "unit": "szt."
+    },
+    "seler": {
+      "name": "Seler",
+      "size": 1,
+      "unit": "szt."
+    },
+    "soczewica": {
+      "name": "Soczewica",
+      "size": 1,
+      "unit": "opk."
+    },
+    "ryz": {
+      "name": "Ryż",
+      "size": 1,
+      "unit": "kg"
+    },
+    "natka_pietruszki": {
+      "name": "Natka pietruszki",
+      "size": 1,
+      "unit": "peczek"
+    },
+    "ogorek_konswerowy": {
+      "name": "Ogórek konserwowy",
+      "size": 1,
+      "unit": "szt."
+    },
+    "builon_warzywny": {
+      "name": "Bulion warzywny",
+      "size": 1,
+      "unit": "kostka"
+    },
+    "smietanka_30": {
+      "name": "Śmietanka 30%",
+      "size": 200,
+      "unit": "g"
+    },
+    "maslo": {
+      "name": "Masło",
+      "size": "trochę",
+      "unit": ""
+    },
+    "przyprawa_curry": {
+      "name": "Przyprawa curry",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "chleb_tostowy": {
+      "name": "Chleb tostowy",
+      "size": 1,
+      "unit": "paczka"
+    },
+    "ser_zolty": {
+      "name": "Ser Żółty",
+      "size": 100,
+      "unit": "g"
+    },
+    "bagietka": {
+      "name": "Bagietka",
+      "size": 1,
+      "unit": "szt."
+    },
+    "pieczarki": {
+      "name": "Pieczarki",
+      "size": 200,
+      "unit": "g"
+    },
+    "makaron_swiderki": {
+      "name": "Makaron świderki",
+      "size": 300,
+      "unit": "g"
+    },
+    "cukier": {
+      "name": "Cukier",
+      "size": 1,
+      "unit": "kg"
+    },
+    "twarog": {
+      "name": "Twaróg",
+      "size": 250,
+      "unit": "g"
+    },
+    "pasta_butter_chicken": {
+      "name": "Pasta butter chicken",
+      "size": 1,
+      "unit": "szt."
+    },
+    "imbir": {
+      "name": "Imbir",
+      "size": 1,
+      "unit": "szt."
+    },
+    "mleczko_kokosowe": {
+      "name": "Mleczko kokosowe",
+      "size": 1,
+      "unit": "puszka"
+    },
+    "curry": {
+      "name": "Przyprawa curry",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "papryka_czerowna": {
+      "name": "Papryka czerwona",
+      "size": 1,
+      "unit": "szt."
+    },
+    "cytryna": {
+      "name": "Cytryna",
+      "size": 1,
+      "unit": "szt."
+    },
+    "mrozona_fasolka_szparakowa": {
+      "name": "Mrozona Fasolka Szparakowa",
+      "size": 1,
+      "unit": "szt."
+    },
+    "mieszanka_chinska": {
+      "name": "Mieszanka Chinska",
+      "size": 1,
+      "unit": "szt."
+    },
+    "olej": {
+      "name": "Olej",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "chilli": {
+      "name": "Chilli",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "jajka": {
+      "name": "Jajka",
+      "size": 1,
+      "unit": "szt."
+    },
+    "suszone_pomidory": {
+      "name": "Suszone Pomidory",
+      "size": 1,
+      "unit": "słoik"
+    },
+    "chia": {
+      "name": "Chia",
+      "size": 1,
+      "unit": "opk."
+    },
+    "erytrytol": {
+      "name": "Erytrytol",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "wiorki_kokosowe": {
+      "name": "Wiorki Kokosowe",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "maka_przenna": {
+      "name": "Maka Przenna",
+      "size": 1,
+      "unit": "kg"
+    },
+    "mleko": {
+      "name": "Mleko",
+      "size": 1,
+      "unit": "l"
+    },
+    "drozdze": {
+      "name": "Drozdze",
+      "size": 100,
+      "unit": "g"
+    },
+    "ser_feta": {
+      "name": "Ser Feta",
+      "size": 1,
+      "unit": "opk."
+    },
+    "mozarella": {
+      "name": "Mozarella",
+      "size": 1,
+      "unit": "opk."
+    },
+    "skrobia_ziemniaczana": {
+      "name": "Skrobia Ziemniaczana",
+      "size": 1,
+      "unit": "kg"
+    },
+    "papryka_slodka": {
+      "name": "Papryka Slodka",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "papryka_ostra": {
+      "name": "Papryka Ostra",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "papryka_wędzona": {
+      "name": "Papryka Wędzona",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "sól": {
+      "name": "Sól",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "ananas_puszka": {
+      "name": "Ananas Puszka",
+      "size": 1,
+      "unit": "szt."
+    },
+    "kielbasa": {
+      "name": "Kielbasa",
+      "size": 1,
+      "unit": "opk."
+    },
+    "papryka_zolta": {
+      "name": "Papryka Zolta",
+      "size": 1,
+      "unit": "szt."
+    },
+    "burak_mlody": {
+      "name": "Burak Mlody",
+      "size": 1,
+      "unit": "szt."
+    },
+    "marchewka": {
+      "name": "Marchewka",
+      "size": 1,
+      "unit": "szt."
+    },
+    "pietruszka": {
+      "name": "Pietruszka",
+      "size": 1,
+      "unit": "szt."
+    },
+    "czosnek_granulowany": {
+      "name": "Czosnek Granulowany",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "majeranek": {
+      "name": "Majeranek",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "smietanka_18": {
+      "name": "Smietanka 18%",
+      "size": 200,
+      "unit": "ml"
+    },
+    "cukier_wanilinowy": {
+      "name": "Cukier wanilinowy",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "jablko": {
+      "name": "Jabłko",
+      "size": 1,
+      "unit": "kg"
+    },
+    "cynamon": {
+      "name": "Cynamon",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "wloszczyzna": {
+      "name": "Włoszczyzna",
+      "size": 1,
+      "unit": "opk."
+    },
+    "pieprz_kolorowy": {
+      "name": "Pieprz kolorowy",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "udka_kurczak": {
+      "name": "Udka z kurczaka",
+      "size": 500,
+      "unit": "g"
+    },
+    "ziola_anglieskie": {
+      "name": "Zioła angielskie",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "lisc_laurowy": {
+      "name": "Liść laurowy",
+      "size": "do smaku",
+      "unit": ""
+    }
+  }
 }
