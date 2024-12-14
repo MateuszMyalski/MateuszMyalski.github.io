@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipe Viewer</title>
+    <title>Planner posiłków</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <div class="header">
-        <h1>Shopping list composer</h1>
+        <h1>Planner posiłków</h1>
     </div>
 
     <div class="content">
         <!-- Recipe List -->
         <div class="card">
-            <h2>Meals</h2>
+            <h2>Posiłki</h2>
             <div class="scrollable" id="recipe-list">
                 <!-- Recipe items go here -->
             </div>
@@ -24,20 +24,20 @@
 
         <!-- Selected Recipe Details -->
         <div class="card">
-            <h2>Recipe Details</h2>
+            <h2>Szczegóły</h2>
             <div id="recipe-details"></div>
-            <button id="add-recipe-button" style="display: none;">Add Recipe</button>
+            <button id="add-recipe-button" style="display: none;">Dodaj przepis</button>
         </div>
 
         <!-- Product List -->
         <div class="card full-width">
-            <h2>Added Meals:</h3>
+            <h2>Dodane posiłki:</h3>
             <div id="added-recipes-summary">
                 <ul id="added-recipes-list"></ul>
             </div>
-            <h2>Shopping list</h2>
+            <h2>Lista zakupów</h2>
             <textarea id="product-summary" readonly></textarea>
-            <button id="copy-products-button" style="width: 100%;">Copy to Clipboard</button>
+            <button id="copy-products-button" style="width: 100%;">Kopiuj do schowka</button>
         </div>
     </div>
 
