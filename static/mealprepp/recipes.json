@@ -353,7 +353,7 @@
         "papryka_zolta": 1,
         "papryka_czerowna": 1,
         "czosnek": 2,
-        "olej":1,
+        "olej": 1,
         "sol": 1,
         "pieprz": 1,
         "oregano": 1,
@@ -389,6 +389,25 @@
         "pieprz": 1,
         "ziola_anglieskie": 1,
         "lisc_laurowy": 1
+      }
+    },
+    "makaron_gigi_hadid": {
+      "name": "Makaron Gigi Hadid",
+      "description": "",
+      "portions": 4,
+      "products": {
+        "makaron_swiderki": 400,
+        "olej": 1,
+        "cebula": 1,
+        "czosnek": 3,
+        "koncentrat_pomidorowy": 0.3,
+        "wodka": 1,
+        "smietanka_30": 100,
+        "maslo": 1,
+        "sol": 1,
+        "pieprz": 1,
+        "chilli": 1,
+        "bazylia": 1
       }
     }
   },
@@ -845,6 +864,11 @@
     },
     "lisc_laurowy": {
       "name": "Liść laurowy",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "wodka": {
+      "name": "Wódka",
       "size": "do smaku",
       "unit": ""
     }
