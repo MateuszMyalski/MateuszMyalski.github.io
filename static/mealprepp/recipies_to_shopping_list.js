@@ -53,8 +53,8 @@ function displayRecipeDetails(recipeKey) {
                 quantity = product.size;
             }
 
-            const productName = product ? product.name : `Unknown (${productKey})`;
-            const productUnit = product ? product.unit : "Unknown unit";
+            const productName = product ? product.name : `Nieznany (${productKey})`;
+            const productUnit = product ? product.unit : "nieznana jednostka";
             return `<li>${productName}: ${quantity} ${productUnit}</li>`;
         })
         .join('');
@@ -63,8 +63,8 @@ function displayRecipeDetails(recipeKey) {
     recipeDetailsElement.innerHTML = `
         <h3>${recipe.name}</h3>
         <p>${recipe.description}</p>
-        <p>Portions: ${recipe.portions}</p>
-        <h4>Ingredients:</h4>
+        <p>Porcje: ${recipe.portions}</p>
+        <h4>Składniki:</h4>
         <ul>
             ${ingredientsList}
         </ul>
@@ -97,8 +97,8 @@ function updateAddedRecipesSummary() {
         listItem.innerHTML = `
             ${recipe.name}: ${totalPortions} portions
             <div style="float:right">
-                <button onclick="removeAllMeals('${recipeKey}')">Remove all</button>
-                <button onclick="removeOneMeals('${recipeKey}')">Remove one</button>
+                <button onclick="removeAllMeals('${recipeKey}')">Usuń wszystko</button>
+                <button onclick="removeOneMeals('${recipeKey}')">Usuń porcję</button>
             </div>
         `;
         addedRecipesListElement.appendChild(listItem);
@@ -163,5 +163,5 @@ document.getElementById('copy-products-button').onclick = () => {
     const productSummaryElement = document.getElementById('product-summary');
     productSummaryElement.select();
     document.execCommand('copy');
-    alert('Product list copied to clipboard!');
+    alert('Skopiowane do schowka!');
 };
