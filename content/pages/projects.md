@@ -12,11 +12,12 @@ Piece of hardware to turn on and off a fan to sink out fumes from my central hea
 
 ### [thinkpad-keybacklight](https://github.com/MateuszMyalski/thinkpad-keybacklight)
 This repository provides a controller for managing the backlight of ThinkPad keyboards with integrated Systemd support. The controller offers extensive features including event-based backlight control, automatic brightness adjustments, and scheduling. This tool is especially useful for users who want to fine-tune their keyboard backlight settings based on input events, time, or system state.
-
 ---
 
 ### [hungry-birds](https://github.com/MateuszMyalski/hungry-birds)
 Experience a unique way of browsing the internet with 'Hungry-Birds'! Watch as birds peck away at your screen, obscuring your view. But don't worry, by holding the 'Alt' key and shaking your cursor, you can startle them away, giving you a chance to glimpse the content beneath. It's a fun and whimsical twist on web browsing that adds an element of surprise and delight to your online adventures!
+
+[Live demo!](https://mateuszmyalski.github.io/static/hungry-birds/)
 
 ---
 
