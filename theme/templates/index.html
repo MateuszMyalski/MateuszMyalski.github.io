@@ -2,13 +2,6 @@
 
 {% block content %}
 
-{% if ABOUTME %}
-<section class="about_me">
-    <h3>$ whoami</h3>
-    {{ ABOUTME }}
-</section>
-{% endif %}
-
 <section class="posts_list">
     {% block content_title %}
     <h3>$ ls -ls | awk '{print $7,$8,$9,$10}'</h3>
@@ -27,4 +20,12 @@
         {% endfor %}
     </ul>
 </section>
+
+{% if ABOUTME %}
+<section class="about_me">
+    <h3>$ whoami</h3>
+    {{ ABOUTME }}
+</section>
+{% endif %}
+
 {% endblock content %}
