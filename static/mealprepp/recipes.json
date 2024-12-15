@@ -47,7 +47,7 @@
       "portions": 4,
       "products": {
         "tortilla": 4,
-        "piers_kurczak": 0.5,
+        "piers_kurczak": 500,
         "ser_tarty": 0.2,
         "ogorek_konswerowy": 0.2,
         "ogorek_szklarniowy": 1,
@@ -99,14 +99,32 @@
       "products": {
         "bagietka": 1,
         "ser_tarty": 0.3,
-        "pieczarki": 100
+        "pieczarki": 100,
+        "cebula": 1,
+        "sol": 1,
+        "pieprz": 1,
+        "szynka": 0.3,
+        "sos_czosnkowy": 1,
+        "keptuch": 1
       }
     },
-    "kurczak_z_sosem_kurkowym": {
-      "name": "Kurczak z sosem kurkowym i makaronem",
-      "description": "TBD",
-      "portions": 0,
-      "products": {}
+    "makaron_kurki": {
+      "name": "Makaron z kurkami",
+      "description": "https://aniagotuje.pl/przepis/makaron-z-kurkami",
+      "portions": 4,
+      "products": {
+        "kurki": 400,
+        "makaron_swiderki": 200,
+        "cebula": 1,
+        "smietanka_30": 100,
+        "maslo": 1,
+        "natka_pietruszki": 0.3,
+        "sol": 1,
+        "pieprz": 1,
+        "cytryna": 0.1,
+        "czosnek": 1,
+        "parmezan": 10
+      }
     },
     "makaron_twarog": {
       "name": "Makaron z serem i twarogiem",
@@ -125,7 +143,7 @@
       "portions": 2,
       "products": {
         "pasta_butter_chicken": 1,
-        "piers_kurczak": 0.25,
+        "piers_kurczak": 250,
         "imbir": 1,
         "mleczko_kokosowe": 1,
         "curry": 1,
@@ -134,6 +152,25 @@
         "cebula": 1,
         "czosnek": 2,
         "sol": 1
+      }
+    },
+    "kurczak_ryz": {
+      "name": "Kurczak na ryżu",
+      "description": "https://aniagotuje.pl/przepis/kurczak-na-ryzu",
+      "portions": 4,
+      "products": {
+        "udka_kurczak": 1000,
+        "sol": 1,
+        "pieprz": 1,
+        "papryka_slodka": 1,
+        "keptuch": 1,
+        "maslo": 1,
+        "czosnek": 2,
+        "ziola_prowansalskie": 1,
+        "ryz": 300,
+        "cebula": 2,
+        "papryka_czerowna": 1,
+        "chilli": 1
       }
     },
     "ryz_zapiekany_jablka": {
@@ -146,7 +183,7 @@
         "cukier": 1,
         "maslo": 1,
         "cukier_wanilinowy": 1,
-        "jablko": 1,
+        "jablko": 4,
         "cynamon": 1,
         "cytryna": 1
       }
@@ -193,11 +230,21 @@
       "portions": 4,
       "products": {}
     },
-    "racuchy_jablka": {
-      "name": "Racuchy z jabłkami",
-      "description": "TBD",
+    "racuchy_drozdzowe_z_jablkami": {
+      "name": "Racuchy drożdżowe z jabłkami",
+      "description": "https://www.kwestiasmaku.com/przepis/racuchy-drozdzowe-z-jablkami",
       "portions": 4,
-      "products": {}
+      "products": {
+        "drozdze": 40,
+        "mleko": 0.2,
+        "maka_przenna": 0.3,
+        "cukier": 1,
+        "sol": 1,
+        "cukier_wanilinowy": 1,
+        "jablko": 2,
+        "maslo": 1,
+        "cukier_puder": 1
+      }
     },
     "zupa_buraczkowa": {
       "name": "Zupa buraczkowa z tostem",
@@ -207,15 +254,67 @@
     },
     "nalesniki_slodko": {
       "name": "Naleśniki z serem i owocami",
-      "description": "TBD",
+      "description": "https://aniagotuje.pl/przepis/jak-zrobic-ciasto-na-nalesniki",
       "portions": 4,
-      "products": {}
+      "products": {
+        "maka_przenna": 230,
+        "jajko": 3,
+        "mleko": 0.2,
+        "olej": 1,
+        "sol": 1
+      }
     },
     "lazanki": {
       "name": "Łazanki",
-      "description": "TBD",
+      "description": "https://aniagotuje.pl/przepis/lazanki",
       "portions": 4,
-      "products": {}
+      "products": {
+        "makaron_lazanki": 240,
+        "kielbasa": 2,
+        "kapusta_kiszona": 400,
+        "cebula": 2,
+        "pieczarki": 150,
+        "olej": 1,
+        "lisc_laurowy": 1,
+        "ziola_anglieskie": 1,
+        "sol": 1,
+        "pieprz": 1
+      }
+    },
+    "siekane_kotlety_kurczak": {
+      "name": "Siekane kotlety z kurczaka",
+      "description": "https://smaker.pl/przepisy-dania-glowne/przepis-siekane-kotlety-z-kurczaka,188983,karol-gotuje.html",
+      "portions": 4,
+      "products": {
+        "piers_kurczak": 500,
+        "papryka_czerowna": 1,
+        "cebula": 1,
+        "pieczarki": 100,
+        "natka_pietruszki": 0.3,
+        "ser_mozzarella": 70,
+        "jajko": 3,
+        "majonez": 1,
+        "maka": 0.1,
+        "sol": 1,
+        "pieprz": 1
+      }
+    },
+    "koteleciki_szu_szu": {
+      "name": "Kotleciki szu szu",
+      "description": "https://aniagotuje.pl/przepis/kotleciki-szu-szu",
+      "portions": 4,
+      "products": {
+        "piers_kurczak": 650,
+        "skrobia_ziemniaczana": 70,
+        "jajko": 3,
+        "olej": 1,
+        "jogurt_naturalny": 1,
+        "czosnek": 2,
+        "papryka_slodka": 1,
+        "sol": 1,
+        "pieprz": 1,
+        "chilli": 1
+      }
     },
     "leniwe_golabki": {
       "name": "Leniwe golabki",
@@ -253,7 +352,7 @@
         "cukinia": 0.5,
         "mieszanka_chinska": 0.2,
         "olej": 1,
-        "piers_kurczak": 0.25,
+        "piers_kurczak": 250,
         "curry": 0.2,
         "cytryna": 0.3,
         "mleczko_kokosowe": 500,
@@ -281,7 +380,7 @@
         "sol": 1,
         "pieprz": 1,
         "cebula": 1,
-        "jajka": 4,
+        "jajko": 4,
         "ser_tarty": 0.1,
         "olej": 1,
         "maslo": 1,
@@ -312,7 +411,7 @@
         "sol": 1,
         "cukier": 1,
         "olej": 1,
-        "jajka": 5,
+        "jajko": 5,
         "ser_feta": 200,
         "mozarella": 200,
         "ser_zolty": 0.2,
@@ -321,16 +420,16 @@
     },
     "kurczak_slodko_kwasny": {
       "name": "Kurczak z warzywami w sosie słodko-kwaśnym",
-      "description": "",
+      "description": "https://aniagotuje.pl/przepis/kurczak-slodko-kwasny",
       "portions": 4,
       "products": {
         "ryz": 200,
-        "piers_kurczak": 0.5,
+        "piers_kurczak": 650,
         "cebula": 1,
         "olej": 1,
         "mieszanka_chinska": 0.3,
         "imbir": 1,
-        "skrobia_ziemniaczana": 0.2,
+        "skrobia_ziemniaczana": 20,
         "papryka_slodka": 1,
         "papryka_ostra": 1,
         "papryka_wędzona": 1,
@@ -338,7 +437,9 @@
         "sól": 1,
         "pieprz": 1,
         "koncentrat_pomidorowy": 1,
-        "ananas_puszka": 1
+        "ananas_puszka": 1,
+        "marchew": 1,
+        "papryka_czerowna": 1
       }
     },
     "leczo": {
@@ -358,6 +459,26 @@
         "pieprz": 1,
         "oregano": 1,
         "papryka_ostra": 1
+      }
+    },
+    "orzo": {
+      "name": "Makaron orzo z kurczakiem",
+      "description": "https://aniagotuje.pl/przepis/makaron-orzo-z-kurczakiem",
+      "portions": 4,
+      "products": {
+        "makaron_orzo": 220,
+        "piers_kurczak": 650,
+        "cebula": 2,
+        "papryka_czerowna": 1,
+        "suszone_pomidory": 0.1,
+        "ser_cheddar": 70,
+        "smietanka_30": 100,
+        "maslo": 1,
+        "bazylia": 1,
+        "papryka_slodka": 1,
+        "sol": 1,
+        "oregano": 1,
+        "pieprz": 1
       }
     },
     "krem_botwinka": {
@@ -480,8 +601,8 @@
     },
     "piers_kurczak": {
       "name": "Pierś z kurczaka",
-      "size": 0.5,
-      "unit": "kg"
+      "size": 500,
+      "unit": "g"
     },
     "ogorek_konserwowy": {
       "name": "Ogórek konserwowy",
@@ -708,8 +829,8 @@
       "size": "do smaku",
       "unit": ""
     },
-    "jajka": {
-      "name": "Jajka",
+    "jajko": {
+      "name": "jajko",
       "size": 1,
       "unit": "szt."
     },
@@ -760,8 +881,8 @@
     },
     "skrobia_ziemniaczana": {
       "name": "Skrobia Ziemniaczana",
-      "size": 1,
-      "unit": "kg"
+      "size": 1000,
+      "unit": "g"
     },
     "papryka_slodka": {
       "name": "Papryka Slodka",
@@ -836,7 +957,7 @@
     "jablko": {
       "name": "Jabłko",
       "size": 1,
-      "unit": "kg"
+      "unit": "szt."
     },
     "cynamon": {
       "name": "Cynamon",
@@ -872,6 +993,61 @@
       "name": "Wódka",
       "size": "do smaku",
       "unit": ""
+    },
+    "cukier_puder": {
+      "name": "Cukier puder",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "makaron_lazanki": {
+      "name": "Makaron łazanki",
+      "size": 500,
+      "unit": "g"
+    },
+    "kapusta_kiszona": {
+      "name": "Kapusta kiszona",
+      "size": 750,
+      "unit": "g"
+    },
+    "ser_mozzarella": {
+      "name": "Ser Mozzarella",
+      "size": 125,
+      "unit": "g"
+    },
+    "jogurt_naturalny": {
+      "name": "Jogurt naturalny",
+      "size": "",
+      "unit": ""
+    },
+    "sos_czosnkowy": {
+      "name": "Sos czosnkowy",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "ziola_prowansalskie": {
+      "name": "Ziola prowansalskie",
+      "size": "do smaku",
+      "unit": ""
+    },
+    "parmezan": {
+      "name": "Parmezan",
+      "size": 250,
+      "unit": "g"
+    },
+    "makaron_orzo": {
+      "name": "Makaron orzo",
+      "size": 500,
+      "unit": "g"
+    },
+    "ser_cheddar": {
+      "name": "Ser cheddar",
+      "size": 250,
+      "unit": "g"
+    },
+    "kurki": {
+      "name": "Kurki",
+      "size": 200,
+      "unit": "g"
     }
   }
 }
