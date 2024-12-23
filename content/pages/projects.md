@@ -5,6 +5,11 @@ title: Projects
 
 List of side projects I created to tinker with and _maybe_ to improve my workflow in daily work.
 
+### [Meal-prepp](https://mateuszmyalski.github.io/static/mealprepp/)
+Alpha version of database with recipes I like to cook that allows me to prepare shopping list based on the next week.
+
+---
+
 ### [fan-controller-for-co2-sensor](https://mateuszmyalski.github.io/fan-controller-for-co2-sensor.html)
 Piece of hardware to turn on and off a fan to sink out fumes from my central heating system.
 
