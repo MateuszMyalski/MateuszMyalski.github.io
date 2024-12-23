@@ -117,6 +117,14 @@ section.about_me h2, section.posts_list h2 {
     font-weight: lighter;
 }
 
+section.posts_list .grayed_out {
+    color: var(--accent-gray-color);
+}
+
+section.posts_list .tag::before {
+    content: "#";
+}
+
 section.meta {
     border-top-style: ridge;
     padding: 10px 10px;
