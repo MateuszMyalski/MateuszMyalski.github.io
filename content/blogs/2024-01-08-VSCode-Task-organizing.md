@@ -3,6 +3,8 @@ layout: post
 title: VSCode Task organizing
 date: 2024-01-08
 status: draft
+category: Tutorials
+tags: linux
 ---
 # VSCode Task organizing
 

@@ -2,6 +2,8 @@
 title: Fan controller for CO2 sensor
 date: 2024-08-03
 layout: post
+category: Projects
+tags: hardware
 ---
 # Fan controller for CO2 sensor
 

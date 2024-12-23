@@ -29,6 +29,7 @@ title: {title}
 date: {current_date}
 layout: post
 status: draft
+category:
 ---
 # {title}
 """

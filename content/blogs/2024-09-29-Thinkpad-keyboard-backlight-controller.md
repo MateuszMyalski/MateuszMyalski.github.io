@@ -2,6 +2,8 @@
 title: Thinkpad keyboard backlight controller
 date: 2024-09-29
 layout: post
+category: Projects
+tags: linux
 ---
 # Thinkpad keyboard backlight controller
 

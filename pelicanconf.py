@@ -45,13 +45,13 @@ MENUITEMS = (("GitHub", "https://github.com/MateuszMyalski"), ("RSS", "atom.xml"
 DESCRIPTION = "Whether you're here to learn, explore, or just out of curiosity, I hope you find something valuable."
 ABOUTME = """
 <p style="font-weight:bold">
-Hello!
+Cześć! (Hello!)
 </p>
 <p>
 I'm Mateusz Myalski, an embedded software developer with a deep passion for technology and learning. This blog serves as my personal space where I crystallize knowledge from my notes and share descriptions of my home projects.
 </p>
 <p>
-I hold a Master's degree in Applied Science, specializing in Electronics and Communication. My engineering background fuels my curiosity, driving me to continuously explore new concepts and ideas. I often find myself diving into various topics, and this blog is where I document my thoughts and findings.
+I hold a Master's degree in Applied Science, specializing in Electronics and Communication.
 </p>
 <p>
 Writing these blog posts allows me to summarize what I`ve learned in a way that`s easy to revisit later, ensuring that I can quickly refresh my memory. It also gives me the opportunity to share insights with others who might find them useful.

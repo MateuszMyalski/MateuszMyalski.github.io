@@ -2,6 +2,8 @@
 layout: post
 title: VSCode Automatyzacja i tworzenie Makefile
 date: 2019-12-23
+category: Tutorials
+tags: linux, makefile
 ---
 # VSCode Automatyzacja i tworzenie Makefile
 

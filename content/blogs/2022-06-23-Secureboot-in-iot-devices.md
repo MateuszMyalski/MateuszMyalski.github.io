@@ -2,6 +2,8 @@
 layout: post
 title: Secure boot concept in IoT devices
 date: 2022-06-23
+category: Security
+tags: embedded
 ---
 # Secure boot concept in IoT devices
 

@@ -2,6 +2,8 @@
 layout: post
 title: Displaying canvas within an iframe background
 date: 2024-01-23
+category: Tutorials
+tags: javascript
 ---
 # Displaying canvas within an iframe background
 

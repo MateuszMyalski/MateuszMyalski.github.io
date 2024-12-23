@@ -2,6 +2,8 @@
 layout: post
 title: Pointer madness
 date: 2022-08-03
+category: Tutorials
+tags: c
 ---
 # Pointer madness
 At the beginning of the journey with C programming language, many students struggling to image what a pointer is and how to use it. Often this is the point when beginners formulate the statement:

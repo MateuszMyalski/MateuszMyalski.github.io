@@ -2,6 +2,8 @@
 layout: post
 title: My approach to syncing dotfiles
 date: 2024-01-19
+category: Tutorials
+tags: linux
 ---
 # My Approach to Syncing Dotfiles
 Recently, I decide to tidy up my dotfiles on both my personal Linux machine and my workstation. Initially, I keep a single file in a public repository, copying and pasting bits of functions and aliases manually. However, as my configurations grow, syncing between my laptop and workstation becomes challenging.

@@ -2,6 +2,7 @@
 layout: post
 title: Symmetric keys
 date: 2021-03-26
+category: Security
 ---
 # Symmetric keys
 ## The concept

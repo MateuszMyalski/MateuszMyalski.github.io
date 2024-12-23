@@ -2,6 +2,8 @@
 title: Configuring openOCD with FTDI JTAG interface
 date: 2024-08-19
 layout: post
+category: Tutorials
+tags: embedded
 ---
 # Configuring openOCD with FTDI
 

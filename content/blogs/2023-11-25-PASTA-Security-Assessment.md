@@ -2,6 +2,7 @@
 layout: post
 title: PASTA Security Assessment
 date: 2023-11-25
+category: Security
 ---
 # PASTA Security Assessment
 

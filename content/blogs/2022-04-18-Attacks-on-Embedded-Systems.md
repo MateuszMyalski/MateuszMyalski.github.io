@@ -2,6 +2,8 @@
 layout: post
 title: Attacks on Embedded Systems
 date: 2022-04-18
+category: Security
+tags: embedded
 ---
 # Attacks on Embedded Systems
 When it comes to analyzing attack vectors on Embedded System, we have many potential ways of creating the vulnerability during designing the software. 

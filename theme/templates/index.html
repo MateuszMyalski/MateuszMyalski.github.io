@@ -3,10 +3,32 @@
 {% block content %}
 
 <section class="posts_list">
-    {% block content_title %}
-    <h3>$ ls -ls | awk '{print $7,$8,$9,$10}'</h3>
-    {% endblock %}
+    {% if ABOUTME %}
+    <section class="about_me">
+        <h3><span class="grayed_out">$</span> whoami</h3>
+        {{ ABOUTME }}
+    </section>
+    {% endif %}
 
+    {% for category, articles in categories %}
+    <h3><span class="grayed_out">$ ls -ls</span> {{ category }}</h3>
+    <ul>
+        {% for article in articles %}
+        <li>
+            <a href="{{ SITEURL }}/{{ article.url }}">
+                <time datetime="{{ article.date.isoformat() }}">
+                    [{{ article.date|strftime('%d/%b/%Y')}}]
+                </time>
+                - {{ article.title }}
+                {% for tag in article.tags %}
+                <span class="grayed_out tag">{{ tag.name }}</span>
+                {% endfor %}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+    {% if 0 %}
     <ul>
         {% for article in articles_page.object_list %}
         <li>
@@ -19,13 +41,7 @@
         </li>
         {% endfor %}
     </ul>
+    {% endif %}
 </section>
-
-{% if ABOUTME %}
-<section class="about_me">
-    <h3>$ whoami</h3>
-    {{ ABOUTME }}
-</section>
-{% endif %}
 
 {% endblock content %}

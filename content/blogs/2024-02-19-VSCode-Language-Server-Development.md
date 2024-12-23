@@ -2,6 +2,8 @@
 title: VSCode Language Server Development
 date: 2024-02-19
 layout: post
+category: Tutorials
+tags: javascript
 ---
 # VSCode Language Server Development
 

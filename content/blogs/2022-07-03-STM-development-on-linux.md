@@ -2,6 +2,8 @@
 layout: post
 title: STM development on linux
 date: 2022-07-03
+category: Tutorials
+tags: embedded, linux
 ---
 # STM development on linux
 ## Introduction

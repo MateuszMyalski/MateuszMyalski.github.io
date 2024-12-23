@@ -2,6 +2,7 @@
 layout: post
 title: Deliver with quality
 date: 2023-07-17
+category: Tutorials
 ---
 # Deliver with quality
 
