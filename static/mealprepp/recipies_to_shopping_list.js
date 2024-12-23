@@ -17,7 +17,14 @@ function renderRecipeList() {
     const recipeListElement = document.getElementById('recipe-list');
     recipeListElement.innerHTML = '';
 
-    for (const recipeKey in recipesData) {
+    // Sort recipe keys alphabetically by recipe name
+    const sortedRecipeKeys = Object.keys(recipesData).sort((a, b) => {
+        const nameA = recipesData[a].name.toLowerCase();
+        const nameB = recipesData[b].name.toLowerCase();
+        return nameA.localeCompare(nameB);
+    });
+
+    for (const recipeKey of sortedRecipeKeys) {
         const recipe = recipesData[recipeKey];
 
         const recipeElement = document.createElement('div');
@@ -31,9 +38,11 @@ function renderRecipeList() {
         recipeElement.onclick = () => displayRecipeDetails(recipeKey);
         recipeListElement.appendChild(recipeElement);
     }
-    displayRecipeDetails(Object.keys(recipesData)[0]);
-}
 
+    if (sortedRecipeKeys.length > 0) {
+        displayRecipeDetails(sortedRecipeKeys[0]);
+    }
+}
 // Display recipe details
 function displayRecipeDetails(recipeKey) {
     if (selectedRecipeKey) {

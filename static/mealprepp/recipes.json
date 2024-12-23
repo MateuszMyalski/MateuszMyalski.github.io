@@ -195,7 +195,7 @@
       "products": {}
     },
     "makaron_pesto_pom_tunczyk": {
-      "name": "Makaron z pesto pomidrami i tuńczykiem",
+      "name": "Makaron z pesto pomidorami i tuńczykiem",
       "description": "TBD",
       "portions": 2,
       "products": {}
@@ -220,12 +220,6 @@
     },
     "kotlet_schabowe_ziemniaki_salatka": {
       "name": "Kotlet Schabowy z ziemniakami i sałatką",
-      "description": "TBD",
-      "portions": 4,
-      "products": {}
-    },
-    "kotlet_drobiowy_ziemniaki_salatka": {
-      "name": "Kotlet drobiowy z ziemniakami i sałatką",
       "description": "TBD",
       "portions": 4,
       "products": {}
