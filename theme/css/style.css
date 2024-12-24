@@ -178,6 +178,24 @@ section div.highlight {
     border-left: 4px var(--accent-four-color) solid;
 }
 
+section.reading_list {
+    font-weight: bold;
+}
+
+
+section.reading_list li {
+    list-style: decimal-leading-zero;
+}
+
+section.reading_list li.read{
+    color: var(--accent-gray-color);
+    font-weight: bold;
+}
+
+section.reading_list li.read::after{
+    content: " (Read)";
+}
+
 footer {
     text-align: right;
     border-top-style: ridge;
