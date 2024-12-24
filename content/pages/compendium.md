@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Compendium
+status: draft
 ---
 
 Sources that I recon are worth to be read when you are interested in embedded systems:
