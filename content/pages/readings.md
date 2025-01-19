@@ -42,6 +42,7 @@ Sources that I recon are worth to be read when you are interested in embedded sy
         <li class="read">Atomowe Nawyki - James Clear</li>
         <li class="read">Droga - Cormac McCarthy</li>
         <li class="read">Nic mnie nie złamie. Zapanuj nad swoim umysłem i pokonaj przeciwności losu - Goggins David</li>
+        <li class="read">Charyzma - Nikolaus B. Enkelmann</li>
         <li>Embedded Systems Security - David Kleidermacher</li>
     </ul>
 

@@ -9,7 +9,7 @@
         {{ ABOUTME }}
     </section>
     {% endif %}
-
+    {% if 0 %}
     {% for category, articles in categories %}
     <h3><span class="grayed_out">$ ls -ls</span> {{ category }}</h3>
     <ul>
@@ -28,20 +28,23 @@
         {% endfor %}
     </ul>
     {% endfor %}
-    {% if 0 %}
+    {% endif %}
     <ul>
         {% for article in articles_page.object_list %}
         <li>
             <a href="{{ SITEURL }}/{{ article.url }}">
                 <time datetime="{{ article.date.isoformat() }}">
-                    [{{ article.date|strftime('%d/%m/%Y')}}]
+                    [{{ article.date|strftime('%d/%b/%Y')}}]
                 </time>
                 - {{ article.title }}
+                {% for tag in article.tags %}
+                <span class="grayed_out tag">{{ tag.name }}</span>
+                {% endfor %}
+
             </a>
         </li>
         {% endfor %}
     </ul>
-    {% endif %}
 </section>
 
 {% endblock content %}
