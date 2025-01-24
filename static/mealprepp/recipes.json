@@ -11,6 +11,20 @@
         "ser_tarty": 0.2
       }
     },
+    "kluski_leniwe": {
+      "name": "Kluski leniwe",
+      "description": "https://www.doradcasmaku.pl/przepis-pierogi-leniwe-z-ziemniakami-85931",
+      "portions": 4,
+      "products": {
+        "ziemniaki": 0.5,
+        "twarog": 250,
+        "jajko": 1,
+        "maka": 1,
+        "sol": 1,
+        "bulka_tarta": 10,
+        "maslo": 1
+      }
+    },
     "mielone": {
       "name": "Kotlety mielone (karminadle) z ziemniakami",
       "description": "",
@@ -1041,6 +1055,11 @@
     "kurki": {
       "name": "Kurki",
       "size": 200,
+      "unit": "g"
+    },
+    "bulka_tarta" {
+      "name": "Bułka tarta",
+      "size": 500,
       "unit": "g"
     }
   }
