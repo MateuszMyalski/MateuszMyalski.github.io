@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta title="eSDE-notes">
+    <title>eSDE-notes</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning..." href="/atom.xml">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <link rel="shortcut icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+    <link rel="icon" href="https://mateuszmyalski.github.io/theme/favicon.png" type="image/x-icon">
+
+    <meta name="description" content="Notes collected during development, work, learning..." />
+
+    <link rel="stylesheet" type="text/css" href="https://mateuszmyalski.github.io/theme/css/style.css" />
+
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="https://mateuszmyalski.github.io/index.html">eSDE-notes</a>
+            </h1>
+            <p>Notes collected during development, work, learning...</p>
+        </hgroup>
+
+        <nav>
+            <li>
+                <a href="https://mateuszmyalski.github.io/pages/blogroll.html">Blogroll</a>
+            </li>
+            <li>
+                <a href="https://mateuszmyalski.github.io/pages/projects.html">Projects</a>
+            </li>
+            <li>
+                <a href="https://mateuszmyalski.github.io/pages/readings.html">Readings</a>
+            </li>
+            <li>
+                <a href="https://github.com/MateuszMyalski">GitHub</a>
+            </li>
+            <li>
+                <a href="atom.xml">RSS</a>
+            </li>
+        </nav>
+
+    </header>
+
+    <main>
+
+<section class="post">
+    <h1>Using I2C on Linux</h1>
+<h2>Linux pseudofiles</h2>
+<p>The Linux system abstracts the hardware layer from the OS by treating everything as a file. When working with single-board computers like the Raspberry Pi, you can easily write drivers directly in userspace without needing to implement complex kernel drivers. One example is the I2C bus interface available on one of its pins. The Raspberry Pi ecosystem offers several libraries that help you interact with I2C, but this article will show you how to use the native API to utilize this interface.</p>
+<p>Before writing any code, make sure you have enabled access to your hardware interface using the <code>raspi-config</code> tool. To do this, enter <code>raspi-config</code> in the CLI, navigate to <code>Interface Options</code>, and select <code>I2C</code> to enable access to the hardware interface. Probably the board will need to reboot.</p>
+<p>If you do everything correctly you should be able to see I2C-* folders in the following directory <code>/dev/i2c-</code>.</p>
+<h2>Linux API</h2>
+<p>The I2C interface from the user perspective is a simple file, which can be opened. The file handler allows to use <code>ioctl</code> function to configure the interface parameters. According to the <a href="https://www.kernel.org/doc/html/v5.4/i2c/dev-interface.html">kernel documentation</a> following settings importnat for the basic usage can be used set:</p>
+<ul>
+<li><code>I2C_SLAVE</code> - sets the target device to work as slave,</li>
+<li><code>I2C_TENBIT</code> - sets the address bit size to 10-bits instead default 7-bits.</li>
+</ul>
+<p><em>This article ommits the exesitence of SMBus features.</em></p>
+<p>The I2C interface works with standard <code>read</code> and <code>write</code> function calls without any additional complexity.</p>
+<h2>I2C Read &amp; Write</h2>
+<p>Include necessary header files to work with file descriptors:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/ioctl.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;fcntl.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;linux/i2c-dev.h&gt;</span>
+</code></pre></div>
+
+<p>To select the I2C interface open the file descriptor with attributes for reading and wrritting:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">i2c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">open</span><span class="p">(</span><span class="s">&quot;/dev/i2c-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">O_RDWR</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i2c</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>To communicate with the typical I2C device which is going to work as slave, use <code>ioctl</code> function to define its hardware address. Since the hardware address is 7-bit and the typical address in datasheets are expressed as 8-bit byte, the address must be shifted one place to the right. In example when the 8-bit hardware address is <code>0xBF</code>, the 7-bit address will be <code>0x5F</code>. The R/W bit is going to set automatically by the Linux's driver.</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ioctl</span><span class="p">(</span><span class="n">i2c</span><span class="p">,</span><span class="w"> </span><span class="n">I2C_SLAVE</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="mh">0xBF</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">close</span><span class="p">(</span><span class="n">i2c</span><span class="p">);</span>
+<span class="w">    </span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Now you can construct two atomical functions that will help you sending one byte to the device, and reading one byte.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">uint8_t</span><span class="w"> </span><span class="nf">rx_byte</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i2c_fd</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">addr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">rx</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Write the register address</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">write</span><span class="p">(</span><span class="n">i2c_fd</span><span class="p">,</span><span class="w"> </span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">close</span><span class="p">(</span><span class="n">i2c_fd</span><span class="p">);</span>
+<span class="w">        </span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Read the data from the register</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="n">i2c_fd</span><span class="p">,</span><span class="w"> </span><span class="n">rx</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">close</span><span class="p">(</span><span class="n">i2c_fd</span><span class="p">);</span>
+<span class="w">        </span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="kt">uint8_t</span><span class="w"> </span><span class="nf">tx_byte</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i2c_fd</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">addr</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="w">    </span><span class="n">buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">addr</span><span class="p">;</span>
+<span class="w">    </span><span class="n">buffer</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Write the address and data</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">write</span><span class="p">(</span><span class="n">i2c_fd</span><span class="p">,</span><span class="w"> </span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">close</span><span class="p">(</span><span class="n">i2c_fd</span><span class="p">);</span>
+<span class="w">        </span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Using these two functions, you will be able to create higher abstraction layers to help you configure the I2C device.</p>
+<h3>i2c-tools</h3>
+<p>For debuging purposes the Linux communicty created I2C tools that helps you to communicate with the interface directly through the bash. To install those use <code>sudo apt-get install i2c-tools</code>. This will enable I2C tools to scan the I2C bus for any device online <code>i2cdetect -l 1</code> (here command is listining all devices on interface i2c-1). Next, by using <code>i2cget</code> you can issue a read/write operation directly on the I/Os <code>i2cget 1 0x5f 0x0f b</code> - the command will use <code>i2c-1</code> interface and read single byte (<code>b</code>) from device which hardware address is <code>0x5f</code> (remember about 8-bit to 7-bit transformation) from memory address <code>0x0f</code>.</p>
+
+    <section class="meta">
+        <div class="title_block">
+            <span class="title_label">
+                Title:
+            </span>
+            <span class="title">
+                Using I2C on Linux
+            </span>
+        </div>
+        <div class="date_block">
+            <span class="date_label">
+                Posted on:
+            </span>
+            <span class="date">
+                <time datetime="2025-02-21T00:00:00+01:00">21/02/2025
+            </span>
+        </div>
+        <div class="print">
+            <a href="javascript:if(window.print)window.print()">🖨️ Print</a>
+        </div>
+    </section>
+</section>
+
+</section>
+
+    </main>
+
+    <footer>
+        Made with<span id="heart">&#9829;</span>
+    </footer>
+</body>
+
+</html>
