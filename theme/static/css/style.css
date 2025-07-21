@@ -1,182 +1,81 @@
 @import url(pygments/github.css);
 
 :root {
-    --font-color: black;
-    --main-bg-color: white;
-    --accent-gray-color: #777;
-    --accent-one-color: #E6CE1E;
-    --accent-two-color: #E6391E;
-    --accent-three-color: #3210E5;
-    --accent-four-color: #008F4F;
+  --font-color: #000;
+  --bg-color: #fff;
+  --link-color: #0040bb;
+  --gray-color: #666;
+  --red-color: #ff0000c9;
+  --highlight-border: #aaa;
 }
 
-
 body {
-    font-family: Monospace;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-    line-height: 1.4;
-    color: var(--font-color);
-    max-width: 700px;
-    margin-left: 1vw;
+  font-family: "Courier New", Courier, monospace;
+  color: var(--font-color);
+  background-color: var(--bg-color);
+  line-height: 1.4;
+  font-size: 14px;
+  margin: 0 auto;
+  max-width: 700px;
+  padding: 2em 1em;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 header {
-    border-bottom-style: ridge;
-    margin-bottom: 1em;
-    color: var(--accent-gray-color)
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 2em;
+  padding-bottom: 1em;
 }
 
-header a {
-    color: #000;
-    text-decoration-skip-ink: auto;
-    text-decoration: none;
+header h1 {
+  font-size: 2em;
+  margin-bottom: 0.2em;
+  font-weight: normal;
 }
 
-header a::before {
-    content: "["
-}
-
-header a::after {
-    content: "]"
-}
-
-header hgroup h1 {
-    font-size: 3em;
-    margin-bottom: 0;
-    margin-top: 1vh;
-    font-weight: lighter;
-}
-
-header hgroup h1:hover {
-    font-weight: bolder;
-}
-
-header hgroup p {
-    font-style: italic;
-    margin-top: 0;
+header p {
+  font-style: italic;
+  color: var(--gray-color);
+  margin-top: 0;
 }
 
 header nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    padding-bottom: 0.5em;
+  margin-top: 1em;
 }
 
 header nav li {
-    list-style: none;
-    font-size: 1.2em;
-    font-weight: lighter;
-    margin-right: 2vw;
+  display: inline;
+  margin-right: 1em;
+  font-size: 1em;
+  color: var(--gray-color);
 }
 
-header nav li:hover {
-    font-weight: bolder;
+section h1 {
+  font-weight: bold;
+  margin-top: 2em;
 }
 
-section li {
-    margin-top: .5em;
+section h2, section h3 {
+  font-weight: normal;
+  margin-top: 2em;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.2em;
+}
+
+section p {
+  margin-top: 1em;
 }
 
 section a {
-    color: var(--accent-three-color);
-    text-decoration: none;
+  color: var(--link-color);
+  text-decoration: none;
 }
 
 section a:hover {
-    text-decoration: underline;
-    font-weight: bolder;
+  text-decoration: underline;
 }
 
-section.page a::before {
-    content: "["
-}
-
-section.page a::after {
-    content: "]"
-}
-
-section.post {
-    line-height: 1.6;
-}
-
-section.post :is(ul, ol, pre) {
-    line-height: 1.3;
-}
-
-section.posts_list ul a {
-    text-decoration: none;
-}
-
-section.posts_list ul li {
-    margin-top: 0.2em;
-}
-
-section.about_me h2, section.posts_list h2 {
-    font-weight: lighter;
-}
-
-section.posts_list .grayed_out {
-    color: var(--accent-gray-color);
-}
-
-section.posts_list .tag::before {
-    content: "#";
-}
-
-section.meta {
-    border-top-style: ridge;
-    padding: 10px 10px;
-    color: var(--accent-gray-color)
-}
-
-section.meta a {
-    color: var(--accent-gray-color)
-}
-
-section.post em {
-    font-family: monospace;
-    font-style: italic;
-    padding: 0px 2px;
-}
-
-section.post h1 {
-    font-size: 2em;
-}
-
-section.post img {
-    max-width: 100%;
-    display: block;
-    margin: 3% auto;
-}
-
-section.post code:not(pre code) {
-    border: 1px solid black;
-    padding: 0px 2px;
-    white-space: nowrap;
-}
-
-section.post blockquote {
-    border-left-color: var(--accent-one-color);
-    border-left-width: 4px;
-    border-left-style: solid;
-    margin-left: 0;
-    padding-left: 40px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
-section.post table {
-    width: 100%;
-}
-
-
-section div.highlight {
-    padding-left: 10px;
-    overflow-y: auto;
-    border-left: 4px var(--accent-four-color) solid;
-}
 
 section.reading_list {
     font-weight: bold;
@@ -188,7 +87,7 @@ section.reading_list li {
 }
 
 section.reading_list li.read{
-    color: var(--accent-gray-color);
+    color: var(--gray-color);
     font-weight: bold;
 }
 
@@ -196,16 +95,20 @@ section.reading_list li.read::after{
     content: " (Read)";
 }
 
-footer {
-    text-align: right;
-    border-top-style: ridge;
-    color: var(--accent-gray-color)
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto; /* top/bottom 1em margin, auto left/right to center */
+  float: none;      /* just to be sure */
 }
 
-footer span#heart {
-    font-size: 1.2em;
-    margin-left: 0.3em;
-    color: var(--accent-two-color);
+pre {
+  font-family: "Courier New", Courier, monospace;
+  background: #f8f8f8;
+  padding: 0.2em 0.4em;
+  border: 1px solid #ddd;
+  border-radius: 3px;
 }
 
 pre.ascii.center {
@@ -213,54 +116,68 @@ pre.ascii.center {
     margin: 0 auto;
 }
 
-@media screen and (max-width: 700px) {
-    body {
-        min-width: 98vw;
-        max-width: 98vw;
-    }
+blockquote {
+  margin-left: 0;
+  padding-left: 1.5em;
+  border-left: 4px solid #ddd;
+  color: var(--gray-color);
+  font-style: italic;
+}
+
+ul, ol {
+  padding-left: 2em;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+}
+
+table, th, td {
+  border: 1px solid #aaa;
+}
+
+th, td {
+  padding: 0.5em;
+  text-align: left;
+}
+
+footer {
+  margin-top: 4em;
+  font-size: 0.9em;
+  color: var(--gray-color);
+  border-top: 1px solid #ccc;
+  padding-top: 1em;
+  text-align: right;
+}
+
+footer span#heart {
+  font-size: 1.2em;
+  margin-left: 0.3em;
+  color: var(--red-color);
 }
 
 @media print {
-    body {
-        margin: 0 auto;
-        padding: 0;
-        color: #000;
-        background-color: none;
-        max-width: 700px;
-    }
+  header, footer, nav {
+    display: none;
+  }
 
-    header {
-        display: none;
-    }
+  section a::after {
+    content: " (" attr(href) ")";
+  }
 
-    * {
-        background: none !important;
-        background-color: none !important;
-        background-image: none !important;
-        break-inside: avoid;
-    }    
+  body {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 10pt;
+    background: none;
+    color: black;
+  }
 
-    img.print, svg.print {
-        display: block;
-        max-width: 100%;
-    }
-
-    section a::after {
-        content: " ("attr(href) ")";
-    }
-
-    section div.highlight {
-        overflow-y: visible;
-        overflow-wrap: break-word;
-    }
-
-    section.post section.meta {
-        display: none;
-    }
-
-    footer span#heart::after {
-        content: " Copyright Mateusz Myalski";
-        font-size: initial;
-        color: var(--font-color)
-    }
+  * {
+    background: none !important;
+    color: black !important;
+  }
 }
