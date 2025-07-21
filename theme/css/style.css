@@ -5,6 +5,7 @@
   --bg-color: #fff;
   --link-color: #0040bb;
   --gray-color: #666;
+  --red-color: #ff0000c9;
   --highlight-border: #aaa;
 }
 
@@ -75,6 +76,25 @@ section a:hover {
   text-decoration: underline;
 }
 
+
+section.reading_list {
+    font-weight: bold;
+}
+
+
+section.reading_list li {
+    list-style: decimal-leading-zero;
+}
+
+section.reading_list li.read{
+    color: var(--gray-color);
+    font-weight: bold;
+}
+
+section.reading_list li.read::after{
+    content: " (Read)";
+}
+
 img {
   max-width: 100%;
   height: auto;
@@ -91,14 +111,9 @@ pre {
   border-radius: 3px;
 }
 
-pre {
-  padding: 1em;
-  font-size: 12px;
-  overflow-x: auto;
-  border-left: 4px solid var(--highlight-border);
-  background: #f9f9f9;
-  white-space: pre-wrap;       /* Allow wrapping */
-  word-wrap: break-word;
+pre.ascii.center {
+    width: fit-content;
+    margin: 0 auto;
 }
 
 blockquote {
@@ -135,6 +150,12 @@ footer {
   border-top: 1px solid #ccc;
   padding-top: 1em;
   text-align: right;
+}
+
+footer span#heart {
+  font-size: 1.2em;
+  margin-left: 0.3em;
+  color: var(--red-color);
 }
 
 @media print {
