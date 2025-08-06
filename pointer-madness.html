@@ -101,13 +101,13 @@
 <span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">my_char_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">foo</span><span class="p">;</span><span class="w"> </span><span class="c1">// Now we are pointing to `foo` variable</span>
 
 <span class="c1">// Modify the content that the pointer is poining to</span>
-<span class="p">(</span><span class="o">*</span><span class="n">foo</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;b&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Now `foo` contain letter `b`</span>
+<span class="p">(</span><span class="o">*</span><span class="n">my_char_ptr</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;b&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Now `foo` contain letter `b`</span>
 
 <span class="c1">// Modify the address that the pointer is pointing to</span>
 <span class="n">my_char_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">bar</span><span class="p">;</span><span class="w"> </span><span class="c1">// Now we are pointing to `bar` variable</span>
 
 <span class="c1">// Modify the content that the pointer is poining to</span>
-<span class="p">(</span><span class="o">*</span><span class="n">foo</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;x&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Now `bar` contain letter `x` (dereferencion)</span>
+<span class="p">(</span><span class="o">*</span><span class="n">my_char_ptr</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;x&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Now `bar` contain letter `x` (dereferencion)</span>
 
 <span class="c1">// Go check out this with printf :)</span>
 </code></pre></div>
