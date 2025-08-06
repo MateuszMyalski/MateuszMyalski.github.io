@@ -65,13 +65,13 @@ char bar = 'z';
 char* my_char_ptr = &foo; // Now we are pointing to `foo` variable
 
 // Modify the content that the pointer is poining to
-(*foo) = 'b'; // Now `foo` contain letter `b`
+(*my_char_ptr) = 'b'; // Now `foo` contain letter `b`
 
 // Modify the address that the pointer is pointing to
 my_char_ptr = &bar; // Now we are pointing to `bar` variable
 
 // Modify the content that the pointer is poining to
-(*foo) = 'x'; // Now `bar` contain letter `x` (dereferencion)
+(*my_char_ptr) = 'x'; // Now `bar` contain letter `x` (dereferencion)
 
 // Go check out this with printf :)
 ```
