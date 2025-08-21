@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel='shortcut icon' href="favicon/favicon.ico"">
+    <link rel=" manifest" href="favicon/site.webmanifest">
+
+    <title>Coffe Scale</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="main">
+            <div class="slider">
+                <input type="range" />
+            </div>
+            <div class="icon">
+                <img src="coffee-mug.svg" alt="" srcset="">
+            </div>
+            <div class="portion">1:15</div>
+        </div>
+        <div class="serving">
+            <div class="serving-label">Per serving:</div>
+            <div class="water-icon-serving icon">
+                <img src="water.svg" width="83px" height="65px" alt="" srcset="">
+            </div>
+            <div class="water-value-serving">
+                <input type="number" min="1" max="1000" value="250"><span class="unit">g</span>
+            </div>
+            <div class="coffee-icon-serving icon"><img src="coffee-bean.svg" width="80px" height="80px" alt=""
+                    srcset="">
+            </div>
+            <div class="coffee-value-serving">
+                <input type="number" min="1" max="100" value="16"><span class="unit">g</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const slider = document.querySelector(".slider input");
+            const waterInput = document.querySelector(".water-value-serving input");
+            const coffeeInput = document.querySelector(".coffee-value-serving input");
+            const portionDisplay = document.querySelector(".portion");
+
+            // initialize slider min/max for ratios (1:10 to 1:25 for example)
+            slider.min = 10;
+            slider.max = 25;
+            slider.value = 15;
+
+            function updateFromSlider() {
+                const ratio = slider.value; // ratio water:coffee
+                const coffee = parseFloat(coffeeInput.value);
+                const water = coffee * ratio;
+
+                waterInput.value = Math.round(water);
+                portionDisplay.textContent = `1:${ratio}`;
+            }
+
+            function updateFromWater() {
+                const ratio = slider.value;
+                const water = parseFloat(waterInput.value);
+                const coffee = water / ratio;
+
+                coffeeInput.value = Math.round(coffee);
+            }
+
+            function updateFromCoffee() {
+                const ratio = slider.value;
+                const coffee = parseFloat(coffeeInput.value);
+                const water = coffee * ratio;
+
+                waterInput.value = Math.round(water);
+            }
+
+            // attach listeners
+            slider.addEventListener("input", updateFromSlider);
+            waterInput.addEventListener("input", updateFromWater);
+            coffeeInput.addEventListener("input", updateFromCoffee);
+
+            // initial update
+            updateFromSlider();
+        });
+    </script>
+
+</body>
+
+</html>
