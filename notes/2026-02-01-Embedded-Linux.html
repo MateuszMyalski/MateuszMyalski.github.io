@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>Embedded Linux</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#first-atom"
+                                id="toc-first-atom">First atom</a></li>
+                                <li><a href="#minimal-requirements"
+                                id="toc-minimal-requirements">Minimal
+                                requirements</a></li>
+                                <li><a href="#system-blocks"
+                                id="toc-system-blocks">System
+                                blocks</a></li>
+                                <li><a href="#toolchain"
+                                id="toc-toolchain">Toolchain</a></li>
+                                <li><a href="#cpu-architectures"
+                                id="toc-cpu-architectures">CPU
+                                architectures</a></li>
+                                <li><a
+                                href="#application-binary-interface-abi"
+                                id="toc-application-binary-interface-abi">Application
+                                Binary Interface (ABI)</a></li>
+                                <li><a href="#c-library"
+                                id="toc-c-library">C Library</a></li>
+                                <li><a href="#booting-process"
+                                id="toc-booting-process">Booting
+                                process</a></li>
+                                <li><a href="#rom-code"
+                                id="toc-rom-code">ROM Code</a></li>
+                                <li><a
+                                href="#secondary-stage-bootloader"
+                                id="toc-secondary-stage-bootloader">Secondary
+                                Stage Bootloader</a></li>
+                                <li><a href="#third-stage-bootloader"
+                                id="toc-third-stage-bootloader">Third
+                                Stage Bootloader</a></li>
+                                <li><a href="#kernel"
+                                id="toc-kernel">Kernel</a></li>
+                                <li><a href="#root-filesystem"
+                                id="toc-root-filesystem">Root
+                                filesystem</a></li>
+                                <li><a href="#references"
+                                id="toc-references">References</a></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <p>When someone says that they are using Linux, the first thought
+    that usually comes to mind is a picture of someone glued to the
+    terminal screen, entering magic spells. The word Linux is such a
+    wide term nowadays that it can be interpreted in many ways. Each
+    Linux <a
+    href="https://en.wikipedia.org/wiki/List_of_Linux_distributions">distribution</a>
+    has its purpose. We can find them on a home computer, where we use
+    it for general purpose usage, on a fridge screen where it tries to
+    show you what is currently on the shelves and sends notifications to
+    your phone when the milk is out, or it can coordinate the server
+    when you are trying to watch the latest episode of your favorite
+    series.</p>
+    <p>The beauty of Linux is not its variety, but rather its <a
+    href="https://www.geeksforgeeks.org/linux-unix/architecture-of-linux-operating-system/">modular
+    architecture</a>, which allows you to take the core and with other
+    components build upon that a system that is tailored to your needs.
+    Not much, not less.</p>
+    <p>By specifying <em>Embedded</em> Linux, we have in mind specific
+    usage of the system. Surely not a system that is for general
+    purpose, but rather one that has a strict goal to achieve and must
+    do it well. Embedded Linux is found on every device that is not your
+    home laptop/PC, but is dedicated hardware created to achieve a
+    certain goal. This can be a smart-fridge controller, parking gateway
+    controller, smart door camera, etc. Those devices are designed to be
+    robust and built at huge scale with cost reduction in mind.</p>
+    <p>Constraints applied to hardware mean constraints applied to
+    firmware that the hardware is running. There is no <em>power</em>,
+    <em>memory</em>, or even <em>time</em> to waste.</p>
+    <h2 id="first-atom">First atom</h2>
+    <p>When we speak about modularity, first we should define the
+    initial atom that creates the system - it is the
+    <em>kernel</em>.</p>
+    <p>The <a href="https://en.wikipedia.org/wiki/Linux_kernel">Linux
+    kernel</a> was created by Linus Torvalds in 1991 as an open-source
+    hobby project. To this day this project is maintained and is the
+    core of the Internet we know now. The kernel itself allows
+    abstracting hardware access to be available for programmers who are
+    creating the system.</p>
+    <figure>
+    <img
+    src="/attachments/images/embedded_linux/kernel_user_diagram.png"
+    alt="Kernel user diagram" />
+    <figcaption aria-hidden="true">Kernel user diagram</figcaption>
+    </figure>
+    <p>When designing hardware which is supposed to execute the Linux
+    Kernel, we can reuse implementations which are already present in
+    the <a href="https://github.com/torvalds/linux">kernel sources
+    “mirror”</a> under the <code>arch/</code> directory. We will find
+    there support for many 32-bit and 64-bit CPU architectures. To keep
+    the portability of the kernel, people are constantly adding, fixing,
+    and updating this directory, so Linux can be easily run on almost
+    any CPU we pick for the device. Most of the architectures consist of
+    a <em>memory management unit (MMU)</em>.</p>
+    <h2 id="minimal-requirements">Minimal requirements</h2>
+    <p><img
+    src="/attachments/images/embedded_linux/linux_tower_meme.png"
+    style="float: right; width: 300px" /> The minimal requirements to
+    run Linux are:</p>
+    <ul>
+    <li>MMU (there are other subsets of Linux such as <a
+    href="https://en.wikipedia.org/wiki/%CE%9CClinux"><em>uClinux</em></a>
+    that do not need MMU),</li>
+    <li>16 MiB RAM (possible even with 8 MiB and 4 MiB when taking into
+    consideration hardcore optimizations),</li>
+    <li>non-volatile memory such as FLASH 8 MiB (including NOR and
+    NAND)</li>
+    <li>UART port</li>
+    <li>JTAG (when the hardware is <em>not</em> capable of running from
+    SD Card)</li>
+    </ul>
+    <h2 id="system-blocks">System blocks</h2>
+    <p>As mentioned at the beginning - the Linux system is built from
+    blocks, which allows it to be tailored exactly to the purpose it
+    needs to fulfill.</p>
+    <ul>
+    <li>Bootloader</li>
+    <li>Kernel</li>
+    <li>Device Tree</li>
+    <li>Root file system</li>
+    </ul>
+    <p>Each stage is responsible for preparing the device for the moment
+    of executing the final application. The <em>bootloader</em> consists
+    of three stages to load the kernel: the <em>ROM Code</em>,
+    <em>second stage bootloader (SPL)</em>, and <em>third stage
+    bootloader (TPL)</em>. All three stages of the booting procedure
+    enable the <a
+    href="/notes/2022-06-23-Secureboot-in-iot-devices.html">secure
+    boot</a> chain.</p>
+    <p>After the kernel gets verified and loaded, it proceeds to mount
+    the device tree, which describes the hardware capabilities of the
+    device. Later, the device tree is used to construct the pseudofile
+    file system that allows interaction with the hardware through simple
+    abstraction.</p>
+    <p>The last stage of booting Linux is mounting the root file system,
+    which is the first application (PID 1) that starts all other
+    processes.</p>
+    <h2 id="toolchain">Toolchain</h2>
+    <p>The kernel code is distributed as C source code, which means that
+    we can apply any changes we would like before using it on the
+    device. Such a release strategy also implies that users need to
+    compile the kernel code themselves. When we download common desktop
+    Linux distributions such as <em>Ubuntu</em> or <em>Debian</em>,
+    there are a few common CPU architectures to select from:</p>
+    <ul>
+    <li>for 64-bit PC (<code>amd64</code>),</li>
+    <li>for 64-bit ARM (<code>AArch64</code>),</li>
+    <li>for Hard Float ABI ARM (<code>armhf</code>),</li>
+    <li>for POWER Processors,</li>
+    <li>for RISC-V 64-bit little endian (<code>riscv64</code>),</li>
+    <li>for IBM System z.</li>
+    </ul>
+    <p>Selecting the proper image for our architecture saves us a ton of
+    time from recompiling the kernel ourselves. Unfortunately, with
+    embedded Linux it is not that easy, and we need to cross-compile the
+    code for the target platform on our host machine. We can distinguish
+    two types of compilation:</p>
+    <ul>
+    <li><em>Native</em> - where the code compilation is targeted for
+    <strong>the same device</strong> it gets compiled on.</li>
+    <li><em>Cross</em> - where the code compilation is targeted for
+    <strong>a different device</strong> than it gets compiled on.</li>
+    </ul>
+    <p>Usually our device is not capable of compiling sources on the
+    device to use the native compilation method<a href="#fn1"
+    class="footnote-ref" id="fnref1"
+    role="doc-noteref"><sup>1</sup></a>, therefore we are forced to
+    prepare a cross-compiler for our host device. To present it more
+    vividly, you can imagine a cross-compiler as a translator for a
+    foreign language who is living in your country. The cross-compiler
+    is part of the toolchain which consists of all tooling necessary to
+    prepare a program for your embedded device.</p>
+    <p>We can enumerate <em>three</em> main components of the
+    <em>toolchain</em>:</p>
+    <ul>
+    <li><em>Binutils</em> - all software that is used to assemble and
+    link binaries that are going to be run on the target.</li>
+    <li><em>GNU Compiler Collection (GCC)</em> - software that is going
+    to be our <em>cross-compiler</em>, a tool that will allow us to
+    translate human-readable code into target machine-understandable
+    code.</li>
+    <li><em>C library</em> - a collection of standardized APIs (POSIX)
+    which allow <em>userspace</em> programs (applications) to interact
+    with the kernel and hardware.</li>
+    </ul>
+    <h2 id="cpu-architectures">CPU architectures</h2>
+    <p>We mentioned different CPU architectures from which we can select
+    a <em>desktop</em> version of Linux - <em>amd64</em>,
+    <em>AArch64</em>, <em>armhf</em>, <em>riscv64</em>, etc. For
+    embedded devices there are many more possibilities. Embedded device
+    architectures can leverage performance by taking some assumptions at
+    the design stage, such as: power limitation, speed requirements,
+    peripheral support, etc. Therefore we can find different flavors of
+    the same CPU core; e.g., ARM CPUs can be 32-bit, 64-bit, support
+    hardware acceleration for floating point numbers or not. The CPU can
+    support an additional instruction set for handling mathematical
+    computation. The endianness is also critical, because it completely
+    changes how the CPU interprets memory cells. Everything needs to be
+    configured when preparing the cross-compiler for our custom
+    platform. The most important is the convention of passing arguments
+    between function calls, named the <em>Application Binary Interface
+    (ABI)</em>.</p>
+    <h2 id="application-binary-interface-abi">Application Binary
+    Interface (ABI)</h2>
+    <p>The Application Binary Interface specifies how arguments and
+    return values are passed between function calls. Which CPU registers
+    are used for passing input arguments, which are used for returning
+    the value from a function. This is a global agreement that the
+    application needs to follow to not corrupt data related to other
+    parts of the system.</p>
+    <p>The processor contains a set of registers that are used to
+    execute logical and arithmetical operations on data. When we call a
+    function in C language:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> a<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> b<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> Pair<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> foo<span class="op">(</span><span class="dt">int</span> x<span class="op">,</span> Pair p<span class="op">,</span> <span class="dt">int</span> y<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x <span class="op">+</span> p<span class="op">.</span>a <span class="op">+</span> p<span class="op">.</span>b <span class="op">+</span> y<span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+    <p>the compiler must be aware of how to use the CPU registers to
+    transfer the C code into assembly language - into direct
+    instructions that the CPU understands.</p>
+    <p>Most of the architectures have a common ABI; there is indeed one
+    big difference in ARM architectures, as in the late 2000s to achieve
+    better mathematical operations performance the ABI was changed to
+    <em>Extended ABI (EABI)</em>. We can also find <em>EABIHF</em>
+    versions which stand for an interface that supports hardware
+    acceleration for floating-point numbers.</p>
+    <table border="1" cellspacing="0" style="margin: 0 auto">
+    <thead>
+    <tr>
+    <th>
+    Aspect
+    </th>
+    <th>
+    -mabi=aapcs -O0
+    </th>
+    <th>
+    -mabi=aapcs-gnu -O0
+    </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>
+    <strong>Assembly (Prologue)</strong>
+    </td>
+    <td>
+    <pre>
+    str     fp, [sp, #-4]!
+    add     fp, sp, #0</pre>
+    </td>
+    <td>
+    <pre>
+    str     fp, [sp, #-4]!
+    add     fp, sp, #0</pre>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <strong>Assembly (Main Body)</strong>
+    </td>
+    <td>
+    <pre style="color: blue;">sub     sp, sp, #20
+    str     r0, [fp, #-8]
+    sub     r0, fp, #16
+    stm     r0, {r1, r2}
+    str     r3, [fp, #-20]
+    ldr     r2, [fp, #-16]
+    ldr     r3, [fp, #-8]
+    add     r2, r2, r3
+    ldr     r3, [fp, #-12]
+    add     r2, r2, r3
+    ldr     r3, [fp, #-20]</pre>
+    </td>
+    <td>
+    <pre style="color: blue;">sub     sp, sp, #16
+    str     r0, [fp, #-4]
+    str     r1, [fp, #-12]
+    str     r2, [fp, #-8]
+    str     r3, [fp, #-16]
+    ldr     r2, [fp, #-12]
+    ldr     r3, [fp, #-4]
+    add     r2, r2, r3
+    ldr     r3, [fp, #-8]
+    add     r2, r2, r3
+    ldr     r3, [fp, #-16]</pre>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <strong>Assembly (Epilogue)</strong>
+    </td>
+    <td>
+    <pre>add     r3, r2, r3
+    mov     r0, r3
+    add     sp, fp, #0
+    ldr     fp, [sp], #4
+    bx      lr</pre>
+    </td>
+    <td>
+    <pre>add     r3, r2, r3
+    mov     r0, r3
+    add     sp, fp, #0
+    ldr     fp, [sp], #4
+    bx      lr</pre>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <strong>Key Characteristics</strong>
+    </td>
+    <td>
+    <ul>
+    <li>
+    First arguments go to registers r0..r3
+    </li>
+    <li>
+    The struct is spread into registers
+    </li>
+    <li>
+    The third argument is passed with r3 register (if it fits)
+    </li>
+    <li>
+    Stack is aligned to 8 bytes
+    </li>
+    <li>
+    Clear prologs and epilogs
+    </li>
+    </ul>
+    </td>
+    <td>
+    <ul>
+    <li>
+    Struct is not passed by register but through stack
+    </li>
+    <li>
+    No stack alignment
+    </li>
+    </ul>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+    <p><a href="%22https://godbolt.org/z/qrK4PhbGn">Godbolt</a></p>
+    <p>GNU encodes the most important information about the toolchain in
+    the <em>prefix</em> of each tool. This allows distinguishing the
+    tooling between configurations. It follows the pattern: *
+    <em>CPU</em> - The CPU architecture, e.g., <code>x86_64</code>
+    (Intel X86 64bit); in case there is a specification about
+    endianness, there is an additional <code>eb</code> (big-endian) or
+    <code>el</code> (little-endian). * <em>Vendor</em> - specifies the
+    provider of the toolchain. * <em>Kernel</em> - In this case Linux. *
+    <em>Operating System</em> - Specifies the user space component which
+    is used, e.g., <code>GNU</code>; this also can come with ABI
+    specification such as <code>eabihf</code> (extended ABI
+    hard-float).</p>
+    <p>You can check your <em>native</em> compiler on your system
+    using:</p>
+    <pre><code>$: gcc -dumpmachine
+x86_64-linux-gnu</code></pre>
+    <h2 id="c-library">C Library</h2>
+    <p>The cross-compiler needs some interface to interact with the
+    underlying system. The C/C++ language has some standard that allows
+    developers to send and receive information to the kernel from
+    userspace. The kernel then can handle all hardware-related tasks and
+    return to the userspace with a response. To establish this interface
+    the POSIX-based standard libc is used.</p>
+    <p>A simple example for stdlibc function can be a
+    <code>printf</code> functionality. On the desktop OS, when the
+    <code>printf</code> is called, we expect to see some characters on
+    the virtual terminal (pts). On embedded devices we usually do not
+    have virtual terminals, but instead the connection is based on some
+    serial connection, e.g., <code>UART</code>.</p>
+    <p>Underneath the <code>printf</code> function there is a stdlibc
+    call named <code>putchar</code>, which may or <em>may not</em> have
+    its default implementation. The <code>putchar</code> function allows
+    sending a ‘single’ character:</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> putchar<span class="op">(</span><span class="dt">int</span> c<span class="op">);</span></span></code></pre></div>
+    <p><em>Full information about the call can be found using
+    <code>man putchar</code></em></p>
+    <p>On an embedded device, such a function should have a different
+    implementation than on a standard desktop environment. The
+    implementation can look like this:</p>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> putchar<span class="op">(</span><span class="dt">int</span> c<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> status <span class="op">=</span> uart_tx<span class="op">(</span>port_a<span class="op">,</span> c<span class="op">);</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> status<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+    <p>Among those you can find other stdlib functions such as:
+    <code>exit</code>, <code>abort</code>, <code>getchar</code>, etc.
+    Not every functionality is needed for an enclosed ecosystem with
+    memory constraints, therefore different versions of stdlib are
+    present. The most important ones are:</p>
+    <ul>
+    <li><em>glibc</em> - quite heavy on resources library, not designed
+    to be used on constrained systems,</li>
+    <li><em>uClibc</em> - small implementation of only the most
+    important functions, you can fine-tune the library to reduce its
+    size,</li>
+    <li><em>musl libc</em> - standard library which is designed to be
+    used on embedded systems.</li>
+    </ul>
+    <p>The market offers a good open-source toolchain often picked to
+    build your first Linux from scratch - <a
+    href="https://crosstool-ng.github.io">crosstool-ng</a>. The full
+    instruction for preparing your own Linux from scratch can be found
+    on <a href="/notes/Linux-from-scratch.html">Linux From
+    Scratch</a>.</p>
+    <h2 id="booting-process">Booting process</h2>
+    <p>Preparing the device to load a user application is divided into
+    several stages. Each stage is usually supplied by a different
+    vendor. As we mentioned at the beginning, Linux supports dozens of
+    hardware alternatives on which it can be implemented. Taking the
+    variety of suppliers into consideration, it forces the design to
+    take into account different mechanisms of hardware initialization.
+    Each stage must also implement secure code execution in case we are
+    planning to release the device into the market. This means that
+    extra safety standards are enrolled into the booting procedures.
+    Those are known as Secure Boot.</p>
+    <h2 id="rom-code">ROM Code</h2>
+    <p>The first stage bootloader that is stored in the <em>Read Only
+    Memory (ROM)</em>. The ROM code is the very first piece of code that
+    is executed after powering on the power supply. The initial
+    bootloader has very limited functionality and is unchangeable
+    without remanufacturing the SoC. It is programmed and executed from
+    the <em>system on chip (SoC)</em> silicon itself. The main purpose
+    is to find the <em>second stage (SPL)</em> bootloader, load it into
+    the <em>static ram (SRAM)</em>, verify, and execute. The SRAM memory
+    that ROM code has access to is usually very small - 4KiB, therefore
+    the SPL is not going to implement much functionality in its
+    logic.</p>
+    <p>The SPL is usually stored at the very beginning of the
+    non-volatile memory, such as FLASH. If it is not able to find it,
+    the ROM code can have implemented fallback mechanisms to load code
+    from:</p>
+    <ul>
+    <li>Serial Peripheral Interface (SPI)</li>
+    <li>eMMC card</li>
+    <li>Ethernet</li>
+    <li>USB</li>
+    <li>UART</li>
+    <li>etc.</li>
+    </ul>
+    <p>The ROM code is delivered from the vendor of the selected SoC,
+    therefore it knows the most about the internal hardware capabilities
+    of the system.</p>
+    <h2 id="secondary-stage-bootloader">Secondary Stage Bootloader</h2>
+    <p>After the SPL is booted the main memory needs preparation for
+    execution of the <em>third stage bootloader (TPL)</em>. The SPL
+    implements functionality to prepare <em>dynamic SRAM (DRAM)</em>
+    memory space, as the SPL code now has access to a broader address
+    range. Successful memory initialization allows SPL to load TPL,
+    which implements much more features and functionalities relating to
+    device booting. There are many open-source alternatives for TPL
+    implementations. One of those can be <a
+    href="https://u-boot.org/"><em>u-boot</em></a> or Barebox.</p>
+    <h2 id="third-stage-bootloader">Third Stage Bootloader</h2>
+    <p>The third stage bootloader now has access to the whole SRAM and
+    DRAM memory, together with the ability to access non-volatile memory
+    where kernel image, together with device tree and
+    <em>initramdisk</em> is stored. The last stage of the bootloader
+    gives much more capabilities related to configuration and even user
+    interaction. The TPL allows accessing a simple shell which can be
+    helpful in device diagnosing, updating, and ensuring the safe secure
+    boot chain.</p>
+    <h2 id="kernel">Kernel</h2>
+    <p>The kernel is the core of the system. People tend to relate to
+    <em>Linux kernel</em> when calling it <em>kernel</em>, but all OSes
+    have their kernels: <em>Windows</em> has its kernel, <em>Zefir</em>,
+    FreeRTOS, etc. Here by <em>kernel</em> we mean the Linux one,
+    developed initially by Torvalds. He created the Linux Kernel as a
+    hobby project in 1991 based on the <em>Minix</em> operating system.
+    He <em>did not</em> create the whole system, as we might imagine
+    using Linux on our laptops and home computers. Instead, he created
+    the core of the system and borrowed <em>GNU</em> components to build
+    a working full-stack OS. This structure has stayed to these days. We
+    build bootloaders, kernel, root filesystem and then we can use it as
+    a full OS.</p>
+    <p>The core must provide a good level of abstraction for developers
+    to deliver software which is portable across different hardware
+    sets. The kernel gives abstraction above used hardware; it hides all
+    quirks and logic that applies to specific pieces of hardware.
+    Moreover the kernel provides all mechanisms to orchestrate the
+    system with a <em>scheduler</em>, synchronize access to resources,
+    handle hardware interrupts, input/output to other devices and much
+    more.</p>
+    <p>Because Linux is still very popular, other developers are
+    constantly contributing to the kernel codebase by adding new
+    architectures, fixing bugs, adding new functionalities. The spirit
+    of the <em>GPL-v2</em> license is to share all code used as a driver
+    to the public domain. This means that any code which runs directly
+    on the kernel level must be open-sourced. Anything which runs in the
+    user-space and just interacts with the kernel through
+    <em>system-calls</em> can be proprietary and is not considered as
+    kernel code.</p>
+    <h2 id="root-filesystem">Root filesystem</h2>
+    <p>The final element after our machine manages to load through
+    bootloaders and execute the kernel is the <em>Root Filesystem</em>.
+    The kernel will mount our root filesystem of choice as ramdisk
+    passed as a pointer from the bootloader, or the kernel will mount a
+    block device (e.g., external memory card) and execute it.</p>
+    <p>The filesystem is initialized by our kernel and is not expected
+    to return from the executed piece of code. The first program is in
+    charge of loading other parts of the system of our choice. The
+    initial program that starts execution as <code>root</code> and is
+    usually called <code>init</code>. If I execute <code>ps aux</code>
+    on my laptop I can search for what program will have <em>PID 1</em>
+    - this means that it is the first program that my kernel runs on
+    startup:</p>
+    <pre><code>USER  PID %CPU %MEM    VSZ   RSS TTY  STAT START   TIME COMMAND
+root    1  0.0  0.0  24148 15344 ?      Ss 16:14   0:03 /sbin/init sp</code></pre>
+    <p>It is indeed the <code>/sbin/init</code> program that initializes
+    my whole system. Later the <code>init</code> application
+    <code>forks</code> and creates separate processes, daemons, and
+    shells to achieve execution of multiple programs at once. The init
+    process loads configuration files, prepares device nodes, sets up
+    pseudo filesystems, loads kernel modules and loads shared libraries
+    into memory so programs can take advantage of those at runtime. In
+    the Linux environment we have two major programs that orchestrate
+    the root file system bootup: <em>SysV</em> and <em>SystemD</em>.
+    Those two applications have major differences in their designs, and
+    to select which one to use in your system you need to take into
+    consideration the system’s needs.</p>
+    <p>The most minimal and often picked root filesystem for embedded
+    purposes is BusyBox, but you will also find distributions like
+    OpenWRT, Debian, etc. Each of those distributions will have its own
+    way of implementing shell, utility programs and management of
+    external peripherals.</p>
+    <p>The most crude and basic directory layout includes:</p>
+    <ul>
+    <li><code>/bin</code>: programs essential for all users</li>
+    <li><code>/dev</code>: device nodes and other special files</li>
+    <li><code>/etc</code>: system configuration</li>
+    <li><code>/lib</code>: essential shared libraries, for example,
+    those that make up the C library</li>
+    <li><code>/proc</code>: the proc filesystem</li>
+    <li><code>/sbin</code>: programs essential to the system
+    administrator</li>
+    <li><code>/sys</code>: the sysfs filesystem</li>
+    <li><code>/tmp</code>: a place to put temporary or volatile
+    files</li>
+    <li><code>/usr</code>: as a minimum, this should contain the
+    directories /usr/bin, /usr/lib and /usr/sbin, which contain
+    additional programs, libraries, and system administrator
+    utilities.</li>
+    <li><code>/var</code>: a hierarchy of files and directories that may
+    be modified at runtime, for example, log messages, some of which
+    must be retained after boot</li>
+    </ul>
+    <p><em>~Mastering Embedded Linux Programming</em></p>
+    <p>To show one huge difference between the abovementioned
+    distributions we can take a look at how BusyBox implements the
+    utility programs such as cat, less, etc. Usually when you take a
+    look at the <code>/bin</code> folder you will find each binary for
+    each available utility tool. BusyBox has symbolic links to one
+    binary <code>/bin/busybox</code> which gets parameterized by the
+    tool name the user issued. This was done to reduce memory footprint,
+    which makes the whole distribution fit in <em>1.4 MB</em>.</p>
+    <h2 id="references">References</h2>
+    <ul>
+    <li>Simmonds, C. Mastering Embedded Linux Programming (3rd ed.)</li>
+    <li><a href="https://en.wikipedia.org/wiki/Linux_kernel">Wikipedia -
+    Linux Kernel</a></li>
+    </ul>
+    <aside id="footnotes" class="footnotes footnotes-end-of-document"
+    role="doc-endnotes">
+    <hr />
+    <ol>
+    <li id="fn1"><p>Despite some more powerful platforms such as
+    Raspberry Pi, Beagle Bone, etc.<a href="#fnref1"
+    class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+    </ol>
+    </aside>
+
+    
+    <div class="meta">
+        
+        
+        
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

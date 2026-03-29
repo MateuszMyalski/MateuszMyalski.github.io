@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>Projects</h1>
+        
+                <p>List of side projects I created to tinker with and
+maybe to improve my workflow in daily work.</p>
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#tiny-expenses"
+                                id="toc-tiny-expenses">Tiny-expenses</a></li>
+                                <li><a href="#meal-prepp"
+                                id="toc-meal-prepp">Meal-prepp</a></li>
+                                <li><a
+                                href="#fan-controller-for-co2-sensor"
+                                id="toc-fan-controller-for-co2-sensor">fan-controller-for-co2-sensor</a></li>
+                                <li><a href="#thinkpad-keybacklight"
+                                id="toc-thinkpad-keybacklight">thinkpad-keybacklight</a></li>
+                                <li><a href="#hungry-birds"
+                                id="toc-hungry-birds">hungry-birds</a></li>
+                                <li><a
+                                href="#logseq-plugin-shallow-copy"
+                                id="toc-logseq-plugin-shallow-copy">logseq-plugin-shallow-copy</a></li>
+                                <li><a href="#socket-terminal"
+                                id="toc-socket-terminal">socket-terminal</a></li>
+                                <li><a href="#fsfs-emulator"
+                                id="toc-fsfs-emulator">fsfs-emulator</a></li>
+                                <li><a href="#windows-gopher-client"
+                                id="toc-windows-gopher-client">windows-gopher-client</a></li>
+                                <li><a href="#feed-the-birds"
+                                id="toc-feed-the-birds">feed-the-birds</a></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <h3 id="tiny-expenses"><a
+    href="https://github.com/MateuszMyalski/tinyexpenses">Tiny-expenses</a></h3>
+    <p>TinyExpenses is a minimal, personal finance tracker built with
+    Flask. It supports multi-user setups, tracks expenses and income by
+    category, and exposes a simple API for automation.</p>
+    <h3 id="meal-prepp"><a
+    href="https://mateuszmyalski.github.io/static/mealprepp/">Meal-prepp</a></h3>
+    <p>Alpha version of database with recipes I like to cook that allows
+    me to prepare shopping list based on the next week.</p>
+    <h3 id="fan-controller-for-co2-sensor"><a
+    href="/blog/2024-08-03-Fan-controller-for-CO2-sensor.html">fan-controller-for-co2-sensor</a></h3>
+    <p>Piece of hardware to turn on and off a fan to sink out fumes from
+    my central heating system.</p>
+    <h3 id="thinkpad-keybacklight"><a
+    href="https://github.com/MateuszMyalski/thinkpad-keybacklight">thinkpad-keybacklight</a></h3>
+    <p>This repository provides a controller for managing the backlight
+    of ThinkPad keyboards with integrated Systemd support. The
+    controller offers extensive features including event-based backlight
+    control, automatic brightness adjustments, and scheduling. This tool
+    is especially useful for users who want to fine-tune their keyboard
+    backlight settings based on input events, time, or system state.</p>
+    <h3 id="hungry-birds"><a
+    href="https://github.com/MateuszMyalski/hungry-birds">hungry-birds</a></h3>
+    <p>Experience a unique way of browsing the internet with
+    ‘Hungry-Birds’! Watch as birds peck away at your screen, obscuring
+    your view. But don’t worry, by holding the ‘Alt’ key and shaking
+    your cursor, you can startle them away, giving you a chance to
+    glimpse the content beneath. It’s a fun and whimsical twist on web
+    browsing that adds an element of surprise and delight to your online
+    adventures!</p>
+    <p><a href="/static/hungry-birds/">Live demo!</a></p>
+    <h3 id="logseq-plugin-shallow-copy"><a
+    href="https://github.com/MateuszMyalski/logseq-plugin-shallow-copy">logseq-plugin-shallow-copy</a></h3>
+    <p>The Block Shallow Copy plugin empowers users with a seamless
+    copying experience, allowing them to duplicate a selected block
+    along with all its child blocks, limited to a depth of one level.
+    This feature proves invaluable when you need to replicate a specific
+    section of content, preserving its hierarchical structure
+    effortlessly.</p>
+    <h3 id="socket-terminal"><a
+    href="https://github.com/MateuszMyalski/socket-terminal">socket-terminal</a></h3>
+    <p>Simple telnet server for connecting IOT devices in e.g. star
+    topology. Build for Debian tested on WSL2. The server has already
+    implemented few basic commands. Well, build mostly to leverage my
+    knowledge in C++ and socket connections.</p>
+    <h3 id="fsfs-emulator"><a
+    href="https://github.com/MateuszMyalski/fsfs-emulator">fsfs-emulator</a></h3>
+    <p>Another project I decided to publish mostly for learning
+    purposes. Emulator of creating custom file system, just to better
+    understand what are the problems and possibilities to store data in
+    the memory.</p>
+    <h3 id="windows-gopher-client"><a
+    href="https://github.com/MateuszMyalski/windows-gopher-client">windows-gopher-client</a></h3>
+    <p>For the time I used Windows there was no “gopher” protocol
+    browser (for anyone that is not familiar with this dinosaur <a
+    href="https://en.wikipedia.org/wiki/Gopher_(protocol)">wikipedia</a>).
+    I decided to write simple one in Python just to not use some
+    web-browser based proxy that has difficulties in working
+    smoothly.</p>
+    <h3 id="feed-the-birds"><a
+    href="https://github.com/MateuszMyalski/feed-the-birds">feed-the-birds</a></h3>
+    <p>Some tinkering with JavaScript to show some animated birds made
+    out of two triangles. Feed them by pressing on the screen.</p>
+
+    
+    <div class="meta">
+        
+        
+        
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

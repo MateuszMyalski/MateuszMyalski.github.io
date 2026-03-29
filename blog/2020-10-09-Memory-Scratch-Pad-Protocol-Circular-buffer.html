@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>Memory Scratch Pad Protocol - Circular Buffer</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#circular-buffer"
+                                id="toc-circular-buffer">Circular
+                                buffer</a></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <p>When working with many ICs that acts as slave you probably have
+    seen their memory organization. Data that is responsible for
+    hardware configuration is mapped to a certain memory addresses which
+    you can access or modify correspondingly. By implementing well known
+    standards such a SPI or I2C you can send: address, command and in
+    case of write operation data to the slave device. The region of
+    memory which is kept updated is called memory scratchpad — this
+    memory registers are acting like a bridge between configuration bits
+    and also conversion results.</p>
+    <p>When the necessity of connection between two devices comes, we
+    have plenty of well written standards and ready freamworks. We can
+    make our implementation of MODBUS protocol, TCP/IP or just use raw
+    UART connection. Using simple raw bytes right from UART buffer can
+    sound very straight forward. Unfortunately problems are arising,
+    when we have to receive and parse many bytes in short period of time
+    without constantly blocking whole task execution. ISRs are coming
+    handy, but they have their limitations especially when we can’t use
+    DMA because of lack of such great peripherals or used up
+    channels.</p>
+    <p>In this article I am going to describe step by step how to
+    implement reliable communication between microcontroller and PC.
+    Firstly we will implement circular buffer to make space for our
+    incoming data while the processor is busy. Next, we will write
+    implementation of simple scratchpad like protocol. After finishing
+    the uC part, we will move to the PC section. We will try to make use
+    of the python script language to write our master’s device code.</p>
+    <p>To sum up everything we will divide our finish line into few
+    steps: - circular buffer library - this will let us to give our uC
+    some time to process infromation, - scratch Pad protocole library
+    and implementation for uC, - python class to establish reliable
+    connection.</p>
+    <h1 id="circular-buffer">Circular buffer</h1>
+    <p>On the Internet we can find many code snippets that are ready to
+    use. We will try to build our own version which will be ready for
+    fast and simple reuse. Firstly we should know how our data structure
+    should behave.</p>
+    <p>Basically it is a fixed size memory region (array) which is able
+    to round around the data if the incoming bytes meet the end of the
+    array, and can perform read/write operations simuntaniusly. Circular
+    buffers have two pointers: - pointer <strong>one</strong> (head) is
+    pointing to the region of memory where new data can be stored, -
+    pointer <strong>two</strong> (tail) is pointing to the region of
+    memory from where next data should be read. The circular buffer is
+    full when the next memory address of __ head__ will be the same
+    memory address as __ tail__ is pointing to. The circular buffer is
+    empty when the <strong>tail</strong> and the <strong>head</strong>
+    is pointing the same memory address. Two pointers gives this data
+    structer ability to read and write “parallel”.</p>
+    <figure>
+    <img
+    src="/attachments/images/memory_scratch_pad_protocole/circular_buffer.jpg"
+    alt="Circular Buffer" />
+    <figcaption aria-hidden="true">Circular Buffer</figcaption>
+    </figure>
+    <p>With this knowladge we can create simple structure for our
+    circular buffer. Shall we create “circular_buffer.c” with:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&quot;circular_buffer.h&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> GPL_circular_buffer_t<span class="op">{</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">size_t</span>  bufferSize<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">size_t</span>  readIndex<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">size_t</span>  writeIndex<span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span>     full<span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span>    <span class="op">*</span>buffer<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="op">};</span> </span></code></pre></div>
+    <p>While creating our library we will try to protect our struct from
+    direct access by simple trick - declerate our typedef in
+    “circular_buffer.h”:</p>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="dt">void</span> <span class="op">*</span>circular_buffer<span class="op">;</span></span></code></pre></div>
+    <p>We will be obligated to dereference the void pointer to our real
+    struct so we can access the data without problems:</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> __circular_buffer <span class="op">*</span>handler <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> __circular_buffer <span class="op">*)</span> malloc<span class="op">(</span><span class="kw">sizeof</span><span class="op">(*</span>handler<span class="op">));</span></span></code></pre></div>
+    <p>User can initialize the circular buffer using create
+    function:</p>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>GPL_circular_buffer_t <span class="op">*</span>circular_buffer_create<span class="op">(</span><span class="dt">size_t</span> size<span class="op">){</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span><span class="op">(</span>size <span class="op">&lt;</span> <span class="dv">1</span><span class="op">)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> NULL<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> __circular_buffer <span class="op">*</span>handler <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> __circular_buffer <span class="op">*)</span> malloc<span class="op">(</span><span class="kw">sizeof</span><span class="op">(*</span>handler<span class="op">));</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    handler<span class="op">-&gt;</span>buffer <span class="op">=</span> <span class="op">(</span><span class="dt">char</span> <span class="op">*)</span> calloc<span class="op">(</span>size<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">char</span> <span class="op">*));</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    handler<span class="op">-&gt;</span>bufferSize <span class="op">=</span> size<span class="op">;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    handler<span class="op">-&gt;</span>readIndex <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    handler<span class="op">-&gt;</span>writeIndex <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    handler<span class="op">-&gt;</span>full <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">(</span>circular_buffer<span class="op">)</span>handler<span class="op">;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span>  </span></code></pre></div>
+    <p>Do not forget that what we malloc/calloc we have to free up. The
+    deinicializer seems pretty straight forward. We have made
+    <em>malloc</em> for the structure and <em>calloc</em> for the buffer
+    itself:</p>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> circular_buffer_destroy<span class="op">(</span>circular_buffer <span class="op">*</span>handler<span class="op">){</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> __circular_buffer <span class="op">*</span>__handler <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> __circular_buffer <span class="op">*)</span> handler<span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>__handler<span class="op">-&gt;</span>buffer<span class="op">);</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>__handler<span class="op">);</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+    <p>Small handy functions for easier code readability:</p>
+    <div class="sourceCode" id="cb6"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> circular_buffer_full<span class="op">(</span>circular_buffer <span class="op">*</span>handler<span class="op">){</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> __circular_buffer <span class="op">*</span>__handler <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> __circular_buffer <span class="op">*)</span> handler<span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span><span class="op">(</span>__handler<span class="op">-&gt;</span>full<span class="op">)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> circular_buffer_reset<span class="op">(</span>circular_buffer <span class="op">*</span>handler<span class="op">){</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> __circular_buffer <span class="op">*</span>__handler <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> __circular_buffer <span class="op">*)</span> handler<span class="op">;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    __handler<span class="op">-&gt;</span>readIndex <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    __handler<span class="op">-&gt;</span>writeIndex <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    __handler<span class="op">-&gt;</span>full <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="dt">size_t</span> circular_buffer_capacity<span class="op">(</span>circular_buffer <span class="op">*</span>handler<span class="op">){</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> __circular_buffer <span class="op">*</span>__handler <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> __circular_buffer <span class="op">*)</span> handler<span class="op">;</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> __handler<span class="op">-&gt;</span>bufferSize<span class="op">;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> circular_buffer_empty<span class="op">(</span>circular_buffer <span class="op">*</span>handler<span class="op">){</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> __circular_buffer <span class="op">*</span>__handler <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> __circular_buffer <span class="op">*)</span> handler<span class="op">;</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span><span class="op">((</span>__handler<span class="op">-&gt;</span>readIndex <span class="op">==</span> __handler<span class="op">-&gt;</span>writeIndex<span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>__handler<span class="op">-&gt;</span>full<span class="op">)</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+    <p>Now we need to take care of the logic. Firstly we will allow the
+    user to push new byte:</p>
+    <div class="sourceCode" id="cb7"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> circular_buffer_write<span class="op">(</span>circular_buffer <span class="op">*</span>handler<span class="op">,</span> <span class="dt">char</span> data<span class="op">){</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> __circular_buffer <span class="op">*</span>__handler <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> __circular_buffer <span class="op">*)</span> handler<span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span><span class="op">(!</span>circular_buffer_full<span class="op">(</span>handler<span class="op">)){</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        __handler<span class="op">-&gt;</span>buffer<span class="op">[</span>__handler<span class="op">-&gt;</span>writeIndex<span class="op">]</span> <span class="op">=</span> data<span class="op">;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        __handler<span class="op">-&gt;</span>writeIndex <span class="op">=</span> <span class="op">(</span>__handler<span class="op">-&gt;</span>writeIndex <span class="op">+</span> <span class="dv">1</span><span class="op">)</span> <span class="op">%</span> __handler<span class="op">-&gt;</span>bufferSize<span class="op">;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        __handler<span class="op">-&gt;</span>full <span class="op">=</span> <span class="op">(</span>__handler<span class="op">-&gt;</span>writeIndex <span class="op">==</span> __handler<span class="op">-&gt;</span>readIndex<span class="op">);</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span><span class="cf">else</span><span class="op">{</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> </span></code></pre></div>
+    <p>We have used small little trick with modulo operator to be sure
+    that we won’t exceed the allocated memory region. In example, we
+    have only 5 element array, but the counter is constantly
+    incrementing, we would like to overwrite the data so:</p>
+    <pre><code>char array[5] = { 0 };
+    for(int i = 0; i &lt; 10; ++i)
+        array[i % 5] = &#39;a&#39; + i;
+
+    printf(&quot;%c&quot;, array[0]);
+    printf(&quot;%c&quot;, array[1]);
+    printf(&quot;%c&quot;, array[2]);
+    printf(&quot;%c&quot;, array[3]);
+    printf(&quot;%c&quot;, array[4]);</code></pre>
+    <p>the output is going to be:</p>
+    <div class="sourceCode" id="cb9"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> fghij</span></code></pre></div>
+    <p>because the output of <code>0 % 5 is 0</code>
+    <code>3 % 5 is 3</code> <code>5 % 5 is 0</code>
+    <code>6 % 5 is 1</code> etc.</p>
+    <p>To read character we should make exactly the same thing but with
+    read pointer instead of write pointer:</p>
+    <div class="sourceCode" id="cb10"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> circular_buffer_read<span class="op">(</span>circular_buffer <span class="op">*</span>handler<span class="op">){</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">struct</span> __circular_buffer <span class="op">*</span>__handler <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> __circular_buffer <span class="op">*)</span> handler<span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> data <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span>                                                </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span><span class="op">(!</span>circular_buffer_empty<span class="op">(</span>handler<span class="op">)){</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> __handler<span class="op">-&gt;</span>buffer<span class="op">[</span>__handler<span class="op">-&gt;</span>readIndex<span class="op">];</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        __handler<span class="op">-&gt;</span>readIndex <span class="op">=</span> <span class="op">(</span>__handler<span class="op">-&gt;</span>readIndex <span class="op">+</span> <span class="dv">1</span><span class="op">)</span> <span class="op">%</span> __handler<span class="op">-&gt;</span>bufferSize<span class="op">;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        __handler<span class="op">-&gt;</span>full <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> data<span class="op">;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+    <p>Now we can go forward to create our scratch pad protocole
+    implementation.</p>
+    <p>Below you can find ready files with circular buffer library:</p>
+    <p><a
+    href="https://github.com/MateuszMyalski/GPL">GPL_library</a></p>
+
+    
+    <div class="meta">
+                <span class="label">Date: </span>
+        <span class="value">2020-10-9</span
+        
+        
+                <span class="label">Category: </span>
+        <span class="value">Tutorials</span
+        
+                <span class="label">Tags: </span>
+        <span class="value">c, python</span
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

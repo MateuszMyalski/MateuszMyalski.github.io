@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>My approach to syncing dotfiles</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#overcoming-challenges"
+                                id="toc-overcoming-challenges">Overcoming
+                                Challenges</a></li>
+                                <li><a href="#the-solution"
+                                id="toc-the-solution">The
+                                Solution</a></li>
+                                <li><a
+                                href="#automatic-version-incrementation"
+                                id="toc-automatic-version-incrementation">Automatic
+                                Version Incrementation</a></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <p>Recently, I decide to tidy up my dotfiles on both my personal
+    Linux machine and my workstation. Initially, I keep a single file in
+    a public repository, copying and pasting bits of functions and
+    aliases manually. However, as my configurations grow, syncing
+    between my laptop and workstation becomes challenging.</p>
+    <h2 id="overcoming-challenges">Overcoming Challenges</h2>
+    <p>The main hurdle is updating aliases at work. Manually syncing the
+    repository and copying the necessary elements becomes cumbersome. I
+    aim to streamline and automate the one-way syncing of my dotfiles,
+    avoiding the need to share access to my personal repository with
+    these devices.</p>
+    <p>To automate the process, I consider setting up periodic tasks
+    with tools like cron or checking for updates each time I open my
+    console. However, this seems overly complex for a simple task. I
+    prefer a straightforward approach: checking for updates
+    automatically every N seconds, such as every 8 hours (one working
+    day) when I open my console.</p>
+    <h2 id="the-solution">The Solution</h2>
+    <p>To track the last time I check for a new version, I utilize
+    timestamps associated with each file. In my dotfile folder, I create
+    a file named .version containing the numeric version of the dotfiles
+    “release.” Reading the modification time allows me to calculate the
+    time since the last remote version check. The script updates the
+    modification time every time a remote check is performed.</p>
+    <p>The challenge is how to easily check the current remote version.
+    Instead of complex web scraping, GitHub’s “raw” view provides a
+    simple solution. Using curl to fetch information without parsing, I
+    can compare the remote and local versions. If the local version is
+    outdated, a message prompts the user at console startup.</p>
+    <p>If the user chooses to update, the script clones the repository
+    into a temporary directory and executes install.sh to copy all
+    necessary files. To prevent unwanted updates, users can block
+    version checking by manually deleting the locally stored .version
+    file.</p>
+    <p>Here’s a snippet of the code performing these tasks:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">REMOTE_VERSION_FILE_URL</span><span class="op">=</span><span class="st">&quot;https://raw.githubusercontent.com/MateuszMyalski/dotfiles/master/.dot/.version&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">VERSION_FILE</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$HOME</span><span class="st">/.dot/.version&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">CHECK_UPDATE_AFTER_SECONDS</span><span class="op">=</span><span class="va">$((</span><span class="dv">60</span> <span class="op">*</span> <span class="dv">60</span> <span class="op">*</span> <span class="dv">8</span><span class="va">))</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">calculate_mod_time_delta()</span> <span class="kw">{</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">local</span> <span class="va">file</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">current_time</span><span class="op">=</span><span class="va">$(</span><span class="fu">date</span> +%s<span class="va">)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">mod_time</span><span class="op">=</span><span class="va">$(</span><span class="fu">stat</span> <span class="at">-c</span> %Y <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span><span class="va">)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">time_diff</span><span class="op">=</span><span class="va">$((current_time</span> <span class="op">-</span> <span class="va">mod_time))</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="va">$time_diff</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">dot_check_update()</span> <span class="kw">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">REMOTE_VERSION</span><span class="op">=</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> <span class="st">&quot;</span><span class="va">$REMOTE_VERSION_FILE_URL</span><span class="st">&quot;</span><span class="va">)</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">LOCAL_VERSION</span><span class="op">=</span><span class="va">$(</span><span class="fu">cat</span> <span class="st">&quot;</span><span class="va">$VERSION_FILE</span><span class="st">&quot;</span><span class="va">)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Step 3: Notify about update</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">[</span> <span class="st">&quot;</span><span class="va">$LOCAL_VERSION</span><span class="st">&quot;</span> <span class="ot">-lt</span> <span class="st">&quot;</span><span class="va">$REMOTE_VERSION</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;New version of dot files available!&quot;</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;Remote version: </span><span class="va">$REMOTE_VERSION</span><span class="st">&quot;</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;Local version: </span><span class="va">$LOCAL_VERSION</span><span class="st">&quot;</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;To update execute: dot_self_update&quot;</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;To stop this message remove file: </span><span class="va">$VERSION_FILE</span><span class="st">&quot;</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">[</span> <span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span> <span class="ot">!=</span> <span class="st">&quot;-s&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;Remote version: </span><span class="va">$REMOTE_VERSION</span><span class="st">&quot;</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;Local version: </span><span class="va">$LOCAL_VERSION</span><span class="st">&quot;</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;Version up to date!&quot;</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">1</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if flag file exists</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">!</span> <span class="ot">-e</span> <span class="st">&quot;</span><span class="va">$VERSION_FILE</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The update checks has been disabled</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Check the file modification delta</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="va">time_delta</span><span class="op">=</span><span class="va">$(</span><span class="ex">calculate_mod_time_delta</span> <span class="st">&quot;</span><span class="va">$VERSION_FILE</span><span class="st">&quot;</span><span class="va">)</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: curl the version from git</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="st">&quot;</span><span class="va">$time_delta</span><span class="st">&quot;</span> <span class="ot">-gt</span> <span class="st">&quot;</span><span class="va">$CHECK_UPDATE_AFTER_SECONDS</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    <span class="ex">dot_check_update</span> <span class="st">&quot;-s&quot;</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Do not check too frequently</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> <span class="st">&quot;</span><span class="va">$VERSION_FILE</span><span class="st">&quot;</span></span></code></pre></div>
+    <p>You can find my dotfiles on GitHub. They may not be
+    sophisticated, but you might find some useful techniques to adapt to
+    your “simple” dotfiles structure.</p>
+    <h2 id="automatic-version-incrementation">Automatic Version
+    Incrementation</h2>
+    <p>Concerned about remembering to manually increment the version
+    number in .version? I write a simple Git hook to automate this task
+    with every commit:</p>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="va">VERSION_FILE</span><span class="op">=</span><span class="st">&quot;.dot/.version&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if the version file exists</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">-e</span> <span class="st">&quot;</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/</span><span class="va">$VERSION_FILE</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Increment version number</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">current_version</span><span class="op">=</span><span class="va">$(</span><span class="fu">cat</span> <span class="st">&quot;</span><span class="va">$VERSION_FILE</span><span class="st">&quot;</span><span class="va">)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">new_version</span><span class="op">=</span><span class="va">$((current_version</span> <span class="op">+</span> <span class="dv">1</span><span class="va">))</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;</span><span class="va">$new_version</span><span class="st">&quot;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$VERSION_FILE</span><span class="st">&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add the version file to the staging area</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">git</span> add <span class="st">&quot;</span><span class="va">$VERSION_FILE</span><span class="st">&quot;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Version incremented to </span><span class="va">$new_version</span><span class="st">&quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Error: </span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/</span><span class="va">$VERSION_FILE</span><span class="st"> not found&quot;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">exit</span> 1</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Continue with the rest of the commit process</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span> 0</span></code></pre></div>
+    <p>Now, with these streamlined processes, managing and syncing
+    dotfiles is a breeze!</p>
+
+    
+    <div class="meta">
+                <span class="label">Date: </span>
+        <span class="value">2024-01-19</span
+        
+        
+                <span class="label">Category: </span>
+        <span class="value">Tutorials</span
+        
+                <span class="label">Tags: </span>
+        <span class="value">linux</span
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

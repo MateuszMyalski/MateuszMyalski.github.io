@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>Python Venv</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#check-installed-python3"
+                                id="toc-check-installed-python3">1.
+                                Check installed python3</a></li>
+                                <li><a href="#install--venv-package"
+                                id="toc-install--venv-package">2.
+                                Install <strong>-ven</strong>v
+                                package</a></li>
+                                <li><a href="#using-venv"
+                                id="toc-using-venv">3. Using venv</a>
+                                <ul>
+                                <li><a href="#creating"
+                                id="toc-creating">Creating</a></li>
+                                <li><a href="#activating"
+                                id="toc-activating">Activating</a></li>
+                                <li><a href="#deactivating"
+                                id="toc-deactivating">Deactivating</a></li>
+                                </ul></li>
+                                <li><a href="#installing-packages"
+                                id="toc-installing-packages">4.
+                                Installing packages</a></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <h2 id="check-installed-python3">1. Check installed python3</h2>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> python3 <span class="at">--version</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Python</span> 3.12.3</span></code></pre></div>
+    <p>In case python3 is not found install it</p>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apt</span> install python3</span></code></pre></div>
+    <h2 id="install--venv-package">2. Install <strong>-ven</strong>v
+    package</h2>
+    <p>For python3 you need to install additional package for creating
+    virtual environment:</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apt</span> install python3.12-venv</span></code></pre></div>
+    <h2 id="using-venv">3. Using venv</h2>
+    <h3 id="creating">Creating</h3>
+    <p>To create the virtual environment:</p>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv</span></code></pre></div>
+    <p>Where <strong>.venv</strong> is the name of the virtual
+    environment - it can be anything you want, just keep it consistent
+    with later commands.</p>
+    <h3 id="activating">Activating</h3>
+    <p>To start the virtual environment source the
+    <strong>activate</strong> script</p>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span></code></pre></div>
+    <p>You should see name of your virtual environment added to the
+    shell prompt in e.g.</p>
+    <div class="sourceCode" id="cb6"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">(</span><span class="ex">.venv</span><span class="kw">)</span> <span class="ex">root@5763a8789136:</span> </span></code></pre></div>
+    <h3 id="deactivating">Deactivating</h3>
+    <p>To deactivate the environment just type
+    <strong>deactivate</strong> in the console, the prefix from prompt
+    should vanish.</p>
+    <h2 id="installing-packages">4. Installing packages</h2>
+    <p>The virtual environment separates your packages from the system
+    ones you can use now packages using <strong>pip install</strong>
+    command.</p>
+
+    
+    <div class="meta">
+                <span class="label">Date: </span>
+        <span class="value">2025-12-05</span
+        
+        
+        
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

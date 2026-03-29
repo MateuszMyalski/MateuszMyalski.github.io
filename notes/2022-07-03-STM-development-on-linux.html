@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>STM development on linux</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#introduction"
+                                id="toc-introduction">Introduction</a></li>
+                                <li><a href="#installing-the-compiler"
+                                id="toc-installing-the-compiler">Installing
+                                the compiler</a></li>
+                                <li><a href="#installing-the-programmer"
+                                id="toc-installing-the-programmer">Installing
+                                the programmer</a></li>
+                                <li><a href="#installing-the-stlink-gdb"
+                                id="toc-installing-the-stlink-gdb">Installing
+                                the stlink-gdb</a>
+                                <ul>
+                                <li><a
+                                href="#installing-other-useful-tools"
+                                id="toc-installing-other-useful-tools">Installing
+                                other useful tools</a></li>
+                                </ul></li>
+                                <li><a href="#minicom---serial-terminal"
+                                id="toc-minicom---serial-terminal">Minicom
+                                - serial terminal</a></li>
+                                <li><a
+                                href="#saleae---logic-analyzer-software"
+                                id="toc-saleae---logic-analyzer-software">Saleae
+                                - logic analyzer software</a></li>
+                                <li><a href="#st-link-server"
+                                id="toc-st-link-server">ST-LINK
+                                server</a></li>
+                                <li><a href="#how-to-use-tools"
+                                id="toc-how-to-use-tools">How to use
+                                tools</a>
+                                <ul>
+                                <li><a href="#running-the-gdb"
+                                id="toc-running-the-gdb">Running the
+                                GDB</a></li>
+                                <li><a href="#programming-from-cli"
+                                id="toc-programming-from-cli">Programming
+                                from CLI</a></li>
+                                </ul></li>
+                                <li><a href="#vscode"
+                                id="toc-vscode">VSCode</a>
+                                <ul>
+                                <li><a href="#gdb-interaction"
+                                id="toc-gdb-interaction">GDB
+                                interaction</a></li>
+                                <li><a href="#project-rebuild"
+                                id="toc-project-rebuild">Project
+                                rebuild</a></li>
+                                <li><a href="#auto-flashing"
+                                id="toc-auto-flashing">Auto-flashing</a></li>
+                                </ul></li>
+                                <li><a href="#troubleshooting"
+                                id="toc-troubleshooting">Troubleshooting</a>
+                                <ul>
+                                <li><a href="#gdb-needs-ncurses"
+                                id="toc-gdb-needs-ncurses">GDB needs
+                                ncurses</a></li>
+                                <li><a href="#references"
+                                id="toc-references">References</a></li>
+                                </ul></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <h2 id="introduction">Introduction</h2>
+    <p>Setting up a development environment can be time-consuming
+    especially, when working with new platforms. During my hobby
+    projects, I always struggled to find easy to follow how-to prepare
+    full standalone environment for STM32. I am not big fan to work with
+    all the regenerated project structures like PlatformIO, CubeMX or
+    Arduino. When I am working on my hobby projects, I would like to go
+    over difficulties that can teach me something new.</p>
+    <p>This small article presents how to create a simple standalone
+    working environment for STM32 development.</p>
+    <h2 id="installing-the-compiler">Installing the compiler</h2>
+    <p>Arm-none-eabi compiler: <a
+    href="https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads">Downloads
+    | GNU Arm Embedded Toolchain Downloads – Arm Developer</a></p>
+    <p>To make this compiler available everywhere, add the
+    <code>gcc-arm-none-eabi/bin</code> directory to the
+    <code>PATH</code> env. variable. To use it in Makefiles only use
+    <code>gcc-arm-none-eabi/bin</code> path in variable.</p>
+    <h2 id="installing-the-programmer">Installing the programmer</h2>
+    <ol type="1">
+    <li>Download Linux files of <a
+    href="https://www.st.com/en/development-tools/stm32cubeprog.html">STM32CubeProg
+    - STMicroelectronics</a>.</li>
+    <li>Install STM32CubeProgrammer.</li>
+    <li>Execute install STM32CubeProgrammer file.</li>
+    <li>After unpacking the STM32CubeProgrammer, add
+    <code>Cube Programmer</code> libraries to your .bashrc file.
+    <code>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/STMicroelectronics/STM32Cube/STM32CubeProgrammer/lib/</code></li>
+    <li>Give permission to libUSB by:
+    <code>cd &lt;INSTALATION_PATH&gt;/STMicroelectronics/STM32Cube/STM32CubeProgrammer/Drivers/rules/ sudo cp .* /etc/udev/rules.d</code></li>
+    </ol>
+    <h2 id="installing-the-stlink-gdb">Installing the stlink-gdb</h2>
+    <p>It is possible to use OpenOCD to connect to the target board.
+    However, the problem is that not always the newest platforms are
+    already in the config files. The stlink-gdb server is always ready
+    to work with your platform and most of the GDB configs are done for
+    the developers. This usually the most frustrating thing when
+    starting the debugger – configuring it.</p>
+    <p>Unfortunately, the ST does not give easy way of downloading JUST
+    the stling-gdb server. Instead, it is needed to download the CubeIDE
+    and take the binary from it.</p>
+    <ol type="1">
+    <li>Download CubeIDE <a
+    href="https://www.st.com/en/development-tools/stm32cubeide.html">STM32CubeIDE
+    - STMicroelectronics</a><br />
+    </li>
+    <li>Unzip the file.</li>
+    <li>Extract Makefiles and go to plugins.</li>
+    </ol>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span> en.st-stm32cubeide<span class="pp">*</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> st-stm32cubeide<span class="pp">*</span> <span class="at">--noexec</span> </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> st-stm32cubeide<span class="pp">*</span>.root </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> xvzf st-stm32cubeide<span class="pp">*</span>.tar.gz </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> plugins</span></code></pre></div>
+    <ol start="4" type="1">
+    <li>Find folder named
+    <code>com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.*</code></li>
+    <li>Copy its tools folder to the
+    <code>&lt;INSTALATION_PATH&gt;/STMicroelectronics/STLink-GDB-Server</code><br />
+    </li>
+    <li>Create config file in
+    <code>&lt;INSTALATION_PATH&gt;/STMicroelectronics/STLink-GDB-Server/bin/config.txt</code></li>
+    </ol>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#-e: Enables persistant mode</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-e</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#-f &lt;Log-File&gt;: Name of log file. Please make sure</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#               that directory not is write protected.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-f</span> debug.log</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#-p &lt;Port-Number&gt;: TCP-Listen Port-Number.</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">-p</span> 3333</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#-r &lt;delay-sec&gt;: Maximum Delay in status refresh</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">-r</span> 15</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#-d: Enables SWD mode</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">-d</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#-t: Shared mode using ST-LINK server</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ex">-t</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#-cp &lt;path&gt;: Path to STM32CubeProgrammer</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#          Modify to correct path</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#          for STM32_Programmer_CLI executable</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">-cp</span> ../../STM32Cube/STM32CubeProgrammer/bin/</span></code></pre></div>
+    <ol start="7" type="1">
+    <li>Create script <code>stlink-gdb-server.sh</code>
+    <code>bash     #!/bin/bash      cd &lt;INSTALLATION_PATH&gt;/STMicroelectronics/STLink-GDB-Server/bin      bash ST-LINK_gdbserver.sh</code></li>
+    <li>Add <code>chmod</code> on the <code>stlink-gdb-server.sh</code>
+    and copy in into the <code>/usr/bin</code> directory
+    <code>bash     chmod +x stlink-gdb-server.sh     mv stlink-gdb-server.sh /usr/bin</code></li>
+    </ol>
+    <h3 id="installing-other-useful-tools">Installing other useful
+    tools</h3>
+    <h2 id="minicom---serial-terminal">Minicom - serial terminal</h2>
+    <p>Simple CLI based serial terminal. Easy to navigate and to
+    use.</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install minicom</span></code></pre></div>
+    <h2 id="saleae---logic-analyzer-software">Saleae - logic analyzer
+    software</h2>
+    <p>I like to use Saleae logic analyzer. They are also supplying
+    pretty nice software to interact with their devices. Not only the
+    original devices uses them also this <a
+    href="https://www.az-delivery.de/products/saleae-logic-analyzer">Chainees
+    Logic Analyzer</a>.</p>
+    <p>To download SW: <a href="https://www.saleae.com/downloads/">Logic
+    analyzer software from Saleae</a></p>
+    <h2 id="st-link-server">ST-LINK server</h2>
+    <ol type="1">
+    <li>Download the <a
+    href="https://www.st.com/en/development-tools/st-link-server.html">ST-LINK-SERVER
+    - STMicroelectronics</a></li>
+    <li>Unpack the folder .</li>
+    <li>Execute:</li>
+    </ol>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dpkg <span class="at">-i</span> st-stlink-server-xxxx-linux-amd64.deb</span></code></pre></div>
+    <ol start="4" type="1">
+    <li>To run - execute <code>stlink-server</code>.</li>
+    </ol>
+    <h1 id="how-to-use-tools">How to use tools</h1>
+    <h2 id="running-the-gdb">Running the GDB</h2>
+    <ol type="1">
+    <li>Connect ST-Link.</li>
+    <li>Execute <code>stlink-gdb-server</code>.</li>
+    <li>Execute the GDB <code>arm-none-eabi-gdb</code>.</li>
+    <li>In GDB run</li>
+    </ol>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">target</span> extended-remote localhost:3333</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">file</span> <span class="op">&lt;</span>PATH_TO_ELF<span class="op">&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">b</span> main</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">continue</span></span></code></pre></div>
+    <h2 id="programming-from-cli">Programming from CLI</h2>
+    <p>The <code>CubeProgrammer</code> must be installed, then
+    execute:</p>
+    <div class="sourceCode" id="cb6"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>CUBE_PROGRAMMER_BIN_PATH<span class="op">&gt;</span>/STM32_Programmer.sh <span class="dt">\</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-c</span> port=SWD freq=4000 <span class="dt">\</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">-w</span> <span class="op">&lt;</span>OUT_PATH<span class="op">&gt;</span>/<span class="op">&lt;</span>APP_NAME<span class="op">&gt;</span>.hex 0x08000000 <span class="dt">\</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">-s</span></span></code></pre></div>
+    <h1 id="vscode">VSCode</h1>
+    <h2 id="gdb-interaction">GDB interaction</h2>
+    <p>Create <code>launch.json</code> with content:</p>
+    <div class="sourceCode" id="cb7"><pre
+    class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;configurations&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;(gdb) Launch&quot;</span><span class="fu">,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;cppdbg&quot;</span><span class="fu">,</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;request&quot;</span><span class="fu">:</span> <span class="st">&quot;launch&quot;</span><span class="fu">,</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;program&quot;</span><span class="fu">:</span> <span class="st">&quot;&lt;PATH_TO_APP&gt;.elf&quot;</span><span class="fu">,</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;miDebuggerPath&quot;</span><span class="fu">:</span> <span class="st">&quot;&lt;TOOLCHAIN_PATH&gt;/gcc-arm-none-eabi/bin/arm-none-eabi-gdb&quot;</span><span class="fu">,</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;miDebuggerServerAddress&quot;</span><span class="fu">:</span> <span class="st">&quot;localhost:3333&quot;</span><span class="fu">,</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;MIMode&quot;</span><span class="fu">:</span> <span class="st">&quot;gdb&quot;</span><span class="fu">,</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;cwd&quot;</span><span class="fu">:</span> <span class="st">&quot;.&quot;</span><span class="fu">,</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;setupCommands&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>            <span class="fu">{</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Enable pretty-printing for gdb&quot;</span><span class="fu">,</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;-enable-pretty-printing&quot;</span><span class="fu">,</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;ignoreFailures&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="ot">]</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+    <p>To run the debbuging session, first execute in the terminal
+    <code>stlink-gdb-server.sh</code>, and launch debugging from the
+    VSCode.</p>
+    <h2 id="project-rebuild">Project rebuild</h2>
+    <p>Tasks in VSCode can be really helpful, the most basic ones are to
+    run <code>make</code> commands by pressing <code>CTRL+B</code> or
+    selecting it with <code>CTRL+SHIFT+B</code>.</p>
+    <div class="sourceCode" id="cb8"><pre
+    class="sourceCode json"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="st">&quot;2.0.0&quot;</span><span class="fu">,</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;tasks&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;Build project&quot;</span><span class="fu">,</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;shell&quot;</span><span class="fu">,</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;group&quot;</span><span class="fu">:</span> <span class="st">&quot;build&quot;</span><span class="fu">,</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;command&quot;</span><span class="fu">:</span> <span class="st">&quot;make all&quot;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;Clean project&quot;</span><span class="fu">,</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;shell&quot;</span><span class="fu">,</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;group&quot;</span><span class="fu">:</span> <span class="st">&quot;build&quot;</span><span class="fu">,</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;command&quot;</span><span class="fu">:</span> <span class="st">&quot;make clean&quot;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;Info project&quot;</span><span class="fu">,</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;shell&quot;</span><span class="fu">,</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;group&quot;</span><span class="fu">:</span> <span class="st">&quot;build&quot;</span><span class="fu">,</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;command&quot;</span><span class="fu">:</span> <span class="st">&quot;make info&quot;</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+    <h2 id="auto-flashing">Auto-flashing</h2>
+    <p>Being able to flash the .hex file into the target via simple
+    click is way easier than going through GUI interface. It is possible
+    to automate the procedure with simple task.</p>
+    <div class="sourceCode" id="cb9"><pre
+    class="sourceCode json"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="st">&quot;2.0.0&quot;</span><span class="fu">,</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;tasks&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;Upload binary&quot;</span><span class="fu">,</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;shell&quot;</span><span class="fu">,</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;group&quot;</span><span class="fu">:</span> <span class="st">&quot;none&quot;</span><span class="fu">,</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;command&quot;</span><span class="fu">:</span> <span class="st">&quot;&lt;PATH_TO_PROGRAMMER&gt;&quot;</span><span class="fu">,</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;problemMatcher&quot;</span><span class="fu">:</span> <span class="ot">[]</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+    <p>Path to programmer:</p>
+    <div class="sourceCode" id="cb10"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>INSTALL_PATH<span class="op">&gt;</span>/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer.sh <span class="dt">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">-c</span> port=SWD freq=4000 <span class="dt">\</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">-w</span> <span class="op">&lt;</span>PATH_TO_APP<span class="op">&gt;</span>.hex 0x08000000 <span class="dt">\</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">-s</span></span></code></pre></div>
+    <h1 id="troubleshooting">Troubleshooting</h1>
+    <h2 id="gdb-needs-ncurses">GDB needs ncurses</h2>
+    <p>Missing <code>ncurses</code> when running GDB? Run:</p>
+    <div class="sourceCode" id="cb11"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install libncurses5 libncurses5:i386</span></code></pre></div>
+    <h2 id="references">References</h2>
+    <ul>
+    <li><a
+    href="http://pacinispace.blogspot.com/2020/02/stm32cubeide-st-link-gdb-server-on-linux.html">STM32CubeIDE
+    programmer and ST-LINK GDB server on Linux</a></li>
+    </ul>
+
+    
+    <div class="meta">
+                <span class="label">Date: </span>
+        <span class="value">2022-07-03</span
+        
+        
+                <span class="label">Category: </span>
+        <span class="value">Tutorials</span
+        
+                <span class="label">Tags: </span>
+        <span class="value">embedded, linux</span
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

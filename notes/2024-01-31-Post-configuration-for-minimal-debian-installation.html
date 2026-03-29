@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>Post configuration for minimal debian
+installation</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a
+                                href="#installing-xfce-desktop-environment"
+                                id="toc-installing-xfce-desktop-environment">1.
+                                Installing XFCE Desktop
+                                Environment</a></li>
+                                <li><a href="#granting-sudo-access"
+                                id="toc-granting-sudo-access">2.
+                                Granting Sudo Access</a></li>
+                                <li><a
+                                href="#configuring-existing-ssh-keys"
+                                id="toc-configuring-existing-ssh-keys">3.
+                                Configuring existing SSH keys</a></li>
+                                <li><a href="#gui-wifi-manager"
+                                id="toc-gui-wifi-manager">4. GUI WiFi
+                                Manager</a></li>
+                                <li><a href="#audio-manager"
+                                id="toc-audio-manager">5. Audio
+                                Manager</a></li>
+                                <li><a href="#bluetooth-manager"
+                                id="toc-bluetooth-manager">6. Bluetooth
+                                Manager</a></li>
+                                <li><a href="#touchpad-click"
+                                id="toc-touchpad-click">7. Touchpad
+                                click</a></li>
+                                <li><a href="#the-keyring"
+                                id="toc-the-keyring">8. The keyring</a>
+                                <ul>
+                                <li><a href="#keyring-prompt"
+                                id="toc-keyring-prompt">Keyring
+                                prompt</a></li>
+                                </ul></li>
+                                <li><a href="#snap-store"
+                                id="toc-snap-store">9. Snap store</a>
+                                <ul>
+                                <li><a
+                                href="#making-snap-applications-visible-for-the-system"
+                                id="toc-making-snap-applications-visible-for-the-system">Making
+                                snap applications visible for the
+                                system</a></li>
+                                </ul></li>
+                                <li><a href="#emojis"
+                                id="toc-emojis">10. Emojis</a></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <p>As I transitioned to Debian with a minimal installation paired
+    with the XFCE desktop environment, I realized the importance of
+    enhancing my system for a more comprehensive user experience. While
+    the initial minimal setup laid the foundation, I found it necessary
+    to install additional packages to fine-tune and optimize my Debian
+    environment. This collection of notes not only serves as a guide to
+    replicate my current configuration but also acts as a reference for
+    future improvements. The integration of XFCE, along with carefully
+    chosen packages, strikes a balance between efficiency and
+    functionality, ensuring a smooth and personalized Debian experience.
+    I created some notes that gets into essential packages and
+    configurations, making it a handy resource for anyone seeking to
+    configure Debian with XFCE at an intermediate to advanced level of
+    proficiency.</p>
+    <p><strong>Disclaimer: The following packages are customized to my
+    taste. Feel free, and encouraged, to adjust them to your
+    preferences.</strong></p>
+    <h2 id="installing-xfce-desktop-environment">1. Installing XFCE
+    Desktop Environment</h2>
+    <p>Once you complete the Debian installation from your USB/CD
+    without selecting any desktop environment, you will need to
+    configure it yourself. Start by installing the essential components
+    for a minimal XFCE desktop environment. Open a terminal and
+    execute:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install xfce4-power-manager xinit nm-applet network-manager-gnome thunar xfce4-session xfce4-settings xfconf xfdesktop4 xfwm4 rxvt-unicode git make rofi</span></code></pre></div>
+    <ul>
+    <li><code>xfce4-power-manager</code> - It also allows users to
+    control the display backlight brightness and set power-saving modes
+    for displays and monitors.</li>
+    <li><code>xinit</code> - X display server.</li>
+    <li><code>nm-applet</code> - Provides detection and configuration
+    for systems to automatically connect to networks.</li>
+    <li><code>network-manager-gnome</code> - GUI application for
+    displaying tray icon and manage connections.</li>
+    <li><code>Thunar</code> - Thunar provides a user-friendly interface
+    for managing files and directories, with features like tabbed
+    browsing, bulk renaming, and file previews. It is the default GUI
+    file manager for XFCE</li>
+    <li><code>xfce4-session</code> - Manages the user sessions, handling
+    the startup and termination of applications and managing the overall
+    session settings.</li>
+    <li><code>xfce4-settings</code> - Allows users to configure various
+    settings for the XFCE desktop environment, including display,
+    keyboard, mouse, and more.</li>
+    <li><code>xfconf</code> - Stores and retrieves application
+    configuration settings. It is a key-value configuration system used
+    by various XFCE components.</li>
+    <li><code>xfdesktop</code> - Manages the desktop background, icons,
+    and provides basic desktop management functions.</li>
+    <li><code>xfwm4</code> - Manages window placement, decorations, and
+    handles basic window management functions within the XFCE desktop
+    environment.</li>
+    <li><code>rxvt-unicode</code> - Provides a lightweight terminal
+    emulator with support for Unicode, suitable for use within the XFCE
+    environment.</li>
+    <li><code>git</code> - Version control software.</li>
+    <li><code>make</code> - Unix build system tool.</li>
+    <li><code>rofi</code> - Application launcher.</li>
+    </ul>
+    <p>These packages collectively form the core components necessary
+    for a functional and lightweight XFCE desktop environment on a
+    Debian system. They handle various aspects of the desktop user
+    experience, ranging from file management to window handling and
+    configuration settings.</p>
+    <h2 id="granting-sudo-access">2. Granting Sudo Access</h2>
+    <p>I discovered that my created profile is not part of the
+    <code>sudoers</code> group, preventing me from using any other
+    commands relevant to the <code>root</code> user for further
+    configurations.</p>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">su</span> <span class="at">-</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">usermod</span> <span class="at">-aG</span> sudo <span class="op">&lt;</span>username<span class="op">&gt;</span></span></code></pre></div>
+    <h2 id="configuring-existing-ssh-keys">3. Configuring existing SSH
+    keys</h2>
+    <p>I typically store my private keys in a secure location, ensuring
+    continued access when switching systems by creating backups. Place
+    your private keys in the <code>~/.ssh</code> directory. If you
+    haven’t used the default names (<code>id_rsa</code>), remember to
+    add them manually after each reboot, or include them in your
+    <code>.bashrc</code> for automatic loading.</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-add</span> ~/.ssh/<span class="op">&lt;</span>key<span class="op">&gt;</span></span></code></pre></div>
+    <p>Usually when ou create the file by yourself, the chmod
+    permissions are set to 644, this is too wide from private key.
+    Change it to 600.</p>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> 600 id_rsa</span></code></pre></div>
+    <h2 id="gui-wifi-manager">4. GUI WiFi Manager</h2>
+    <p>If you configured your WiFi during installation, you likely have
+    internet access. However, changing connection settings currently
+    requires using command-line commands, which may not be convenient if
+    done infrequently. XFCE includes <code>nm-applet</code>, a tool that
+    simplifies network configuration. Unfortunately, I encountered
+    issues enabling it, necessitating manual editing of the Network
+    Manager configuration.</p>
+    <p>Begin by removing your previously configured network from
+    <code>/etc/network/interfaces</code>. You wil find something
+    similar:</p>
+    <pre><code># The primary network interface
+allow-hotplug wlp0s20f3
+iface wlp0s20f3 inet dhcp
+    wpa-ssid wifi-name
+    wpa-psk  wifi-password</code></pre>
+    <p>Subsequently, modify the
+    <code>/etc/NetworkManager/NetworkManager.conf</code> file to set it
+    as ‘managed’:</p>
+    <pre><code>[main]
+plugins=ifupdown,keyfile
+
+[ifupdown]
+managed=true</code></pre>
+    <p>Reboot the system.</p>
+    <h2 id="audio-manager">5. Audio Manager</h2>
+    <p>To commence listening to audio, it is essential to install the
+    basic packages enabling configuration of sound input and output. I
+    recommend using <code>pulseaudio</code> as it usually suffices for
+    this purpose and <code>xfce4-pulseaudio-plugin</code> for displaying
+    the tray icon.</p>
+    <div class="sourceCode" id="cb7"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install pulseaudio xfce4-pulseaudio-plugin</span></code></pre></div>
+    <h2 id="bluetooth-manager">6. Bluetooth Manager</h2>
+    <p>I typically use my AirPods with the Linux system. The Bluetooth
+    manager is not included by default in the minimal installation. To
+    set it up, you need to download <code>blueman</code> or any other
+    GUI manager. Alternatively, if you prefer, you can stick to the
+    command line (CLI). 😊</p>
+    <div class="sourceCode" id="cb8"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install bluetooth pulseaudio-module-bluetooth blueman</span></code></pre></div>
+    <ul>
+    <li><code>bluetooth</code> - Essential Bluetooth utilities and tools
+    for managing Bluetooth devices.</li>
+    <li><code>pulseaudio-module-bluetooth</code> - PulseAudio extension
+    module enabling seamless integration of Bluetooth audio
+    devices.</li>
+    <li><code>blueman</code> - GTK-based Bluetooth manager with a
+    user-friendly graphical interface.</li>
+    </ul>
+    <h2 id="touchpad-click">7. Touchpad click</h2>
+    <p>Since I use a laptop for my daily activities, I am accustomed to
+    using touchpad taps to click on items. To enable this functionality,
+    you need to add a few configurations.</p>
+    <p>based on this <a
+    href="https://unix.stackexchange.com/questions/337008/activate-tap-to-click-on-touchpad">thread</a>.
+    In the file <code>/etc/X11/xorg.conf.d/40-libinput.conf</code>
+    add</p>
+    <pre><code>Section &quot;InputClass&quot;
+        Identifier &quot;touchpad catchall&quot;
+        Driver &quot;synaptics&quot;
+        MatchIsTouchpad &quot;on&quot;
+        Option &quot;TapButton1&quot; &quot;1&quot;
+        Option &quot;TapButton2&quot; &quot;3&quot;</code></pre>
+    <p>Reboot the system.</p>
+    <h2 id="the-keyring">8. The keyring</h2>
+    <p>When attempting to log in to my GitHub account to sync settings
+    on VSCode, I encountered an error related to the keyring
+    application. It appears that XFCE lacks a dedicated tool to store
+    secrets on the device. A possible solution is to reuse one from
+    GNOME.</p>
+    <div class="sourceCode" id="cb10"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install gnome-keyring</span></code></pre></div>
+    <h3 id="keyring-prompt">Keyring prompt</h3>
+    <p>If you set up a password for the keyring, you will be prompted to
+    enter it every time you restart the machine. There’s a suggestion <a
+    href="https://unix.stackexchange.com/questions/324843/chrome-harasses-me-for-a-keychain-password-at-startup">here</a>
+    to set them blank. While it may not sound ideal, it is a workaround
+    for the issue.</p>
+    <h2 id="snap-store">9. Snap store</h2>
+    <p>I enjoy installing a few apps from the Snap Store, which are not
+    available by default. To install them:</p>
+    <pre><code>sudo apt install snapd
+sudo snap install core
+sudo snap install snap-store</code></pre>
+    <h3 id="making-snap-applications-visible-for-the-system">Making snap
+    applications visible for the system</h3>
+    <p>To achieve this, simply add symbolic links to the
+    applications.</p>
+    <div class="sourceCode" id="cb12"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> /var/lib/snapd/desktop/ ~/.local/share/applications/</span></code></pre></div>
+    <h2 id="emojis">10. Emojis</h2>
+    <p>When I started browsing the internet, I noticed that some emojis
+    were not displaying correctly; instead, I saw black blocks. This
+    issue can be resolved by downloading the
+    <code>noto-color-emoji</code> fonts.</p>
+    <div class="sourceCode" id="cb13"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install fonts-noto-color-emoji</span></code></pre></div>
+
+    
+    <div class="meta">
+                <span class="label">Date: </span>
+        <span class="value">2024-01-31</span
+        
+        
+                <span class="label">Category: </span>
+        <span class="value">Tutorials</span
+        
+                <span class="label">Tags: </span>
+        <span class="value">linux</span
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

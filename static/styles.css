@@ -1,0 +1,199 @@
+body {
+    max-width: 985px;
+    font-family: ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji";
+    margin: 0 auto;
+    font-size: 10.5pt;
+    line-height: 17pt;
+}
+
+main {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+hgroup {
+    display: block;
+    margin-bottom: 20px;
+}
+
+hgroup > h1 {
+    margin-bottom: 2px;
+}
+
+hgroup > p {
+    margin-top: 2px;
+    font-style: italic;
+    color: #303030;
+}
+
+article {
+    counter-reset: figure;
+}
+
+article > .meta {
+    color: #202020;
+    font-size: 8pt;
+    text-align: right;
+}
+
+article > .meta > .value {
+    margin-right: 10px;
+}
+
+
+article > h2 {
+    background: #d3d3d347;
+    padding: 8px 8px;
+    box-sizing: border-box;
+    clear: both;
+}
+
+nav {
+    border-bottom: 1px solid #cacaca;
+    background: #f7f7f7;
+    padding-top: 1%;
+    padding-bottom: 1%;
+}
+
+nav ol {
+    display: flex;
+    font-weight: bold;
+    width: 60%;
+    margin: 0;
+    flex-wrap: wrap;
+    padding-left: 1%;
+    padding-right: 1%;
+    box-sizing: border-box;
+}
+
+nav ol li {
+    display: block;
+    min-width: fit-content;
+    flex: 0 1 auto;
+    margin-top: 5px;
+    padding: 0 10px;
+}
+
+nav ol li a {
+    color: #4c4c4c;
+    text-decoration: none;    
+}
+
+nav ol li a:hover {
+    color: #303030;
+    text-decoration: none;
+}
+
+ul#archive-list {
+    list-style: none;
+}
+
+ul#archive-list time {
+    font-weight: bold;
+}
+
+ul#archive-list li {
+    margin-top: 1.5pt;
+}
+
+ul#archive-list li a:hover {
+    color: darkblue;
+}
+
+article > ol > li > code,
+article > ul > li > code,
+p > code {
+    font-size: 11pt;
+    background: #d3d3d347;
+    padding: 0 3px;
+}
+
+figure {
+    width: 100%;
+    margin: 0;
+    background: #d3d3d347;
+    padding: 20px;
+    padding-bottom: 0;
+    clear: both;
+    box-sizing: border-box;
+    counter-increment: figure;
+}
+
+img {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+figure > img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+figure > figcaption:before {
+    content: "Fig " counter(figure) ": ";
+}
+
+figure > figcaption {
+    display: block;
+    margin: 10px auto;
+    width: fit-content;
+    font-style: italic;
+    color: #303030;
+    font-weight: bold;
+    text-align: center;
+}
+
+article > pre,
+article > div.sourceCode > pre{
+    border: 1px #ccc solid;
+    border-radius: 3px;
+    padding: 10px;
+    min-width: fit-content;
+}
+
+main .sidebar {
+    width: 30%;
+    float: right;
+    padding: 0px 12px;
+    margin-left: 50px;
+    margin-bottom: 10px;
+    font-size: 9pt;
+    background: #d3d3d347;
+}
+
+main .todo {
+    background: #d3d3d347;
+    border: 1px #a70000 solid;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+aside#footnotes p {
+    font-size: 10pt;
+    margin: 0;
+}
+
+footer {
+    font-size: 8.5pt;
+    text-align: right;
+    border-top: 1px solid #cacaca;
+    padding: 0px 5px;
+    color: #4c4c4c;
+}
+
+@media (max-width: 985px) {
+    body {
+        margin: 0 10px;
+    }
+
+    main .sidebar {
+        float: none;
+        width: 90%;
+        margin: auto;
+    }
+    
+    nav ol {
+        width: 100%;
+    }
+}

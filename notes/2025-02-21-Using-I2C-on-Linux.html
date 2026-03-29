@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>Using I2C on Linux</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#linux-api"
+                                id="toc-linux-api">Linux API</a></li>
+                                <li><a href="#i2c-read-write"
+                                id="toc-i2c-read-write">I2C Read &amp;
+                                Write</a>
+                                <ul>
+                                <li><a href="#i2c-tools"
+                                id="toc-i2c-tools">i2c-tools</a></li>
+                                </ul></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <p>The Linux system abstracts the hardware layer from the OS by
+    treating everything as a file. When working with single-board
+    computers like the Raspberry Pi, you can easily write drivers
+    directly in userspace without needing to implement complex kernel
+    drivers. One example is the I2C bus interface available on one of
+    its pins. The Raspberry Pi ecosystem offers several libraries that
+    help you interact with I2C, but this article will show you how to
+    use the native API to utilize this interface.</p>
+    <p>Before writing any code, make sure you have enabled access to
+    your hardware interface using the <code>raspi-config</code> tool. To
+    do this, enter <code>raspi-config</code> in the CLI, navigate to
+    <code>Interface Options</code>, and select <code>I2C</code> to
+    enable access to the hardware interface. Probably the board will
+    need to reboot.</p>
+    <p>If you do everything correctly you should be able to see I2C-*
+    folders in the following directory <code>/dev/i2c-</code>.</p>
+    <h2 id="linux-api">Linux API</h2>
+    <p>The I2C interface from the user perspective is a simple file,
+    which can be opened. The file handler allows to use
+    <code>ioctl</code> function to configure the interface parameters.
+    According to the <a
+    href="https://www.kernel.org/doc/html/v5.4/i2c/dev-interface.html">kernel
+    documentation</a> following settings importnat for the basic usage
+    can be used set:</p>
+    <ul>
+    <li><code>I2C_SLAVE</code> - sets the target device to work as
+    slave,</li>
+    <li><code>I2C_TENBIT</code> - sets the address bit size to 10-bits
+    instead default 7-bits.</li>
+    </ul>
+    <p><em>This article ommits the exesitence of SMBus
+    features.</em></p>
+    <p>The I2C interface works with standard <code>read</code> and
+    <code>write</code> function calls without any additional
+    complexity.</p>
+    <h2 id="i2c-read-write">I2C Read &amp; Write</h2>
+    <p>Include necessary header files to work with file descriptors:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdint.h&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/ioctl.h&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;linux/i2c-dev.h&gt;</span></span></code></pre></div>
+    <p>To select the I2C interface open the file descriptor with
+    attributes for reading and wrritting:</p>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> i2c <span class="op">=</span> open<span class="op">(</span><span class="st">&quot;/dev/i2c-1&quot;</span><span class="op">,</span> O_RDWR<span class="op">);</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>i2c <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    exit<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+    <p>To communicate with the typical I2C device which is going to work
+    as slave, use <code>ioctl</code> function to define its hardware
+    address. Since the hardware address is 7-bit and the typical address
+    in datasheets are expressed as 8-bit byte, the address must be
+    shifted one place to the right. In example when the 8-bit hardware
+    address is <code>0xBF</code>, the 7-bit address will be
+    <code>0x5F</code>. The R/W bit is going to set automatically by the
+    Linux’s driver.</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>ioctl<span class="op">(</span>i2c<span class="op">,</span> I2C_SLAVE<span class="op">,</span> <span class="op">(</span><span class="bn">0xBF</span> <span class="op">&gt;&gt;</span> <span class="dv">1</span><span class="op">))</span> <span class="op">&lt;</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    close<span class="op">(</span>i2c<span class="op">);</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    exit<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+    <p>Now you can construct two atomical functions that will help you
+    sending one byte to the device, and reading one byte.</p>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">uint8_t</span> rx_byte<span class="op">(</span><span class="dt">int</span> i2c_fd<span class="op">,</span> <span class="dt">uint8_t</span> addr<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint8_t</span> rx<span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Write the register address</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>write<span class="op">(</span>i2c_fd<span class="op">,</span> addr<span class="op">,</span> <span class="dv">1</span><span class="op">)</span> <span class="op">!=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        close<span class="op">(</span>i2c_fd<span class="op">);</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        exit<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Read the data from the register</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>read<span class="op">(</span>i2c_fd<span class="op">,</span> rx<span class="op">,</span> <span class="dv">1</span><span class="op">)</span> <span class="op">!=</span> <span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        close<span class="op">(</span>i2c_fd<span class="op">);</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        exit<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> buf<span class="op">[</span><span class="dv">0</span><span class="op">];</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="dt">uint8_t</span> tx_byte<span class="op">(</span><span class="dt">int</span> i2c_fd<span class="op">,</span> <span class="dt">uint8_t</span> addr<span class="op">,</span> <span class="dt">uint8_t</span> data<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint8_t</span> buffer<span class="op">[</span><span class="dv">2</span><span class="op">];</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    buffer<span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> addr<span class="op">;</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    buffer<span class="op">[</span><span class="dv">1</span><span class="op">]</span> <span class="op">=</span> data<span class="op">;</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Write the address and data</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>write<span class="op">(</span>i2c_fd<span class="op">,</span> buffer<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>buffer<span class="op">))</span> <span class="op">!=</span> <span class="dv">2</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        close<span class="op">(</span>i2c_fd<span class="op">);</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        exit<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+    <p>Using these two functions, you will be able to create higher
+    abstraction layers to help you configure the I2C device.</p>
+    <h3 id="i2c-tools">i2c-tools</h3>
+    <p>For debuging purposes the Linux communicty created I2C tools that
+    helps you to communicate with the interface directly through the
+    bash. To install those use
+    <code>sudo apt-get install i2c-tools</code>. This will enable I2C
+    tools to scan the I2C bus for any device online
+    <code>i2cdetect -l 1</code> (here command is listining all devices
+    on interface i2c-1). Next, by using <code>i2cget</code> you can
+    issue a read/write operation directly on the I/Os
+    <code>i2cget 1 0x5f 0x0f b</code> - the command will use
+    <code>i2c-1</code> interface and read single byte (<code>b</code>)
+    from device which hardware address is <code>0x5f</code> (remember
+    about 8-bit to 7-bit transformation) from memory address
+    <code>0x0f</code>.</p>
+    <p>The <code>i2cget</code> command can be substituted with C code
+    using presented code in previous chapter:</p>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> i2c <span class="op">=</span> open<span class="op">(</span><span class="st">&quot;/dev/i2c-1&quot;</span><span class="op">,</span> O_RDWR<span class="op">);</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ioctl<span class="op">(</span>i2c<span class="op">,</span> I2C_SLAVE<span class="op">,</span> <span class="op">(</span><span class="bn">0xBF</span> <span class="op">&gt;&gt;</span> <span class="dv">1</span><span class="op">));</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">uint8_t</span> rx <span class="op">=</span> rx_byte<span class="op">(</span>i2c<span class="op">,</span> <span class="bn">0x0f</span><span class="op">);</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>close<span class="op">(</span>i2c<span class="op">);</span></span></code></pre></div>
+
+    
+    <div class="meta">
+                <span class="label">Date: </span>
+        <span class="value">2025-02-21</span
+        
+        
+                <span class="label">Category: </span>
+        <span class="value">linux</span
+        
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

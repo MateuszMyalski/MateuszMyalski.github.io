@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>VSCode Language Server Development</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#what-is-the-lsp"
+                                id="toc-what-is-the-lsp">What is the
+                                LSP</a></li>
+                                <li><a
+                                href="#minimal-environment-set-up"
+                                id="toc-minimal-environment-set-up">Minimal
+                                environment set-up</a></li>
+                                <li><a href="#client-set-up"
+                                id="toc-client-set-up">Client
+                                set-up</a></li>
+                                <li><a href="#server-set-up"
+                                id="toc-server-set-up">Server
+                                set-up</a></li>
+                                <li><a href="#debugging"
+                                id="toc-debugging">Debugging</a>
+                                <ul>
+                                <li><a href="#logs-form-server-side"
+                                id="toc-logs-form-server-side">Logs form
+                                server side</a></li>
+                                <li><a href="#console-log"
+                                id="toc-console-log">Console
+                                log</a></li>
+                                </ul></li>
+                                <li><a href="#logs-from-client-side"
+                                id="toc-logs-from-client-side">Logs from
+                                client side</a></li>
+                                <li><a href="#event-cooking-book"
+                                id="toc-event-cooking-book">Event
+                                cooking-book</a>
+                                <ul>
+                                <li><a href="#document"
+                                id="toc-document">Document</a></li>
+                                <li><a href="#completion"
+                                id="toc-completion">Completion</a></li>
+                                <li><a href="#links"
+                                id="toc-links">Links</a></li>
+                                <li><a href="#ondocumentlinks"
+                                id="toc-ondocumentlinks">onDocumentLinks</a></li>
+                                <li><a href="#ondocumentlinkresolve"
+                                id="toc-ondocumentlinkresolve">onDocumentLinkResolve</a></li>
+                                <li><a href="#custom-requests"
+                                id="toc-custom-requests">Custom
+                                requests</a></li>
+                                </ul></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <p>Programming languages come with their own semantics and features,
+    and programmers often rely on hints and checkers provided by their
+    Integrated Development Environment (IDE) to speed up development and
+    troubleshoot code. However, implementing every possible semantic
+    feature directly into an IDE for all programming languages would not
+    be optimal. Therefore, the Language Server Protocol (LSP) was
+    created as a layer between the user interface and the IDE. The
+    server provides necessary functionalities often visible when
+    searching symbols or writing function prototypes, etc.</p>
+    <p>This paper aims to provide a practical approach to developing
+    your first LSP that interacts with both the user and the IDE. I will
+    describe the conventions used in VSCode npm packages for extension
+    development. By the end of this read, you will have a good starting
+    point to implement your own ideas within the event-based environment
+    of the LSP. I will also provide interesting resources for finding
+    examples and describing possibilities you might be seeking on the
+    internet, gathering some examples to implement various
+    functionalities. Here, I’ve done it all for you!</p>
+    <h2 id="what-is-the-lsp">What is the LSP</h2>
+    <p>The Language Server Protocol (LSP) server is thoroughly described
+    on the official <a
+    href="https://code.visualstudio.com/api/language-extensions/language-server-extension-guide">Microsoft
+    webpage</a>. Understanding its intricacies is crucial, but let’s
+    focus on the high-level overview.</p>
+    <p>When a client performs actions like code highlighting or file
+    editing, it often requires advanced features such as autocompletion
+    in languages like C, JavaScript, or Python. To cater to these needs,
+    the LSP acts as an intermediary. It facilitates communication
+    between the client and various language servers, enabling seamless
+    integration of language-specific functionalities into the
+    development environment.</p>
+    <pre class="ascii center">
+    Languages:            Methods:
+                | textDocument/didClose     |
+    JS -------> | textDocument/documentLink |
+                | textDocument/references   |
+    Python ---> | textDocument/hover        | -----> LSP
+                | textDocument/completion   |
+    C --------> | textDocument/inlayHint    |
+                | textDocument/didOpen      |
+    </pre>
+    <p>All available methods are thoroughly described in the <a
+    href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/">official
+    documentation</a>. The documentation outlines various requests and
+    responses in corresponding chapters.</p>
+    <p>For practical implementation guidance, I found it immensely
+    useful to draw inspiration from the following resources:</p>
+    <ul>
+    <li><a
+    href="https://github.com/microsoft/vscode-languageserver-node/blob/main/client-node-tests/src/servers/testServer.ts">vscode-languageserver-node/testServer.ts</a></li>
+    <li><a
+    href="https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample">vscode-extension-samples/lsp-sample</a></li>
+    </ul>
+    <p>It’s worth noting that messages can be sent using four different
+    standards:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">declare</span> <span class="kw">enum</span> TransportKind {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    stdio <span class="op">=</span> <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    ipc <span class="op">=</span> <span class="dv">1</span><span class="op">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pipe <span class="op">=</span> <span class="dv">2</span><span class="op">,</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    socket <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+    <p>I am going to focus on using the <code>ipc</code> method of
+    transporting messages between the client and LSP.</p>
+    <p>In Visual Studio Code (VSCode), messages between the client
+    (VSCode) and the language server are typically sent using JSON-RPC
+    (Remote Procedure Call) over the chosen IPC (Inter-Process
+    Communication) mechanism. JSON-RPC is a lightweight remote procedure
+    call protocol utilizing JSON for data serialization.</p>
+    <p>Messages are formatted as JSON objects containing fields such as
+    <code>jsonrpc</code>, <code>method</code>, <code>params</code>, and
+    <code>id</code>. These fields specify the JSON-RPC version, the
+    method being called or responded to, any parameters associated with
+    the method, and an identifier for the message (typically used for
+    correlating responses with requests). Then, they are serialized and
+    transmitted.</p>
+    <p>To put this into an example, imagine you are currently editing an
+    open file. The client sends a notification method to our server with
+    the message ID <code>textDocument/didChange</code>, along with
+    corresponding parameters. However, before this happens, the server
+    needs to inform the client that it is capable of handling such a
+    message, which is described as follows:</p>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>textDocumentSync<span class="op">:</span> TextDocumentSyncKind<span class="op">.</span><span class="at">Incremental</span><span class="op">,</span></span></code></pre></div>
+    <p>This informs our client that we are capable of handling text
+    document events and to send only changes instead of the full
+    document, as it would be with the option
+    <code>TextDocumentSyncKind.Full</code>.</p>
+    <p>With this minimal theory in place, we are now prepared to
+    exchange a few logs.</p>
+    <h2 id="minimal-environment-set-up">Minimal environment set-up</h2>
+    <p>To start, we need to set up a TypeScript environment. This
+    requires having Node.js installed. To install node:</p>
+    <pre><code>sudo apt install node</code></pre>
+    <p>Clone the minimal LSP development environment from the public
+    GitHub repository <a
+    href="https://github.com/semanticart/minimum-viable-vscode-language-server-extension">here</a>.</p>
+    <p>Once cloned, you’ll find the following directories:</p>
+    <ul>
+    <li><code>.vscode</code>: Contains all necessary shortcuts
+    configuration, enabling you to easily hit ‘F5’ to start
+    debugging.</li>
+    <li><code>client</code>: Contains all client-side related
+    operations, responsible for setting up the connection with our
+    LSP.</li>
+    <li><code>server</code>: Houses our LSP related source files.</li>
+    </ul>
+    <p>After cloning the repository, it’s recommended to update the
+    versions of <code>vscode-languageserver</code> in
+    <code>server/package.json</code> and
+    <code>vscode-languageclient</code> in
+    <code>client/package.json</code>.</p>
+    <p>To prepare the environment for further development, execute
+    <code>npm install</code>. To debug, simply hit <code>F5</code>.</p>
+    <h2 id="client-set-up">Client set-up</h2>
+    <p>We begin by examining our client-side setup. Here, we need to
+    configure the client settings and establish a connection with the
+    LSP.</p>
+    <p>The “extension” must cover two functions that will be called by
+    VSCode when enabling our extension: <code>activate</code> and
+    <code>deactivate</code>. We need to provide implementations for
+    these two functions.</p>
+    <p>The activation method should consist of the following steps:</p>
+    <ol type="1">
+    <li>Specify server options:
+    <ol type="1">
+    <li>Where is the LSP script located?</li>
+    <li>How do we want to run the server?</li>
+    <li>How do we exchange messages?</li>
+    </ol></li>
+    <li>Set up our client and point it to the server configuration.</li>
+    <li>Register any event handling functions (which will be described
+    later in the chapter about sending custom requests from server to
+    client).</li>
+    <li>Start the client.</li>
+    </ol>
+    <p>During deactivation, we should close all used resources and stop
+    our client session.</p>
+    <p>Minimal client set-up is showed in <a
+    href="https://github.com/semanticart/minimum-viable-vscode-language-server-extension/blob/%20main/client/src/extension.ts">GitHub:
+    minimum-viable-vscode-language-server-extension</a></p>
+    <h2 id="server-set-up">Server set-up</h2>
+    <p>We are creating the connection object with:</p>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> connection <span class="op">=</span> <span class="fu">createConnection</span>(ProposedFeatures<span class="op">.</span><span class="at">all</span>)<span class="op">;</span></span></code></pre></div>
+    <p>then we need to specify the first event that will occure where
+    the client will establish the connection.</p>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>connection<span class="op">.</span><span class="fu">onInitialize</span>((params<span class="op">:</span> InitializeParams) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> result<span class="op">:</span> InitializeResult <span class="op">=</span> {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    capabilities<span class="op">:</span> {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      <span class="co">/* Here we list all methods the server can handle */</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  }<span class="op">;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> result<span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+    <p>The client will wait for the set of capabilities that our server
+    will handle to send only those messages that we really care
+    about.</p>
+    <p>Once we specify this event, we can start listening for any
+    incoming connections:</p>
+    <div class="sourceCode" id="cb6"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>connection<span class="op">.</span><span class="fu">listen</span>()<span class="op">;</span></span></code></pre></div>
+    <p>Minimal server set-up is showed in <a
+    href="https://github.com/semanticart/minimum-viable-vscode-language-server-extension/blob/main/server/src/server.ts">GitHub:
+    minimum-viable-vscode-language-server-extension</a></p>
+    <h2 id="debugging">Debugging</h2>
+    <p>The very first thing I tried to do when I started to work with
+    LSP was to display some logs, to better understand the events and
+    parameters that I received. This truly helped me to understand the
+    overall flow of the LSP.</p>
+    <p>Since we are working with multiple applications running at the
+    same time, I had some trouble finding the correct methods of sending
+    logs and notifications.</p>
+    <h3 id="logs-form-server-side">Logs form server side</h3>
+    <figure>
+    <img
+    src="/attachments/images/VSCode_language_server_development/server_side_logs.png"
+    alt="Server Side Logs" />
+    <figcaption aria-hidden="true">Server Side Logs</figcaption>
+    </figure>
+    <p>They are going to be visible in the newly opened VSCode
+    window.</p>
+    <h4 id="notification">Notification</h4>
+    <p>The most visible log is to send a notification to our client from
+    the server side.</p>
+    <div class="sourceCode" id="cb7"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>connection<span class="op">.</span><span class="at">window</span><span class="op">.</span><span class="fu">showInformationMessage</span>(<span class="st">&quot;Notification&quot;</span>)<span class="op">;</span></span></code></pre></div>
+    <h3 id="console-log">Console log</h3>
+    <p>Another practical way of logging information would be to send it
+    to a terminal.</p>
+    <div class="sourceCode" id="cb8"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>connection<span class="op">.</span><span class="at">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;onInitialize &quot;</span>)<span class="op">;</span></span></code></pre></div>
+    <h2 id="logs-from-client-side">Logs from client side</h2>
+    <h4 id="default-console-log">Default console log</h4>
+    <p>We can use debug terminal to send logs:</p>
+    <div class="sourceCode" id="cb9"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;Init!&quot;</span>)<span class="op">;</span></span></code></pre></div>
+    <p>They are going to be visible in the “Debug Console” in the window
+    where you started the debugging.</p>
+    <h4 id="own-console-instance">Own console instance</h4>
+    <p>We can create our own custom message stream:</p>
+    <div class="sourceCode" id="cb10"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> orange <span class="op">=</span> vscode<span class="op">.</span><span class="at">window</span><span class="op">.</span><span class="fu">createOutputChannel</span>(<span class="st">&quot;My custom terminal&quot;</span>)<span class="op">;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>orange<span class="op">.</span><span class="fu">appendLine</span>(<span class="st">&quot;Log line!&quot;</span>)<span class="op">;</span></span></code></pre></div>
+    <p>They are going to be visible in the new opened VSCode window. You
+    need to change the selected terminal as showed on previous
+    screenshot.</p>
+    <h2 id="event-cooking-book">Event cooking-book</h2>
+    <p>Events I used and were handy while my development.</p>
+    <h3 id="document">Document</h3>
+    <p>Instruct the server about capabilities:</p>
+    <div class="sourceCode" id="cb11"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>textDocumentSync<span class="op">:</span> TextDocumentSyncKind<span class="op">.</span><span class="at">Incremental</span><span class="op">,</span></span></code></pre></div>
+    <p>To handle document related events first create object for text
+    documents manager, attach established connection and start listening
+    any text document related events.</p>
+    <div class="sourceCode" id="cb12"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> documents<span class="op">:</span> TextDocuments<span class="op">&lt;</span>TextDocument<span class="op">&gt;</span> <span class="op">=</span> <span class="kw">new</span> <span class="fu">TextDocuments</span>(TextDocument)<span class="op">;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>documents<span class="op">.</span><span class="fu">listen</span>(connection)<span class="op">;</span></span></code></pre></div>
+    <h4 id="ondidchangecontent">onDidChangeContent</h4>
+    <p>Triggered every time when the we edit the file content.</p>
+    <div class="sourceCode" id="cb13"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>documents<span class="op">.</span><span class="fu">onDidChangeContent</span>((_change) <span class="kw">=&gt;</span> {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  connection<span class="op">.</span><span class="at">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;onDidChangeContent&quot;</span>)<span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code></pre></div>
+    <h3 id="completion">Completion</h3>
+    <p>Instruct server about capabilities:</p>
+    <div class="sourceCode" id="cb14"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>completionProvider<span class="op">:</span> {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    resolveProvider<span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    triggerCharacters<span class="op">:</span> [<span class="st">&quot;[&quot;</span>]<span class="op">,</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+    <p>You can specify in which key the completion list should be showed
+    <code>triggerCharacters</code>.</p>
+    <h4 id="oncompletion">onCompletion</h4>
+    <p>The list after you hit <code>ctrl + space</code> will be
+    constructed from the array you return.</p>
+    <div class="sourceCode" id="cb15"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>connection<span class="op">.</span><span class="fu">onCompletion</span>((_textDocumentPosition<span class="op">:</span> CompletionParams)<span class="op">:</span> CompletionItem[] <span class="kw">=&gt;</span> {</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    connection<span class="op">.</span><span class="at">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;onCompletion&quot;</span>)<span class="op">;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> [</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        { label<span class="op">:</span> <span class="st">&#39;Label A&#39;</span><span class="op">,</span> insertText<span class="op">:</span> <span class="st">&#39;text&#39;</span>}<span class="op">,</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>      ]</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span></code></pre></div>
+    <h3 id="links">Links</h3>
+    <p>Instruct server about capabilities:</p>
+    <div class="sourceCode" id="cb16"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>documentLinkProvider<span class="op">:</span> {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    resolveProvider<span class="op">:</span> <span class="kw">true</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+    <p>Links can be created by specifying the range of characters that
+    are supposed to be interactive. These links are created using
+    <code>onDocumentLinks</code> and can later handled one by one with
+    <code>onDocumentLinkResolve</code>.</p>
+    <h3 id="ondocumentlinks">onDocumentLinks</h3>
+    <p>Assign ranges of characters to links:</p>
+    <div class="sourceCode" id="cb17"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>connection<span class="op">.</span><span class="fu">onDocumentLinks</span>((_params) <span class="kw">=&gt;</span> {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        DocumentLink<span class="op">.</span><span class="fu">create</span>(<span class="bu">Range</span><span class="op">.</span><span class="fu">create</span>(<span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span>))</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    ]<span class="op">;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+    <h3 id="ondocumentlinkresolve">onDocumentLinkResolve</h3>
+    <p>This event will be triggered when user clicks on the link with
+    <code>Ctrl + click</code></p>
+    <div class="sourceCode" id="cb18"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>connection<span class="op">.</span><span class="fu">onDocumentLinkResolve</span>((link) <span class="kw">=&gt;</span> {</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    connection<span class="op">.</span><span class="at">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;onDocumentLinkResolve&quot;</span>)<span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    connection<span class="op">.</span><span class="at">URI</span> <span class="op">=</span> URI<span class="op">.</span><span class="fu">file</span>(<span class="st">&quot;path_to_file.txt&quot;</span>)<span class="op">.</span><span class="fu">toString</span>()<span class="op">;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> link<span class="op">;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+    <p>It is possible to read the current workspaces URI which is passed
+    as parrem in <code>onInitialize</code> event
+    <code>params.workspaceFolders[0].URI</code>.</p>
+    <h3 id="custom-requests">Custom requests</h3>
+    <p>It is possible to send custom requests or notifications from
+    server to client and other way round.</p>
+    <h4 id="sendrequest">sendRequest</h4>
+    <p>You can send request from server to client with
+    <code>sendRequest</code>.</p>
+    <div class="sourceCode" id="cb19"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> params <span class="op">=</span> {}<span class="op">;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>connection<span class="op">.</span><span class="fu">sendRequest</span>(<span class="st">&quot;customMethod/eventName&quot;</span><span class="op">,</span> params)<span class="op">;</span></span></code></pre></div>
+    <p>In case the request suppose to return some value you can assign
+    it to the variable as from usuall function.</p>
+    <div class="sourceCode" id="cb20"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> params <span class="op">=</span> {}<span class="op">;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> response <span class="op">=</span> connection<span class="op">.</span><span class="fu">sendRequest</span>(<span class="st">&quot;customMethod/eventName&quot;</span><span class="op">,</span> params)<span class="op">;</span></span></code></pre></div>
+    <h4 id="onrequest">onRequest</h4>
+    <p>To receive custom request on client side you can use
+    <code>onRequest</code> event.</p>
+    <div class="sourceCode" id="cb21"><pre
+    class="sourceCode ts"><code class="sourceCode typescript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>client<span class="op">.</span><span class="fu">onRequest</span>(<span class="st">&quot;customMethod/eventName&quot;</span><span class="op">,</span> (params<span class="op">:</span> <span class="dt">any</span>) <span class="kw">=&gt;</span> {</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&quot;My custom event!&quot;</span>)<span class="op">;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> response <span class="op">=</span> { custom<span class="op">:</span> <span class="st">&quot;label&quot;</span> }<span class="op">;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> response</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+    <p>To return data from completed request just return the object or
+    value as in normal function.</p>
+
+    
+    <div class="meta">
+                <span class="label">Date: </span>
+        <span class="value">2024-02-19</span
+        
+        
+                <span class="label">Category: </span>
+        <span class="value">Tutorials</span
+        
+                <span class="label">Tags: </span>
+        <span class="value">javascript</span
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

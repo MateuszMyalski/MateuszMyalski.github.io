@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>Symmetric keys</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#the-concept"
+                                id="toc-the-concept">The
+                                concept</a></li>
+                                <li><a href="#encryption"
+                                id="toc-encryption">Encryption</a></li>
+                                <li><a href="#algorithms"
+                                id="toc-algorithms">Algorithms</a>
+                                <ul>
+                                <li><a href="#des"
+                                id="toc-des">DES</a></li>
+                                <li><a href="#aes"
+                                id="toc-aes">AES</a></li>
+                                </ul></li>
+                                <li><a href="#gcm---galois-counter-mode"
+                                id="toc-gcm---galois-counter-mode">GCM -
+                                Galois Counter Mode</a></li>
+                                <li><a href="#drawbacks"
+                                id="toc-drawbacks">Drawbacks</a></li>
+                                <li><a href="#openssl"
+                                id="toc-openssl">OpenSSL</a></li>
+                                <li><a href="#references"
+                                id="toc-references">References</a></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <h2 id="the-concept">The concept</h2>
+    <p>During sharing data between two devices it is currently a
+    standard that the data is somehow <strong>encrypted</strong>. To
+    allow safe transmission, so third persons cannot simply read the
+    data some kind of mechanism must be introduced. The mechanism is
+    called <strong>symmetric encryption</strong>.</p>
+    <h2 id="encryption">Encryption</h2>
+    <p>To describe how the symmetric encryption works it is good to
+    state two important aspect of the described mechanism: - the
+    encryption and decryption is performed by using secret key, - the
+    secret key is known by two devices that communicate with each other,
+    - the selected algorithm is the same for encrypting the message and
+    for decryption.</p>
+    <figure>
+    <img src="/attachments/images/symmetric_keys/block_diagram.png"
+    alt="Block Diagram" />
+    <figcaption aria-hidden="true">Block Diagram</figcaption>
+    </figure>
+    <h2 id="algorithms">Algorithms</h2>
+    <p>There is many known algorithms that allows data encryption with
+    known secret key. Algorithms are in two types: - block algorithms -
+    only even blocks of bits are encrypted, - stream algorithms - data
+    can be encrypted as it flows in the stream.</p>
+    <h3 id="des">DES</h3>
+    <p>Old method of encryption. DES was using different variation of
+    keys 2 or 3. Currently used widely in EMV chip cards. Not very good
+    algorithm to secure important information.</p>
+    <h3 id="aes">AES</h3>
+    <p>The most common and the most advanced technique. Has it’s own
+    variation of the key ARS-128, AES-192 and AES-256.</p>
+    <h2 id="gcm---galois-counter-mode">GCM - Galois Counter Mode</h2>
+    <p>It is a mode of operation for symmetric-key cryptographic block
+    cipher. This mode allows to achieve high performance and speed when
+    encrypting/encrypting the data with inexpensive hardware resources.
+    This mode uses initialization vector to encrypt the data and is
+    widely used in GMAC. GCM is defined for block ciphers where block
+    size is 128 bits. The implementation can <strong>use instruction
+    pipeline or hardware pipeline so parallel executions</strong> of
+    certain algorithm stages is possible.</p>
+    <p>It is recommended due to the security to use different IV
+    (Initialization Vector) when using the same key. GCM is not good
+    selection for very short tag-lengths nor very long messages.</p>
+    <p>GCM has also it’s own version called <em>Sophie Germain Counter
+    Mode</em> that uses modular arithmetic and safe prime numbers to
+    prevent “weak keys”.</p>
+    <p>This method is also used to produce <strong>GMAC</strong> that
+    produce <em>MAC</em> (Message Authentication Code). During
+    encryption with selected mode GCM/CCM and algorithm (currently only
+    AES is supported), the mechanism produces <strong>tag</strong> that
+    allows to authenticate the encrypted message.</p>
+    <figure>
+    <img src="/attachments/images/symmetric_keys/block_diagram_gmac.png"
+    alt="Block Diagram" />
+    <figcaption aria-hidden="true">Block Diagram</figcaption>
+    </figure>
+    <h2 id="drawbacks">Drawbacks</h2>
+    <p><strong>Key Exhaustion</strong> - the secret key is leaking
+    information that allows the attacker to reconstruct the used key.
+    Mostly this can be visible during Side Channel Attacks by analyzing
+    the power consumption. When the keys is used too many times on the
+    data it is possible to match some patterns. Furthermore it is
+    suggested that if the AES with Galois Counter Mode (GCM) mode is
+    used, single key should not encrypt more than 2^32 cipher
+    blocks.</p>
+    <p><strong>Attribution data</strong> - no expiration date of the key
+    is contained in the key. Therefor by using the symmetric key it is
+    important to rotate keys and replace them with new ones. It is also
+    problem that the key is has no information which algorithm should be
+    used for decryption/encryption and when it becomes invalid.</p>
+    <h2 id="openssl">OpenSSL</h2>
+    <p>Unfortunately the OpenSSL does not support GCM mode. The manual
+    states: &gt;The <strong>enc</strong> program does not support
+    authenticated encryption modes like CCM and GCM, and will not
+    support such modes in the future. The <strong>enc</strong> interface
+    by necessity must begin streaming output (e.g., to standard output
+    when <strong>-out</strong> is not used) before the authentication
+    tag could be validated, leading to the usage of <strong>enc</strong>
+    in pipelines that begin processing untrusted data and are not
+    capable of rolling back upon authentication failure.</p>
+    <p>Encrypt some data with raw <strong>aes-128</strong>
+    algorithm:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate 64 bits of random data</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>head <span class="ex">-c</span> 64 <span class="op">&lt;</span> /dev/urandom <span class="op">&gt;</span> data.bin </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Encrypt with key - secret_key</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>openssl <span class="ex">enc</span> <span class="at">-aes128</span> <span class="at">-in</span> data.bin <span class="at">-out</span> data.bin.enc <span class="at">-pass</span> pass:my_secret_key</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">***</span> WARNING : deprecated key derivation used.</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Using</span> <span class="at">-iter</span> or <span class="at">-pbkdf2</span> would be better.</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>du <span class="ex">-b</span> <span class="pp">*</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">64</span>  data.bin        <span class="co"># Raw data</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">96</span>  data.bin.enc    <span class="co"># Encrypted data</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>diff <span class="ex">data.bin</span> data.bin.enc <span class="at">-sd</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">Binary</span> files data.bin and data.bin.enc differ</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Decrypt with key - secret_key</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>openssl <span class="ex">enc</span> <span class="at">-aes128</span> <span class="at">-d</span> <span class="at">-in</span> data.bin.enc <span class="at">-out</span> data.bin.dec <span class="at">-pass</span> pass:my_secret_key</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>du <span class="ex">-b</span> <span class="pp">*</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">64</span>  data.bin</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">64</span>  data.bin.dec</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ex">96</span>  data.bin.enc    <span class="co"># Decrypted data</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>diff <span class="ex">data.bin</span> data.bin.dec <span class="at">-sd</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="ex">Files</span> data.bin and data.bin.dec are identical</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Decrypt with key - s3cret_key</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>openssl <span class="ex">enc</span> <span class="at">-aes128</span> <span class="at">-d</span> <span class="at">-in</span> data.bin.enc <span class="at">-out</span> data.bin.dec.inv <span class="at">-pass</span> pass:my_s3cret_key</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ex">***</span> WARNING : deprecated key derivation used.</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ex">Using</span> <span class="at">-iter</span> or <span class="at">-pbkdf2</span> would be better.</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="ex">bad</span> decrypt</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ex">139940000032064:error:06065064:digital</span> envelope</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="ex">routines:EVP_DecryptFinal_ex:bad</span> decrypt:../crypto/evp/evp_enc.c:610:</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>diff <span class="ex">data.bin</span> data.bin.dec.inv <span class="at">-sd</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ex">Binary</span> files data.bin and data.bin.dec.inv differ</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>diff <span class="ex">data.bin.dec</span> data.bin.dec.inv <span class="at">-sd</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ex">Binary</span> files data.bin.dec and data.bin.dec.inv differ</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>du <span class="ex">-b</span> <span class="pp">*</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ex">64</span>  data.bin</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ex">64</span>  data.bin.dec</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ex">64</span>  data.bin.dec.inv</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ex">96</span>  data.bin.enc</span></code></pre></div>
+    <p>The conclusion of the experiment is that the encrypted image is
+    bigger than the original content because certain padding is added
+    (use -nopad) and salt (use -nosalt). Furthermore, the tool is
+    showing the warning to not use raw aes-128 algorithm, because due to
+    the nowadays standards this encryption is too weak. Instead during
+    encryption multiple iteration or pbkdf2 method should be used. The
+    PBKDF simply allows to combine multiple passwords together with
+    random number generation to mitigate the brute-force attack method
+    on the encrypted data.</p>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>openssl <span class="ex">enc</span> <span class="at">-aes128</span> <span class="at">-pbkdf2</span> <span class="at">-in</span> data.bin <span class="at">-out</span> data.bin.enc <span class="dt">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">-pass</span> pass:my_secret_key <span class="at">-nopad</span> <span class="at">-nosalt</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>du <span class="ex">-b</span> <span class="pp">*</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">64</span>  data.bin</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">64</span>  data.bin.enc</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span><span class="op">&gt;</span>diff <span class="ex">data.bin</span> data.bin.enc <span class="at">-sd</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Binary</span> files data.bin and data.bin.enc differ</span></code></pre></div>
+    <h2 id="references">References</h2>
+    <ul>
+    <li><a
+    href="https://www.cryptomathic.com/news-events/blog/symmetric-key-encryption-why-where-and-how-its-used-in-banking">Symmetric
+    Key Encryption - why, where and how it’s used in banking</a></li>
+    <li><a
+    href="https://www.cryptomathic.com/news-events/blog/symmetric-cryptography-and-key-management-considerations-on-key-exhaustion-rotation-and-security-models">Symmetric
+    Cryptography and Key Management: Considerations on Key Exhaustion,
+    Rotation and Security Models</a></li>
+    <li><a
+    href="https://en.wikipedia.org/wiki/Galois/Counter_Mode">Counter
+    Mode</a></li>
+    <li><a
+    href="https://en.wikipedia.org/wiki/Sophie_Germain_Counter_Mode">Sophie
+    Germain Counter Mode</a></li>
+    </ul>
+
+    
+    <div class="meta">
+                <span class="label">Date: </span>
+        <span class="value">2021-03-26</span
+        
+        
+                <span class="label">Category: </span>
+        <span class="value">Security</span
+        
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

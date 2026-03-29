@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>Linux From Scratch</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a
+                                href="#base-preparing-environment"
+                                id="toc-base-preparing-environment">[base]
+                                Preparing environment</a></li>
+                                <li><a
+                                href="#build-crosstng-env-building-cross-compiler"
+                                id="toc-build-crosstng-env-building-cross-compiler">[build-crosstng-env]
+                                Building cross-compiler</a></li>
+                                <li><a
+                                href="#build-kernel-env-building-kernel"
+                                id="toc-build-kernel-env-building-kernel">[build-kernel-env]
+                                Building kernel</a>
+                                <ul>
+                                <li><a href="#running-image-on-qemu"
+                                id="toc-running-image-on-qemu">Running
+                                image on QEMU</a></li>
+                                </ul></li>
+                                <li><a
+                                href="#build-rootfs-building-root-filesystem"
+                                id="toc-build-rootfs-building-root-filesystem">[build-rootfs]
+                                Building root filesystem</a>
+                                <ul>
+                                <li><a
+                                href="#preparing-the-rootfs-folder-structure"
+                                id="toc-preparing-the-rootfs-folder-structure">Preparing
+                                the rootfs folder structure</a></li>
+                                <li><a href="#building-busybox"
+                                id="toc-building-busybox">Building
+                                BusyBox</a></li>
+                                <li><a href="#copying-shared-libraries"
+                                id="toc-copying-shared-libraries">Copying
+                                shared libraries</a></li>
+                                <li><a
+                                href="#preparing-the-initramfs-image"
+                                id="toc-preparing-the-initramfs-image">Preparing
+                                the initramfs image</a></li>
+                                </ul></li>
+                                <li><a
+                                href="#runtime-prepare-interactive-session"
+                                id="toc-runtime-prepare-interactive-session">[runtime]
+                                Prepare interactive session</a></li>
+                                <li><a href="#running-qemu"
+                                id="toc-running-qemu">Running
+                                QEMU</a></li>
+                                <li><a href="#full-dockerfile"
+                                id="toc-full-dockerfile">Full
+                                Dockerfile</a></li>
+                                <li><a href="#resources"
+                                id="toc-resources">Resources</a></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <p>This tutorial shows how to run a simple cross-compiled kernel on
+    the QEMU emulator. We will target compilation for the
+    <code>ARM Cortex-A9</code> processor, with hardware acceleration for
+    floating-point operations. The <strong>musl</strong> libc
+    implementation will be used. The cross-compiler will be configured
+    and built using <a
+    href="https://crosstool-ng.github.io/">crosstool-ng</a>.</p>
+    <p>All operations will be executed inside Docker to take advantage
+    of layer caching. Cross-compilation can take up to an hour, so
+    having a reproducible environment with cached layers significantly
+    speeds up repeated runs.</p>
+    <p>The tutorial describes the <em>Dockerfile</em> assembled from
+    other guides that perform these steps on the host. Docker is
+    expected to be <a
+    href="https://docs.docker.com/engine/install/">installed</a> and
+    functioning on the system.</p>
+    <h2 id="base-preparing-environment">[base] Preparing
+    environment</h2>
+    <p>Before we start, choose the operating system for the Docker image
+    that will run the cross-compilation process. I will use the recent
+    <strong>Ubuntu 22.04</strong> image as the
+    <strong>base</strong>.</p>
+    <p>In the <strong>base</strong> stage, install the packages that
+    will be used for cross-compilation.</p>
+    <p><em>If you are not familiar with <code>steps</code> in Docker,
+    see <a
+    href="https://docs.docker.com/build/building/multi-stage/">Docker
+    multi-stage builds</a>.</em></p>
+    <p>To avoid permission issues when accessing artifacts in a mounted
+    volume, add a user with UID 1000. The UID should match your host
+    user’s UID; check it with:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$:</span> id <span class="at">-u</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">1000</span></span></code></pre></div>
+    <p>The base stage should produce the following code:</p>
+    <pre class="docker"><code># Download the base for the container
+FROM ubuntu:22.04 AS base
+
+# Update and download necessary tooling
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install -y qemu-system-arm git build-essential gcc g++ gawk \
+    bison flex texinfo help2man make libncurses5-dev python3-dev \
+    autoconf automake libtool libtool-bin cpio unzip rsync bc device-tree-compiler wget curl
+
+# Set to be a user as we cannot be the root for issuing cross-compilation
+RUN useradd -m -u 1000 -s /bin/bash builder &amp;&amp; \
+    echo &quot;builder ALL=(ALL) NOPASSWD:ALL&quot; &gt;&gt; /etc/sudoers</code></pre>
+    <h2
+    id="build-crosstng-env-building-cross-compiler">[build-crosstng-env]
+    Building cross-compiler</h2>
+    <p><em>This step follows the official <a
+    href="https://crosstool-ng.github.io/docs/install/">crosstool-ng
+    manual</a>.</em></p>
+    <p>The first build will produce the crosstool-ng host tool. All
+    sources are available on GitHub: (<a
+    href="https://github.com/crosstool-ng/crosstool-ng">https://github.com/crosstool-ng/crosstool-ng</a>).
+    To ensure a reproducible build we select a specific crosstool-ng tag
+    — here it is <code>1.26.0</code>. Before building, crosstool-ng must
+    be “bootstrapped” to generate the necessary sources and
+    configuration files for the host platform. The bootstrapping step
+    runs from the root of the cloned repository by executing
+    <code>./bootstrap</code>. During this step the package generates
+    menuconfig entries, package version descriptions, and other files
+    required to build the <code>ct-ng</code> tool. The
+    <code>ct-ng</code> program manages the cross-compiler configuration
+    and orchestrates building the final binutils and toolchain.</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./bootstrap </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">INFO</span>  :: <span class="pp">***</span> Generating package version descriptions</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">INFO</span>  :: Master packages: autoconf ... zlib zstd</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">INFO</span>  :: Generating <span class="st">&#39;config/versions/autoconf.in&#39;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">INFO</span>  :: <span class="pp">***</span> Generating menu/choice selections</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">INFO</span>  :: Generating arch.in <span class="er">(</span><span class="ex">choice</span><span class="kw">)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">INFO</span>  :: Generating kernel.in <span class="er">(</span><span class="ex">choice</span><span class="kw">)</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ex">INFO</span>  :: <span class="pp">***</span> Gathering the list of data files to install</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">INFO</span>  :: <span class="pp">***</span> Running autoreconf</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="ex">INFO</span>  :: <span class="pp">***</span> Done!</span></code></pre></div>
+    <p>Next, provide configuration for the build tools using the
+    <code>./configure</code> script.</p>
+    <p>In <a href="/notes/2026-02-01-Embedded-Linux.html">Embedded
+    Linux</a> we discussed different libc implementations. As an
+    example, you can change the default <strong>newlib</strong> to
+    <strong>musl</strong>. To do that through the TUI:</p>
+    <ol type="1">
+    <li>Enable experimental features in crosstool-ng (Paths and misc
+    options &gt; Try features marked as EXPERIMENTAL)</li>
+    <li>Change the target OS to Linux (Operating System &gt; Target OS
+    &gt; linux)</li>
+    <li>Set the C-library to musl (C-library &gt; C-library &gt;
+    musl)</li>
+    </ol>
+    <p>Use search (press <code>/</code>) and look for <code>MUSL</code>.
+    You’ll see something like:</p>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">Symbol:</span> LIBC_MUSL <span class="pp">[</span><span class="ss">=y</span><span class="pp">]</span>                                                                 │  </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span> Type  : bool                                                                           │  </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span> Defined at config/gen/libc.in:55                                                       │  </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   Prompt: musl                                                                         │  </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   Depends on: GEN_CHOICE_LIBC <span class="pp">[</span><span class="ss">=y</span><span class="pp">]</span> <span class="kw">&amp;&amp;</span> <span class="ex">!WINDOWS</span> <span class="pp">[</span><span class="ss">=n</span><span class="pp">]</span> <span class="kw">&amp;&amp;</span> <span class="ex">!BARE_METAL</span> <span class="pp">[</span><span class="ss">=n</span><span class="pp">]</span> <span class="kw">&amp;&amp;</span> <span class="ex">EXPERIMENTA</span> │  </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>   Location:                                                                            │  </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span>     <span class="op">&gt;</span>  C-library                                                                       │  </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span> <span class="er">(</span><span class="ex">1</span><span class="kw">)</span>   <span class="op">&gt;</span>  C <span class="ex">library</span> <span class="er">(</span><span class="ex">GEN_CHOICE_LIBC</span> <span class="pp">[</span><span class="ss">=y</span><span class="pp">]</span><span class="kw">)</span>                                              <span class="ex">│</span>  </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ex">│</span> Selects: LIBC_SUPPORT_THREADS_NATIVE <span class="pp">[</span><span class="ss">=y</span><span class="pp">]</span> <span class="kw">&amp;&amp;</span> <span class="ex">CC_CORE_NEEDED</span> <span class="pp">[</span><span class="ss">=y</span><span class="pp">]</span>                       │</span></code></pre></div>
+    <p>TIP: Search for “Depends on” and inspect the prompts to find
+    prerequisites that must be adjusted.</p>
+    <p>You can also provide a <code>defconfig</code> file inside the
+    <strong>crosstool-ng</strong> directory with contents like:</p>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode makefile"><code class="sourceCode makefile"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">CT_CONFIG_VERSION</span><span class="ch">=</span><span class="st">&quot;4&quot;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">CT_EXPERIMENTAL</span><span class="ch">=</span><span class="st">y</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">CT_KERNEL_LINUX</span><span class="ch">=</span><span class="st">y</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="dt">CT_LIBC_MUSL</span><span class="ch">=</span><span class="st">y</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="dt">CT_GETTEXT_NEEDED</span><span class="ch">=</span><span class="st">y</span></span></code></pre></div>
+    <p>Running <code>./ct-ng defconfig</code> shows which config is
+    loaded.</p>
+    <p>Passing <code>--enable-local</code> to <code>./configure</code>
+    instructs the build to install crosstool-ng into the user’s home
+    directory.</p>
+    <p>After the previous steps, run <code>make</code> to build the host
+    tool that will then build the cross-compiler.</p>
+    <p>Once the tool is built, select the target cross-compiler to build
+    with <code>./ct-ng &lt;target&gt;</code>. To list available sample
+    configurations use <code>./ct-ng list-samples</code>.</p>
+    <div class="sourceCode" id="cb6"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./ct-ng list-samples</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Status</span>  Sample name</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[L...]</span>   aarch64-ol7u9-linux-gnu</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">[L...]</span>   aarch64-ol8u6-linux-gnu</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">[L...]</span>   aarch64-ol8u7-linux-gnu</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[L...]</span>   arm-bare_newlib_cortex_m3_nommu-eabi</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[L...]</span>   arm-cortex_a15-linux-gnueabihf</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[L...]</span>   arm-cortex_a8-linux-gnueabi</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[L..X]</span>   arm-cortexa5-linux-uclibcgnueabihf</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[L..X]</span>   arm-cortexa9_neon-linux-gnueabihf</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ex">[L..X]</span>   x86_64-w64-mingw32,arm-cortexa9_neon-linux-gnueabihf</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="ex">[L...]</span>   arm-multilib-linux-uclibcgnueabi</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="ex">[L...]</span>   arm-nano-eabi</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[L...]</span>   arm-none-eabi</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[L..X]</span>   arm-picolibc-default</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[L..X]</span>   arm-picolibc-eabi</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a> <span class="ex">L</span> <span class="er">(</span><span class="ex">Local</span><span class="kw">)</span>       <span class="bu">:</span> sample was found in current directory</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a> <span class="ex">G</span> <span class="er">(</span><span class="ex">Global</span><span class="kw">)</span>      <span class="bu">:</span> sample was installed with crosstool-NG</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a> <span class="ex">X</span> <span class="er">(</span><span class="ex">EXPERIMENTAL</span><span class="kw">)</span><span class="bu">:</span> sample may use EXPERIMENTAL features</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a> <span class="ex">B</span> <span class="er">(</span><span class="ex">BROKEN</span><span class="kw">)</span>      <span class="bu">:</span> sample is currently broken</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a> <span class="ex">O</span> <span class="er">(</span><span class="ex">OBSOLETE</span><span class="kw">)</span>    <span class="bu">:</span> sample needs to be upgraded</span></code></pre></div>
+    <p>To build and install the fully configured cross-compiler run
+    <code>./ct-ng build</code>.</p>
+    <pre class="docker"><code>#  Download crosstool-ng
+FROM base AS build-crosstng-env
+USER builder
+WORKDIR /home/builder
+
+RUN git clone https://github.com/crosstool-ng/crosstool-ng ./crosstool-ng
+RUN git -C ./crosstool-ng checkout crosstool-ng-1.26.0
+
+#  Bootstrap the crosstool-ng
+WORKDIR /home/builder/crosstool-ng
+RUN ./bootstrap
+RUN ./configure --enable-local
+RUN make -j$(nproc)
+
+COPY defconfig .
+RUN ./ct-ng defconfig
+RUN ./ct-ng arm-cortexa9_neon-linux-gnueabihf
+RUN ./ct-ng build</code></pre>
+    <h2 id="build-kernel-env-building-kernel">[build-kernel-env]
+    Building kernel</h2>
+    <p>At the kernel build stage we use the prepared cross-toolchain.
+    First, add the toolchain’s bin directory to PATH. Tell the kernel
+    build system which compiler and architecture to use by setting the
+    <code>CROSS_COMPILE</code> and <code>ARCH</code> environment
+    variables.</p>
+    <p>Next select the device configuration to use for the kernel. For
+    this tutorial we will use “<strong>vexpress</strong>”.</p>
+    <p>After that you can build the kernel image and device tree.</p>
+    <pre class="docker"><code>FROM build-crosstng-env AS build-kernel-env
+WORKDIR /home/builder
+
+#  Set cross-compiler path and target architecture
+ENV PATH=&quot;/home/builder/x-tools/arm-cortexa9_neon-linux-gnueabihf/bin:$PATH&quot;
+ENV CROSS_COMPILE=arm-cortexa9_neon-linux-gnueabihf-
+ENV ARCH=arm
+
+#  Download Linux kernel
+RUN wget cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.17.2.tar.xz
+RUN tar xf linux-6.17.2.tar.xz
+
+#  Build kernel
+#   Set default config
+RUN make -C linux-6.17.2 vexpress_defconfig
+#   Build kernel as zImage
+RUN make -C linux-6.17.2 zImage -j$(nproc)
+#   Build device tree file
+RUN make -C linux-6.17.2 dtbs -j$(nproc)</code></pre>
+    <h3 id="running-image-on-qemu">Running image on QEMU</h3>
+    <p>Now we can run the kernel under QEMU. Running the produced kernel
+    image without a rootfs will result in a kernel panic.</p>
+    <p>We are still missing a few parts, but you can prepare an
+    interactive session that copies necessary artifacts from previous
+    stages and exports the required environment variables.</p>
+    <pre class="docker"><code># Prepare for interactive run
+FROM base AS runtime
+USER builder
+WORKDIR /home/builder
+
+ENV PATH=&quot;/home/builder/x-tools/arm-cortexa9_neon-linux-gnueabihf/bin:$PATH&quot;
+ENV CROSS_COMPILE=arm-cortexa9_neon-linux-gnueabihf-
+ENV ARCH=arm
+
+#  We need to copy artifacts from previous stages
+COPY --chown=builder:builder --from=build-crosstng-env /home/builder/crosstool-ng /home/builder/crosstool-ng
+COPY --chown=builder:builder --from=build-crosstng-env /home/builder/x-tools /home/builder/x-tools
+COPY --chown=builder:builder --from=build-kernel-env /home/builder/linux-6.17.2 /home/builder/linux-6.17.2
+
+CMD [&quot;/bin/bash&quot;]</code></pre>
+    <p>First build the Docker image:
+    <code>docker build -t emb .</code></p>
+    <p>Next, run an interactive container:
+    <code>docker run -it emb::latest</code></p>
+    <p>Inside the container execute QEMU. The command options
+    specify:</p>
+    <ul>
+    <li><strong>-M <machine></strong> - selects the emulated
+    machine</li>
+    <li><strong>-m <size></strong> - guest RAM size</li>
+    <li><strong>-kernel <path></strong> - the kernel image</li>
+    <li><strong>-dtb <path></strong> - the device tree blob</li>
+    <li><strong>-append <params></strong> - kernel command line (here we
+    set the console)</li>
+    <li><strong>-nographic</strong> - disable graphical output and
+    redirect I/O to the console</li>
+    </ul>
+    <div class="sourceCode" id="cb10"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/builder/linux-6.17.2 <span class="kw">&amp;&amp;</span> <span class="ex">qemu-system-arm</span> <span class="dt">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>-M vexpress-a9 <span class="dt">\</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>-m 256M <span class="dt">\</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>-kernel arch/arm/boot/zImage <span class="dt">\</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>-dtb arch/arm/boot/dts/arm/vexpress-v2p-ca9.dtb <span class="dt">\</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>-append <span class="st">&quot;console=ttyAMA0&quot;</span> <span class="dt">\</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>-nographic</span></code></pre></div>
+    <p>The kernel will panic:</p>
+    <div class="sourceCode" id="cb11"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Kernel</span> panic <span class="at">-</span> not syncing: VFS: Unable to mount root fs on unknown-block<span class="er">(</span><span class="ex">0,0</span><span class="kw">)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">CPU:</span> 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.17.2 <span class="co">#1 NONE </span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Hardware</span> name: ARM-Versatile Express</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Call</span> trace: </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a> <span class="ex">unwind_backtrace</span> from show_stack+0x10/0x14</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a> <span class="ex">show_stack</span> from dump_stack_lvl+0x54/0x68</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a> <span class="ex">dump_stack_lvl</span> from vpanic+0xf4/0x2e4</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a> <span class="ex">vpanic</span> from __do_trace_suspend_resume+0x0/0x4c</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="ex">---[</span> end Kernel panic <span class="at">-</span> not syncing: VFS: Unable to mount root fs on unknown-block<span class="er">(</span><span class="ex">0,0</span><span class="kw">)</span> <span class="ex">]---</span></span></code></pre></div>
+    <p>To exit QEMU press the key combination <code>CTRL+A X</code>.</p>
+    <h2 id="build-rootfs-building-root-filesystem">[build-rootfs]
+    Building root filesystem</h2>
+    <p>To finish our custom Linux build we need to produce a root
+    filesystem (rootfs) that will be loaded into RAM. Userspace is based
+    on BusyBox. BusyBox contains only the most essential tools. The
+    project reduced the codebase so it could run from very small media;
+    tools are compiled into a single binary. Programs normally found
+    under <code>/bin</code> are symbolic links to
+    <code>/bin/busybox</code> and are dispatched by that binary, so
+    invoking <code>cat</code> actually calls
+    <code>busybox cat</code>.</p>
+    <div class="sourceCode" id="cb12"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ls <span class="at">-la</span> /bin/</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">total</span> 1028</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span>    2 0        0             1900 Dec  5 18:42 .</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">drwxr-xr-x</span>   14 0        0              320 Dec  6 11:27 ..</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span>    1 0        0                7 Dec  5 18:42 arch <span class="op">&gt;</span>  busybox</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span>    1 0        0                7 Dec  5 18:42 ash <span class="op">&gt;</span>  busybox</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span>    1 0        0                7 Dec  5 18:42 base32 <span class="op">&gt;</span>  busybox</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span>    1 0        0                7 Dec  5 18:42 base64 <span class="op">&gt;</span>  busybox</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ex">-rwxr-xr-x</span>    1 0        0          1051780 Dec  5 18:42 busybox</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ex">lrwxrwxrwx</span>    1 0        0                7 Dec  5 18:42 cat <span class="op">&gt;</span>  busybox</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+    <h3 id="preparing-the-rootfs-folder-structure">Preparing the rootfs
+    folder structure</h3>
+    <p>Before building BusyBox, prepare the rootfs directory and create
+    required folders:</p>
+    <div class="sourceCode" id="cb13"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> rootfs <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> rootfs <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> bin dev etc home lib proc sbin sys tmp usr var <span class="dt">\</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>         usr/bin usr/lib usr/sbin var/log</span></code></pre></div>
+    <h3 id="building-busybox">Building BusyBox</h3>
+    <p>BusyBox can be cloned from the official repository
+    (git://busybox.net/busybox.git). We will use stable version 1.36.
+    One configuration you must change is <code>CONFIG_PREFIX</code> to
+    set the installation destination to your rootfs. If you don’t
+    provide a <code>.config</code>, run <code>make defconfig</code>. To
+    further customize options run <code>make menuconfig</code>. In the
+    menu, under “Settings”, search for “Destination path for ‘make
+    install’” and set it to our <code>../rootfs</code> directory.</p>
+    <p>Before building export the <code>CROSS_COMPILE</code> variable
+    (as in previous steps). After configuration build with
+    <code>make -j$(nproc)</code> and then install with
+    <code>make install</code> into the rootfs.</p>
+    <p>The <code>bin/busybox</code> binary uses shared libraries. You
+    can copy all produced <code>.so</code> files from the BusyBox build
+    into <code>/rootfs/lib</code>, or minimize the rootfs by copying
+    only required libraries. To inspect the shared objects used by the
+    binary, use the cross-tool readelf:</p>
+    <div class="sourceCode" id="cb14"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> arm-cortexa9_neon-linux-gnueabihf-readelf <span class="at">-a</span> bin/busybox <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;\.so.[0-9]&quot;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[Requesting</span> program interpreter: /lib/ld-linux-armhf.so.3]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ex">0x00000001</span> <span class="er">(</span><span class="ex">NEEDED</span><span class="kw">)</span>                     <span class="ex">Shared</span> library: <span class="pp">[</span><span class="ss">libm.so.6</span><span class="pp">]</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ex">0x00000001</span> <span class="er">(</span><span class="ex">NEEDED</span><span class="kw">)</span>                     <span class="ex">Shared</span> library: <span class="pp">[</span><span class="ss">libresolv.so.2</span><span class="pp">]</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0x00000001</span> <span class="er">(</span><span class="ex">NEEDED</span><span class="kw">)</span>                     <span class="ex">Shared</span> library: <span class="pp">[</span><span class="ss">libc.so.6</span><span class="pp">]</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="ex">000000:</span> Version: 1  File: libresolv.so.2  Cnt: 1</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="ex">0x0020:</span> Version: 1  File: libm.so.6  Cnt: 2</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="ex">0x0050:</span> Version: 1  File: libc.so.6  Cnt: 10</span></code></pre></div>
+    <h3 id="copying-shared-libraries">Copying shared libraries</h3>
+    <p>All listed <code>.so*</code> files must be present in the rootfs
+    so the kernel can find them at runtime. Shared libraries and headers
+    produced during the cross-toolchain build are placed in the
+    toolchain sysroot. To find the sysroot, ask the cross-compiler:</p>
+    <div class="sourceCode" id="cb15"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> arm-cortexa9_neon-linux-gnueabihf-gcc <span class="at">-print-sysroot</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/home/builder/x-tools/arm-cortexa9_neon-linux-gnueabihf/</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a> <span class="ex">arm-cortexa9_neon-linux-gnueabihf/sysroot</span></span></code></pre></div>
+    <p>Then copy the required shared libraries into
+    <code>rootfs/lib</code>:</p>
+    <div class="sourceCode" id="cb16"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SYSROOT</span><span class="op">=</span><span class="va">$(</span><span class="ex">arm-cortexa9_neon-linux-gnueabihf-gcc</span> <span class="at">-print-sysroot</span><span class="va">)</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> <span class="va">$SYSROOT</span>/lib/ld-linux-armhf.so.3 rootfs/lib/ <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> <span class="va">$SYSROOT</span>/lib/libm.so.6 rootfs/lib/ <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> <span class="va">$SYSROOT</span>/lib/libresolv.so.2 rootfs/lib/ <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> <span class="va">$SYSROOT</span>/lib/libc.so.6 rootfs/lib/</span></code></pre></div>
+    <h3 id="preparing-the-initramfs-image">Preparing the initramfs
+    image</h3>
+    <p>The final step before running the kernel is packing the rootfs
+    into an archive using the <a
+    href="https://linux.die.net/man/1/cpio"><code>cpio</code></a>
+    tool.</p>
+    <blockquote>
+    <p>In copy-out mode, cpio copies files into an archive. It reads a
+    list of filenames, one per line, on the standard input, and writes
+    the archive onto the standard output. A typical way to generate the
+    list of filenames is with the find command.</p>
+    </blockquote>
+    <p>Important: run the <code>find</code> command <code>inside</code>
+    the <code>rootfs</code> directory.</p>
+    <p>We use the portable “newc” archive format, which supports large
+    inode counts.</p>
+    <blockquote>
+    <p>The new (SVR4) portable format, which supports file systems
+    having more than 65536 i-nodes.</p>
+    </blockquote>
+    <p>The use of <code>--owner root:root</code> option allow us to
+    archive file with UID:GID 0:0, means that the files are going to be
+    mounted with <code>root:root</code> permissions.</p>
+    <p>At the end we need to <code>gzip</code> the file</p>
+    <div class="sourceCode" id="cb17"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> rootfs <span class="kw">&amp;&amp;</span> <span class="fu">find</span> . <span class="kw">|</span> <span class="fu">cpio</span> <span class="at">-H</span> newc <span class="at">-o</span> <span class="at">--owner</span> root:root <span class="op">&gt;</span> ~/initramfs.cpio <span class="dt">\</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a> <span class="kw">&amp;&amp;</span> <span class="fu">gzip</span> <span class="at">-k</span> ~/initramfs.cpio<span class="kw">```</span></span></code></pre></div>
+    <p>The final Dockerfile stage for building rootfs:</p>
+    <pre class="docker"><code># Build rootfs ---------------------------------------------------------------------
+FROM base AS build-rootfs-env
+USER builder
+WORKDIR /home/builder
+
+COPY --chown=builder:builder --from=build-crosstng-env /home/builder/x-tools /home/builder/x-tools
+
+ENV PATH=&quot;/home/builder/x-tools/arm-cortexa9_neon-linux-gnueabihf/bin:$PATH&quot;
+ENV CROSS_COMPILE=arm-cortexa9_neon-linux-gnueabihf-
+ENV ARCH=arm
+
+RUN mkdir rootfs &amp;&amp; cd rootfs &amp;&amp; \
+    mkdir -p bin dev etc home lib proc sbin sys tmp usr var \
+             usr/bin usr/lib usr/sbin var/log
+
+#  Clone, configure and build busybox
+RUN git clone git://busybox.net/busybox.git
+RUN git -C ./busybox checkout tags/1_36_0
+
+COPY busybox.config busybox/.config
+RUN make -C busybox -j
+RUN make -C busybox install
+
+#  Copy required libraries
+RUN export SYSROOT=$(arm-cortexa9_neon-linux-gnueabihf-gcc -print-sysroot) &amp;&amp; \
+    cp $SYSROOT/lib/ld-linux-armhf.so.3 rootfs/lib/ &amp;&amp; \
+    cp $SYSROOT/lib/libm.so.6 rootfs/lib/ &amp;&amp; \
+    cp $SYSROOT/lib/libresolv.so.2 rootfs/lib/ &amp;&amp; \
+    cp $SYSROOT/lib/libc.so.6 rootfs/lib/
+
+#  Pack the rootfs
+RUN cd rootfs &amp;&amp; find . | cpio -H newc -o --owner root:root &gt; ~/initramfs.cpio
+RUN gzip -k initramfs.cpio</code></pre>
+    <h2 id="runtime-prepare-interactive-session">[runtime] Prepare
+    interactive session</h2>
+    <p>To make the container more convenient, prepare an interactive
+    runtime image that already includes environment variables and the
+    artifacts copied from build stages. This simplifies iterative
+    testing.</p>
+    <pre class="docker"><code># (INTERACTIVE) RUNTIME STAGE ------------------------------------------------------
+# Prepare for interactive run
+FROM base AS runtime
+USER builder
+WORKDIR /home/builder
+
+ENV PATH=&quot;/home/builder/x-tools/arm-cortexa9_neon-linux-gnueabihf/bin:$PATH&quot;
+ENV CROSS_COMPILE=arm-cortexa9_neon-linux-gnueabihf-
+ENV ARCH=arm
+
+#  We need to copy artifacts from previous stages
+COPY --chown=builder:builder --from=build-crosstng-env /home/builder/crosstool-ng /home/builder/crosstool-ng
+COPY --chown=builder:builder --from=build-crosstng-env /home/builder/x-tools /home/builder/x-tools
+COPY --chown=builder:builder --from=build-kernel-env /home/builder/linux-6.17.2 /home/builder/linux-6.17.2
+COPY --chown=builder:builder --from=build-rootfs-env /home/builder/busybox /home/builder/busybox
+COPY --chown=builder:builder --from=build-rootfs-env /home/builder/rootfs /home/builder/rootfs
+COPY --chown=builder:builder --from=build-rootfs-env /home/builder/initramfs.cpio /home/builder/initramfs.cpio
+COPY --chown=builder:builder --from=build-rootfs-env /home/builder/initramfs.cpio.gz /home/builder/initramfs.cpio.gz
+COPY ./boot.sh /home/builder/boot.sh
+
+CMD [&quot;/bin/bash&quot;]</code></pre>
+    <h2 id="running-qemu">Running QEMU</h2>
+    <p>To build the Docker image use:</p>
+    <pre class="docker"><code>docker build -t emb .</code></pre>
+    <p>To run a container interactively and mount a shared host
+    directory (so you can exchange files between host and container)
+    use:</p>
+    <pre class="docker"><code>docker run -v ./shared:/shared -it emb:latest</code></pre>
+    <p>Inside the Docker container you can finally start the Linux, you
+    should see a prompt for entering your commands.</p>
+    <div class="sourceCode" id="cb22"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd linux-6.17.2 <span class="kw">&amp;&amp;</span> <span class="ex">qemu-system-arm</span> <span class="at">-m</span> 256M <span class="dt">\</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">-nographic</span> <span class="dt">\</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">-M</span> vexpress-a9 <span class="dt">\</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">-kernel</span> arch/arm/boot/zImage <span class="dt">\</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">-append</span> <span class="st">&quot;console=ttyAMA0 rdinit=/bin/sh&quot;</span> <span class="dt">\</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">-dtb</span> arch/arm/boot/dts/arm/vexpress-v2p-ca9.dtb <span class="dt">\</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">-initrd</span> ~/initramfs.cpio.gz</span></code></pre></div>
+    <h2 id="full-dockerfile">Full Dockerfile</h2>
+    <p>The full created Docker image can be found on my public <a
+    href="https://github.com/MateuszMyalski/cross-ng-lfs-sandbox">github
+    repository</a>. Pay attention the repository is live. If you want to
+    have version described in this article use tag <a
+    href="https://github.com/MateuszMyalski/cross-ng-lfs-sandbox/releases/tag/stable-version">stable-version</a>.</p>
+    <h2 id="resources">Resources</h2>
+    <ul>
+    <li>Simmonds, C. Mastering Embedded Linux Programming (3rd ed.)</li>
+    <li><a href="https://www.youtube.com/@linuxdev_pl">Karol Przybylski
+    - Linuxdev</a></li>
+    </ul>
+
+    
+    <div class="meta">
+                <span class="label">Date: </span>
+        <span class="value">2025-12-01</span
+        
+        
+                <span class="label">Category: </span>
+        <span class="value">Linux</span
+        
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>

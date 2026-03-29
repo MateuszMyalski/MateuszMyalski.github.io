@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>VSCode Task organizing</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#workspace-tree"
+                                id="toc-workspace-tree">Workspace
+                                tree</a></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <p>Maintaining several scripts, especially in projects with numerous
+    tasks, can be quite a challenge. In larger projects, these tasks
+    might not be exclusively tied to the build system but could involve
+    automating various aspects of your workflow. Wouldn’t it be
+    convenient to have a centralized hub where all these scripts are
+    neatly organized and easily accessible within the familiar and
+    reliable VSCode environment? This blog post explores a
+    straightforward technique to store and manage your tasks
+    efficiently, making your work more streamlined and less cumbersome.
+    Read on to discover a solution that simplifies the execution of your
+    scripts, helping you save time and boost productivity in your
+    development projects.</p>
+    <p>Rather than relying on intricate chains of raw commands within
+    the <code>task.json</code> file stored in the <code>.vscode</code>
+    directory, consider the simplicity and effectiveness of keeping your
+    automation scripts separate. Utilizing familiar scripting languages
+    like Bash or Python allows for more straightforward handling and
+    maintenance. By creating individual scripts and invoking them
+    through the <code>task.json</code> file with the right arguments or
+    switches, you gain a cleaner and more organized approach. How many
+    times have you, during repository restoration or cloning,
+    inadvertently deleted the essential <code>.vscode</code>
+    configuration settings? This alternative method not only ensures
+    ease of use but also reduces the chances of accidentally losing
+    crucial configurations, enhancing the overall reliability of your
+    development environment.</p>
+    <h2 id="workspace-tree">Workspace tree</h2>
+    <p>To establish an organized structure for your VSCode settings,
+    start by creating a sample .vscode folder outside your current
+    working repository. Using a symbolic link, effortlessly connect this
+    directory to your working project. This approach ensures that even
+    if you delete the sample repository, you won’t lose your essential
+    configurations since they reside in a separate directory. Below is a
+    bash snippet demonstrating how to create the symbolic link:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> /path/to/sample-directory/.vscode /path/to/your/real/.vscode</span></code></pre></div>
+    <p>Within the <code>.vscode</code> directory, craft three pivotal
+    files: <code>launch.json</code>, <code>settings.json</code>, and
+    <code>tasks.json</code>.</p>
+    <ul>
+    <li><p><code>launch.json</code>: This file is crucial for swiftly
+    executing code, whether in debug or non-debug mode. Think of it as a
+    task executed with a single press of a function button.</p></li>
+    <li><p><code>settings.json</code>: This file encapsulates all
+    workspace configurations. Useful for disabling large directories
+    from the Git indexer, turning off unnecessary settings, or defining
+    other locally relevant configurations.</p></li>
+    <li><p><code>tasks.json</code>: Arguably the most important file at
+    this stage. Here, you specify all your tasks and convenient script
+    entry points essential for your workflow. The envisioned folder
+    structure is illustrated above, with symbolic links ensuring
+    accessibility and safeguarding configurations in the main folder
+    even if the sample repository is deleted. This organized setup
+    enhances the overall manageability and durability of your VSCode
+    environment, facilitating a seamless development
+    experience.</p></li>
+    </ul>
+    <p>The structure should look as follows:</p>
+    <pre><code>Main Folder
+├── .vscode
+│   ├── scripts
+│   │   ├── sample_script.sh
+│   │   └── another_script.py
+│   ├── launch.json
+│   ├── settings.json
+│   └── tasks.json
+└── sample-repository
+    ├── .vscode → Symbolic link to Main Folder/.vscode
+    │   ├── scripts
+    │   │   ├── sample_script.sh
+    │   │   └── another_script.py
+    │   ├── launch.json
+    │   ├── settings.json
+    │   └── tasks.json
+    ├── sample_file1.txt
+    └── sample_file2.txt</code></pre>
+
+    
+    <div class="meta">
+                <span class="label">Date: </span>
+        <span class="value">2024-01-08</span
+        
+        
+                <span class="label">Category: </span>
+        <span class="value">Tutorials</span
+        
+                <span class="label">Tags: </span>
+        <span class="value">linux</span
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>
