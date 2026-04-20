@@ -87,21 +87,19 @@
     <code>BDBUS</code> ports. We will use this chip as an example for
     writing an OpenOCD configuration to utilize one of the JTAG
     interfaces.</p>
-    <pre class="ascii center">
-    +-----+---------+-----------+--------+
-    | Pin |  Name   | JTAG Port |  MSSE  |
-    +-----+---------+-----------+--------+
-    | 16  | ADBUS0  |         0 | TCK    |
-    | 17  | ADBUS1  |         0 | TDI    |
-    | 18  | ADBUS2  |         0 | TDO    |
-    | 19  | ADBUS3  |         0 | TMS    |
-    +-----+---------+-----------+--------+
-    | 26  | BDBUS0  |         1 | TCK    |
-    | 27  | BDBUS1  |         1 | TDI    |
-    | 28  | BDBUS2  |         1 | TDO    |
-    | 29  | BDBUS3  |         1 | TMS    |
-    +-----+---------+-----------+--------+
-    </pre>
+    <pre><code>+-----+---------+-----------+--------+
+| Pin |  Name   | JTAG Port |  MSSE  |
++-----+---------+-----------+--------+
+| 16  | ADBUS0  |         0 | TCK    |
+| 17  | ADBUS1  |         0 | TDI    |
+| 18  | ADBUS2  |         0 | TDO    |
+| 19  | ADBUS3  |         0 | TMS    |
++-----+---------+-----------+--------+
+| 26  | BDBUS0  |         1 | TCK    |
+| 27  | BDBUS1  |         1 | TDI    |
+| 28  | BDBUS2  |         1 | TDO    |
+| 29  | BDBUS3  |         1 | TMS    |
++-----+---------+-----------+--------+</code></pre>
     <p>Each port consist four (3 - mandatory, and 1 - optional ) JTAG
     connectors:</p>
     <ul>
@@ -179,13 +177,11 @@
     <pre class="text"><code>ftdi_layout_signal nTRST -data 0x0010 -oe 0x0010</code></pre>
     <p>To make this clearer, we can construct a diagram of used
     masks.</p>
-    <pre class="ascii center">
-    Pin name  | ADBUS7 | ADBUS6 | ADBUS5 | ADBUS4 | ADBUS3 | ADBUS2 | ADBUS1 | ADBUS0 | Mask
-    Direction |  OUT 1 |  OUT 1 |  OUT 1 |  OUT 1 |  IN  0 |  OUT 1 |  OUT 1 |  OUT 1 | 0xfb
-    State     |      0 |      0 |      0 |      0 |      1 |      0 |      0 |      0 | 0x08
-    Data      |      0 |      0 |      0 |      1 |      0 |      0 |      0 |      0 | 0x0010
-    OC En.    |      0 |      0 |      0 |      1 |      0 |      0 |      0 |      0 | 0x0010
-    </pre>
+    <pre><code>Pin name  | ADBUS7 | ADBUS6 | ADBUS5 | ADBUS4 | ADBUS3 | ADBUS2 | ADBUS1 | ADBUS0 | Mask
+Direction |  OUT 1 |  OUT 1 |  OUT 1 |  OUT 1 |  IN  0 |  OUT 1 |  OUT 1 |  OUT 1 | 0xfb
+State     |      0 |      0 |      0 |      0 |      1 |      0 |      0 |      0 | 0x08
+Data      |      0 |      0 |      0 |      1 |      0 |      0 |      0 |      0 | 0x0010
+OC En.    |      0 |      0 |      0 |      1 |      0 |      0 |      0 |      0 | 0x0010</code></pre>
     <h2 id="final-configuration-for-ftdi">Final configuration for
     FTDI</h2>
     <p>To conclude all necessary configuration that must be added to the
