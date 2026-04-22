@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+
+    <link rel="alternate" type="application/atom+xml" title="Notes collected during development, work, learning...">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Mateusz Myalski">
+    <meta name="google-site-verification" content="A8chtL3v4vPM3jRZZVlCtwpChyjii_n7C9bifQOfYzg" />
+    <meta name="description" content="Notes collected during development, work, learning..." />
+    <link rel="shortcut icon" href="/static/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/highlight.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ol>
+                <li><a href="/">~mmyalski</a></li>
+                <li><a href="/blog/archive.html">Blog</a></li>
+                <li><a href="/notes/index.html">Notes</a></li>
+                <li><a href="/recipes/archive.html">Recipes</a></li>
+            </ol>
+            <ol>
+                <li><a href="/pages/blogroll.html">Blogroll</a></li>
+                <li><a href="/pages/compendium.html">Compendium</a></li>
+                <li><a href="/pages/projects.html">Projects</a></li>
+                <li><a href="/pages/readings.html">Readings</a></li>
+                <!-- <li><a href="">RSS</a></li> -->
+                <li><a href="https://github.com/MateuszMyalski/">Git</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main><article>
+    <hgroup>
+                <h1>SystemD</h1>
+        
+            </hgroup>
+
+    
+            <div id="TOC" role="doc-toc" class="sidebar">
+        <details>
+            <summary>Table of content</summary>
+            <p>
+                                <ul>
+                                <li><a href="#structure-of-the-unit"
+                                id="toc-structure-of-the-unit">Structure
+                                of the unit</a></li>
+                                <li><a href="#targets"
+                                id="toc-targets">Targets</a></li>
+                                <li><a href="#unit-file-settings"
+                                id="toc-unit-file-settings">Unit file
+                                settings</a></li>
+                                <li><a href="#systemctl"
+                                id="toc-systemctl">systemctl</a></li>
+                                <li><a href="#overwriting-services"
+                                id="toc-overwriting-services">Overwriting
+                                services</a></li>
+                                <li><a href="#refreshing-unit-files"
+                                id="toc-refreshing-unit-files">Refreshing
+                                unit files</a></li>
+                                <li><a href="#timers"
+                                id="toc-timers">Timers</a>
+                                <ul>
+                                <li><a href="#monotonic-timer"
+                                id="toc-monotonic-timer">Monotonic
+                                timer</a></li>
+                                <li><a href="#calendar-timer"
+                                id="toc-calendar-timer">Calendar
+                                timer</a></li>
+                                </ul></li>
+                                <li><a href="#journalctl"
+                                id="toc-journalctl">journalctl</a></li>
+                                </ul>
+            </p>
+        </details>
+    </div>
+        
+    <p>The SystemD is a application startup manager designed in 2010. It
+    is an answer to the previous manager SysV, which has it’s downsides.
+    The main issue that was targeted to be fixed is long booting times
+    due to the sequentially executed programs. The order of the
+    application startups were controlled in <code>etc/init.d</code>
+    directory by <strong>manually</strong> manipulating the priorities.
+    This was tedious solution and hard to maintain in a longer time
+    span. The SystemD resolves the issue by creating a centralized tool
+    for maintaining dependencies and run levels - the
+    <code>systemctl</code>.</p>
+    <p>The new way of Linux startup has it’s fans and opponents due to
+    the additional complexity it brings. Therfore on some distributions
+    such Linux Alpine you will not found SystemD solution, instead they
+    are shipping OpenRC which is flavored version of SysV. ## The
+    “unit”</p>
+    <p>The most atomic structure is <strong>unit</strong> which
+    describes the program that suppose to be run. The file can be stored
+    in few places in the system:</p>
+    <ul>
+    <li><code>/usr/lib/systemd/system/</code>: units provided by
+    installed packages</li>
+    <li><code>/run/systemd/system/</code>: units installed by the system
+    administrator, (deleted on power-off )</li>
+    <li><code>/etc/systemd/system/</code>: units installed by the system
+    administrator</li>
+    <li><code>~/.config/systemd/user</code>: units provided by the
+    user</li>
+    </ul>
+    <p>Creating the services file will be automatically visible by the
+    <code>systemctl</code> tool in the auto-completion list.</p>
+    <p>The unit file are following some standardized naming convention
+    (but are not mandatory). The most important are listed below:</p>
+    <table>
+    <colgroup>
+    <col style="width: 22%" />
+    <col style="width: 15%" />
+    <col style="width: 61%" />
+    </colgroup>
+    <thead>
+    <tr class="header">
+    <th>Service unit</th>
+    <th><code>.service</code></th>
+    <th>A system service.</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="odd">
+    <td>Target unit</td>
+    <td><code>.target</code></td>
+    <td>A group of systemd units.</td>
+    </tr>
+    <tr class="even">
+    <td>Device unit</td>
+    <td><code>.device</code></td>
+    <td>A device file recognized by the kernel.</td>
+    </tr>
+    <tr class="odd">
+    <td>Mount unit</td>
+    <td><code>.mount</code></td>
+    <td>A file system mount point.</td>
+    </tr>
+    <tr class="even">
+    <td>Swap unit</td>
+    <td><code>.swap</code></td>
+    <td>A swap device or a swap file.</td>
+    </tr>
+    <tr class="odd">
+    <td>Timer unit</td>
+    <td><code>.timer</code></td>
+    <td>A systemd timer.</td>
+    </tr>
+    <tr class="even">
+    <td>System service</td>
+    <td><code>.service</code></td>
+    <td>A system service</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>More of the examples can be found on RedHat Docs<a href="#fn1"
+    class="footnote-ref" id="fnref1"
+    role="doc-noteref"><sup>1</sup></a>. Registered paths can be also
+    displayed with:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemd-analyze</span> unit-paths</span></code></pre></div>
+    <h3 id="structure-of-the-unit">Structure of the unit</h3>
+    <p>The unit file is a text based file which contains three main
+    sections:</p>
+    <ul>
+    <li><code>[Unit]</code> - contains metadata about the unit, which
+    describes dependencies, and conditions when the unit suppose to be
+    launched.</li>
+    <li><code>[Service]</code> - describes how the process suppose to be
+    executed.</li>
+    <li><code>[Install]</code> - This section is not interpreted by
+    systemd during runtime; it is used by the enable and disable
+    commands of the systemctl tool during installation of a unit<a
+    href="#fn2" class="footnote-ref" id="fnref2"
+    role="doc-noteref"><sup>2</sup></a>.</li>
+    </ul>
+    <p>Example service created for custom program that overwrites the
+    keyboard behavior:</p>
+    <pre><code>[Unit]
+Description=Thinkpad keyboard backlight service
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/bin/thinkpad-keybacklight
+Type=exec
+Restart=always
+
+[Install]
+WantedBy=default.target</code></pre>
+    <p>The unit file has description of <em>“Thinkpad keyboard backlight
+    service”</em>, and is <em>executing</em>
+    <code>/usr/bin/thinkpad-keybacklight</code>. The program is suppose
+    to be run by the <code>root</code> and in case of any error the
+    program should be automatically restarted. The unit file must be run
+    on the <code>defualt</code> synchronization points - what is after
+    the text or graphical environment is loaded.</p>
+    <h3 id="targets">Targets</h3>
+    <p>Targets are the synchronization points, it is alternative to the
+    run levels which were used in the SysV. By targeting the unit file
+    on a certain target we can loosely say after which booting stage our
+    program suppose to be launched. Targets allow to create dependency
+    tree much easier, what results in faster system booting times,
+    because not all programs are not strictly chained together. We can
+    try to imagine targets as a group of programs that must be run
+    together to achieve the synchronization point. In case we need some
+    dependency for certain unit within the group we can use dedicated
+    settings in the unit file like
+    <code>WantedBy=sample.service</code>.</p>
+    <p>You can check what kind of targets are defined in your system
+    with:</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> list-units <span class="at">--type</span><span class="op">=</span>target</span></code></pre></div>
+    <p>The most important are usually:</p>
+    <ol type="1">
+    <li><code>poweroff.target</code> - When the device is power off</li>
+    <li><code>rescue.target</code> - The device is in rescue mode</li>
+    <li><code>multi-user.target</code> - Text mode with network
+    interfaces running up</li>
+    <li><code>graphical.target</code> - The graphical environment
+    works</li>
+    <li><code>reboot.target</code> - Reboot</li>
+    </ol>
+    <p>When creating simple services we can use
+    <code>default.target</code> which is usually pointing at the
+    <code>multi-user</code> or <code>graphical</code> target. The
+    service will be reached when almost all other services are up and
+    running, so we can take advantage of those in our programs.</p>
+    <h2 id="unit-file-settings">Unit file settings</h2>
+    <p>There if a lot of other settings that might be useful when
+    creating own unit files. Everything is accessible in the
+    <code>man systemd.services</code> or on freedesktop<a href="#fn3"
+    class="footnote-ref" id="fnref3"
+    role="doc-noteref"><sup>3</sup></a>.</p>
+    <h2 id="systemctl">systemctl</h2>
+    <p>The <code>systemctl</code> is the main application which allows
+    us to control the systemD environment. With the command we can
+    instruct which units should be enabled/disabled, restart them, check
+    logs, statuses etc.</p>
+    <p>To see the list of currently running services use:</p>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> list</span></code></pre></div>
+    <p>To see details about the service use:</p>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> status <span class="op">&lt;</span>service<span class="op">&gt;</span></span></code></pre></div>
+    <pre><code>● thinkpad-keybacklight.service - Thinkpad keyboard backlight service
+     Loaded: loaded (/etc/systemd/system/thinkpad-keybacklight.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-03-18 16:00:59 CET; 1 month 1 day ago
+   Main PID: 1355 (thinkpad-keybac)
+      Tasks: 1 (limit: 37887)
+     Memory: 712.0K (peak: 2.1M)
+        CPU: 15min 2.869s
+     CGroup: /system.slice/thinkpad-keybacklight.service
+             └─1355 /usr/bin/thinkpad-keybacklight
+
+Mar 18 16:00:59 username systemd[1]: Starting thinkpad-keybacklight.service - Thinkpad keyboard backlight service...
+Mar 18 16:00:59 username systemd[1]: Started thinkpad-keybacklight.service - Thinkpad keyboard backlight service.
+</code></pre>
+    <p>The command will show not only the current status of the service,
+    but also statistics regarding the CPU and memory consumption, and
+    logs this program sent.</p>
+    <p>You will see the whole tree of services. Each slice means a
+    cgroup, which has its own resource limits. This might be useful when
+    we would like to create service that has limited accesses/resources.
+    Also, you will be able to see what kind of other forks the process
+    did.</p>
+    <p>When the new unit file is created first we need to enable it
+    with:</p>
+    <div class="sourceCode" id="cb7"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> enable <span class="op">&lt;</span>service<span class="op">&gt;</span></span></code></pre></div>
+    <p>then when it is enabled we must start it manually, or restart the
+    device:</p>
+    <div class="sourceCode" id="cb8"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> start <span class="op">&lt;</span>service<span class="op">&gt;</span></span></code></pre></div>
+    <p>The opposite actions are:</p>
+    <pre><code>systemctl stop &lt;service&gt;
+systemctl disable &lt;service&gt;.</code></pre>
+    <p>Service stopped but not disabled will be restarted automatically
+    after the device reboot. You can simply restart the unit by
+    calling:</p>
+    <div class="sourceCode" id="cb10"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart <span class="op">&lt;</span>service<span class="op">&gt;</span></span></code></pre></div>
+    <h2 id="overwriting-services">Overwriting services</h2>
+    <p>During the system update default services will be overwritten
+    with new versions. In case you need to edit the default services you
+    should use <em>drop-in file</em>, which will be preserved and used
+    instead of the default one. You can use:</p>
+    <pre><code>systemctl edit &lt;service&gt;</code></pre>
+    <p>or do it manually by creating in the services folder,
+    subdirectory named
+    <code>&lt;service&gt;.service.d/override.conf</code></p>
+    <h2 id="refreshing-unit-files">Refreshing unit files</h2>
+    <p>When experimenting and modifying unit-files sometimes the new
+    changes might not be consumed by the systemd. In that case the
+    systemd should be reloaded with:</p>
+    <div class="sourceCode" id="cb12"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> reload</span></code></pre></div>
+    <h2 id="timers">Timers</h2>
+    <p>The systemD is suppose to be the alternative to the CRON for
+    executing periodic tasks. The “timer” type of units gives ability to
+    schedule execution of units based on two types of clocks:</p>
+    <ul>
+    <li><strong>Monotonic</strong> clock - it is a timer that starts
+    counting when the device is started,</li>
+    <li><strong>Calendar</strong> clock - it is a timer based on the
+    calendar time.</li>
+    </ul>
+    <p>Units of timer type have <code>.timer</code> extension.</p>
+    <p>The unit itself can execute the program directly after the time
+    elapses, or can trigger other unit. Triggering other unit is cleaner
+    approach as this gives clear distinction between program execution,
+    and trigger type. Keep in mind that the official manual suggest
+    keeping the names of unit files the same (despite of extension) for
+    easier tracing <a href="#fn4" class="footnote-ref" id="fnref4"
+    role="doc-noteref"><sup>4</sup></a>.</p>
+    <h3 id="monotonic-timer">Monotonic timer</h3>
+    <p>Example timer for running backup shell script</p>
+    <pre><code>[Unit]
+Description=Hourly Backup Timer
+Requires=backup.service
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1h
+AccuracySec=1min
+Persistent=true
+
+[Install]
+WantedBy=timers.target</code></pre>
+    <p>This will create a timer with description <em>“Hourly Backup
+    Timer”</em>. That will run <code>backup.service</code> unit (notice
+    it is using <code>Requires</code> not <code>Wants</code> what create
+    much stronger dependency - the unit file cannot fail to end
+    successfully). The timer is scheduled to be run for the first time 5
+    min after the device bootup, and repeated every 1h from the last
+    activation. The <code>Persistent</code> forces the unit to be
+    triggered even if it the timer was not activated fro the first 5 min
+    from the start. This flag allow you to fix missed triggers. By
+    specifying the <code>timers</code> target be ensure we run the unit
+    after the timer is actually initialized in our system.</p>
+    <h3 id="calendar-timer">Calendar timer</h3>
+    <p>You can adjust the timer schedule using options like
+    <code>OnCalendar=</code> for specific times (e.g.,
+    <code>OnCalendar=daily</code> or
+    <code>OnCalendar=*-*-* 02:00:00</code> for 2 AM daily).</p>
+    <p>For the common patterns for e.g. to run every 1 min use:</p>
+    <div class="sourceCode" id="cb14"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">man</span> systemd.time</span></code></pre></div>
+    <p>The following special expressions may be used as shorthands for
+    longer normalized forms:</p>
+    <ul>
+    <li>minutely → <em>-</em>-* <em>:</em>:00</li>
+    <li>hourly → <em>-</em>-* *:00:00</li>
+    <li>daily → <em>-</em>-* 00:00:00</li>
+    <li>monthly → <em>-</em>-01 00:00:00</li>
+    <li>weekly → Mon <em>-</em>-* 00:00:00</li>
+    <li>yearly → *-01-01 00:00:00</li>
+    <li>quarterly → *-01,04,07,10-01 00:00:00</li>
+    <li>semiannually → *-01,07-01 00:00:00</li>
+    </ul>
+    <h2 id="journalctl">journalctl</h2>
+    <p>For further debugging using logs we can take advantage of the
+    <code>journalctl</code> command to see all logs coming from our unit
+    test file:</p>
+    <div class="sourceCode" id="cb15"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">journalctl</span> <span class="at">-u</span> <span class="op">&lt;</span>service<span class="op">&gt;</span></span></code></pre></div>
+    <aside id="footnotes" class="footnotes footnotes-end-of-document"
+    role="doc-endnotes">
+    <hr />
+    <ol>
+    <li id="fn1"><p><a
+    href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/system_administrators_guide/chap-managing_services_with_systemd">DocsRedHat
+    - SystemD</a><a href="#fnref1" class="footnote-back"
+    role="doc-backlink">↩︎</a></p></li>
+    <li id="fn2"><p><a
+    href="https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#">Freedesktop
+    - systemd.target</a><a href="#fnref2" class="footnote-back"
+    role="doc-backlink">↩︎</a></p></li>
+    <li id="fn3"><p><a
+    href="https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html">Freedesktop
+    - systemd.service</a><a href="#fnref3" class="footnote-back"
+    role="doc-backlink">↩︎</a></p></li>
+    <li id="fn4"><p><a
+    href="https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html">Freedesktop
+    - systemd.timer</a><a href="#fnref4" class="footnote-back"
+    role="doc-backlink">↩︎</a></p></li>
+    </ol>
+    </aside>
+
+    
+    <div class="meta">
+        
+        
+                <span class="label">Category: </span>
+        <span class="value">Linux</span
+        
+            </div class="meta">
+</article>
+    </main>
+    <footer>
+        Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
+    </footer>
+</body>
+
+</html>
