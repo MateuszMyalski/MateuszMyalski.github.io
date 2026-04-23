@@ -2,7 +2,7 @@ body {
     max-width: 985px;
     font-family: ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji";
     margin: 0 auto;
-    font-size: 10.5pt;
+    font-size: 11pt;
     line-height: 17pt;
 }
 
@@ -27,6 +27,10 @@ hgroup > p {
     color: #303030;
 }
 
+article > table {
+    margin: 0 auto;
+}
+
 article {
     counter-reset: figure;
 }
@@ -40,7 +44,6 @@ article > .meta {
 article > .meta > .value {
     margin-right: 10px;
 }
-
 
 article > h2 {
     background: #d3d3d347;
@@ -59,13 +62,13 @@ nav {
 nav ol {
     display: flex;
     font-weight: bold;
-    width: 60%;
-    margin: 0;
     flex-wrap: wrap;
+    margin: 0;
     padding-left: 1%;
     padding-right: 1%;
     box-sizing: border-box;
 }
+
 
 nav ol li {
     display: block;
@@ -161,6 +164,7 @@ main .sidebar {
     margin-bottom: 10px;
     font-size: 9pt;
     background: #d3d3d347;
+    box-sizing: border-box;
 }
 
 main .todo {
@@ -168,6 +172,11 @@ main .todo {
     border: 1px #a70000 solid;
     padding: 10px;
     margin-bottom: 20px;
+}
+
+aside#footnotes hr {
+    border-bottom: none;
+    border-top: 1px solid #cacaca;
 }
 
 aside#footnotes p {
@@ -185,16 +194,12 @@ footer {
 
 @media (max-width: 985px) {
     body {
-        margin: 0 10px;
+        margin: 0 0;
     }
 
     main .sidebar {
         float: none;
-        width: 90%;
-        margin: auto;
-    }
-
-    nav ol {
         width: 100%;
+        margin: auto;
     }
 }
