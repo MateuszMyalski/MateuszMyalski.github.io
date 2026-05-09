@@ -1,6 +1,13 @@
 body {
     max-width: 985px;
-    font-family: ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji",Segoe UI Symbol,"Noto Color Emoji";
+    font-family:
+        ui-sans-serif,
+        system-ui,
+        sans-serif,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        Segoe UI Symbol,
+        "Noto Color Emoji";
     margin: 0 auto;
     font-size: 11pt;
     line-height: 17pt;
@@ -56,7 +63,11 @@ nav {
     border-bottom: 1px solid #cacaca;
     background: #f7f7f7;
     padding-top: 1%;
-    padding-bottom: 1%;
+}
+
+nav img {
+    padding: 0;
+    margin: 0;
 }
 
 nav ol {
@@ -69,17 +80,19 @@ nav ol {
     box-sizing: border-box;
 }
 
-
 nav ol li {
     display: block;
     min-width: fit-content;
     flex: 0 1 auto;
-    margin-top: 5px;
     padding: 0 10px;
+    line-height: 33px;
 }
 
 nav ol li a {
     color: #4c4c4c;
+    margin: 0;
+    padding: 0;
+    display: block;
     text-decoration: none;
 }
 
@@ -149,7 +162,7 @@ figure > figcaption {
 }
 
 article > pre,
-article > div.sourceCode > pre{
+article > div.sourceCode > pre {
     border: 1px #ccc solid;
     border-radius: 3px;
     padding: 10px;
