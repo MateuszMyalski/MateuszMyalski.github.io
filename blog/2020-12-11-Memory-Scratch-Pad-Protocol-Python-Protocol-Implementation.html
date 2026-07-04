@@ -52,56 +52,62 @@
                 </ol>
             </nav>
         </header>
-    <main><article>
-    <hgroup>
-                <h1>Memory Scratch Pad Protocol - PC interaction</h1>
-        
-            </hgroup>
+    <main><main>
+    <article>
+        <hgroup>
+                        <h1>Memory Scratch Pad Protocol - PC
+interaction</h1>
+            
+                    </hgroup>
 
-    
-            <div id="TOC" role="doc-toc" class="sidebar">
-        <details>
-            <summary>Table of content</summary>
-            <p>
-                                <ul>
-                                <li><a href="#data-transmission"
-                                id="toc-data-transmission">Data
-                                transmission</a></li>
-                                <li><a href="#protocol-implementation"
-                                id="toc-protocol-implementation">Protocol
-                                implementation</a></li>
-                                <li><a href="#high-level-overlay"
-                                id="toc-high-level-overlay">High-level
-                                overlay</a></li>
-                                <li><a href="#testing"
-                                id="toc-testing">Testing</a></li>
-                                </ul>
-            </p>
-        </details>
-    </div>
         
-    <p>After we have taught our microcontroller how to receive and
-    respond to commands that comes from serial terminal, we have room
-    for some improvements and automation from PC side. We can use C/C++
-    with proper library to handle serial communication. In case of
-    Windows users it is possible to interact with virtual COM with
-    WinApi. We are going to choose more universal solution.Python is
-    ideal for task to create our protocol. On my repo you can find ready
-    to use package that you can simply install via pip.</p>
-    <p>By using objective language it is possible to create simple model
-    of our database just by using built-in features and one external
-    package ‘py-serial’ We are going to divide our package into
-    classes,that will handle bare connection and data model. Our module
-    will automatically update internal registers and send proper
-    commands.This will make our life simpler if we would like to write
-    programs that interact with internal registers stored in our uC.</p>
-    <h1 id="data-transmission">Data transmission</h1>
-    <p>The first thing we should create is data link layer. Let’s create
-    simple class that serves atomic method for receiving and sending
-    data. In feature we can swap the method for sending/reading bytes to
-    for e.g. sockets read/write.</p>
-    <div class="sourceCode" id="cb1"><pre
-    class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> serial</span>
+                        <div id="TOC" role="doc-toc" class="sidebar">
+            <details>
+                <summary>Table of content</summary>
+                <p>
+                                        <ul>
+                                        <li><a href="#data-transmission"
+                                        id="toc-data-transmission">Data
+                                        transmission</a></li>
+                                        <li><a
+                                        href="#protocol-implementation"
+                                        id="toc-protocol-implementation">Protocol
+                                        implementation</a></li>
+                                        <li><a
+                                        href="#high-level-overlay"
+                                        id="toc-high-level-overlay">High-level
+                                        overlay</a></li>
+                                        <li><a href="#testing"
+                                        id="toc-testing">Testing</a></li>
+                                        </ul>
+                </p>
+            </details>
+        </div>
+                
+        <p>After we have taught our microcontroller how to receive and
+        respond to commands that comes from serial terminal, we have
+        room for some improvements and automation from PC side. We can
+        use C/C++ with proper library to handle serial communication. In
+        case of Windows users it is possible to interact with virtual
+        COM with WinApi. We are going to choose more universal
+        solution.Python is ideal for task to create our protocol. On my
+        repo you can find ready to use package that you can simply
+        install via pip.</p>
+        <p>By using objective language it is possible to create simple
+        model of our database just by using built-in features and one
+        external package ‘py-serial’ We are going to divide our package
+        into classes,that will handle bare connection and data model.
+        Our module will automatically update internal registers and send
+        proper commands.This will make our life simpler if we would like
+        to write programs that interact with internal registers stored
+        in our uC.</p>
+        <h1 id="data-transmission">Data transmission</h1>
+        <p>The first thing we should create is data link layer. Let’s
+        create simple class that serves atomic method for receiving and
+        sending data. In feature we can swap the method for
+        sending/reading bytes to for e.g. sockets read/write.</p>
+        <div class="sourceCode" id="cb1"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> serial</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SerialLink:</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, COM, baud_rate, timeout, stop_bits):</span>
@@ -119,12 +125,12 @@
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> read_byte(<span class="va">self</span>, length: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">bytearray</span>:</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    received <span class="op">=</span> <span class="va">self</span>._serial.read(length)</span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> received</span></code></pre></div>
-    <h1 id="protocol-implementation">Protocol implementation</h1>
-    <p>Now it is time to create protocol class. This class is going to
-    know how to format the command and how to parse the received
-    data.</p>
-    <div class="sourceCode" id="cb2"><pre
-    class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .serial_link <span class="im">import</span> SerialLink</span>
+        <h1 id="protocol-implementation">Protocol implementation</h1>
+        <p>Now it is time to create protocol class. This class is going
+        to know how to format the command and how to parse the received
+        data.</p>
+        <div class="sourceCode" id="cb2"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .serial_link <span class="im">import</span> SerialLink</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ScratchPadProtocol:</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  response_length <span class="op">=</span> <span class="dv">9</span></span>
@@ -160,14 +166,15 @@
 <span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    cell <span class="op">=</span> <span class="bu">int</span>(cell, <span class="dv">16</span>)</span>
 <span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    cell_value <span class="op">=</span> <span class="bu">int</span>(cell_value, <span class="dv">16</span>)</span>
 <span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (cell, cell_value)</span></code></pre></div>
-    <h1 id="high-level-overlay">High-level overlay</h1>
-    <p>If you are more familiar with high-level programming you can
-    notice that we can refer to the uC registers like to the standard
-    array. Why not use this mechanism and override this behavior with
-    our methods that will ask the external device when we are trying to
-    get the value, or send data when we are performing set action.</p>
-    <div class="sourceCode" id="cb3"><pre
-    class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .scratch_pad_protocol <span class="im">import</span> ScratchPadProtocol</span>
+        <h1 id="high-level-overlay">High-level overlay</h1>
+        <p>If you are more familiar with high-level programming you can
+        notice that we can refer to the uC registers like to the
+        standard array. Why not use this mechanism and override this
+        behavior with our methods that will ask the external device when
+        we are trying to get the value, or send data when we are
+        performing set action.</p>
+        <div class="sourceCode" id="cb3"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .scratch_pad_protocol <span class="im">import</span> ScratchPadProtocol</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ScratchPad:</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(</span>
@@ -207,12 +214,12 @@
 <span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;Higher numbers than 255 cannot be stored in scratchpad.&quot;</span>)</span>
 <span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._scratchpad_memory[index] <span class="op">=</span> value</span>
 <span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._link.write_address(index <span class="op">+</span> <span class="va">self</span>._scratchpad_size, value)</span></code></pre></div>
-    <h1 id="testing">Testing</h1>
-    <p>Now we are ready to make simple program that will make use of our
-    created classes and test them. Let’s perform simple read/write in
-    loop.</p>
-    <div class="sourceCode" id="cb4"><pre
-    class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+        <h1 id="testing">Testing</h1>
+        <p>Now we are ready to make simple program that will make use of
+        our created classes and test them. Let’s perform simple
+        read/write in loop.</p>
+        <div class="sourceCode" id="cb4"><pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .scratchpad <span class="im">import</span> ScratchPad</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>scratchpad <span class="op">=</span> ScratchPad(<span class="dv">32</span>, <span class="dv">4</span>, <span class="dv">9600</span>)</span>
@@ -223,35 +230,36 @@
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  time.sleep(<span class="fl">0.01</span>)</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Value 3:</span><span class="sc">{</span>scratchpad[<span class="dv">3</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Value 0:</span><span class="sc">{</span>scratchpad[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
-    <p>We can make it more generic and create simple python package.
-    This thing is beyond of the scope of this tutorial. You can download
-    ready to use package and C code from repo and use it as you want.
-    After three chapters we have created ready to use protocol that is
-    generic and adding another data to read/store is very simple. For
-    sure there is a lot of methods to improve this code.Therefor the
-    scope of these three articles was to show easy way of getting simple
-    communication between your PC and DIY hardware.By using simple UART
-    - COM converter we interact with our external devices without any
-    extra drivers that we need to develop ourselves from scratch.Now
-    make use of it and create simple data aggregator that read the value
-    from some sensors and stores it in internal registers - create
-    pretty plot by using py-plot!</p>
-    <p><a
-    href="https://github.com/MateuszMyalski/GPL">GPL_library</a></p>
+        <p>We can make it more generic and create simple python package.
+        This thing is beyond of the scope of this tutorial. You can
+        download ready to use package and C code from repo and use it as
+        you want. After three chapters we have created ready to use
+        protocol that is generic and adding another data to read/store
+        is very simple. For sure there is a lot of methods to improve
+        this code.Therefor the scope of these three articles was to show
+        easy way of getting simple communication between your PC and DIY
+        hardware.By using simple UART - COM converter we interact with
+        our external devices without any extra drivers that we need to
+        develop ourselves from scratch.Now make use of it and create
+        simple data aggregator that read the value from some sensors and
+        stores it in internal registers - create pretty plot by using
+        py-plot!</p>
+        <p><a
+        href="https://github.com/MateuszMyalski/GPL">GPL_library</a></p>
 
-    
-    <div class="meta">
-                <span class="label">Date: </span>
-        <span class="value">2020-12-11</span
         
-        
-                <span class="label">Category: </span>
-        <span class="value">Tutorials</span
-        
-                <span class="label">Tags: </span>
-        <span class="value">c, python</span
-            </div class="meta">
-</article>
+        <div class="meta">
+                        <span class="label">Date: </span>
+            <span class="value">2020-12-11</span
+            
+            
+                        <span class="label">Category: </span>
+            <span class="value">Tutorials</span
+            
+                        <span class="label">Tags: </span>
+            <span class="value">c, python</span
+                    </div class="meta">
+    </article>
     </main>
     <footer>
         Made with<span style="font-size: 1.2em; margin-left: 0.3em; color: #ff0000;">&#9829;</span> by Mateusz Myalski
